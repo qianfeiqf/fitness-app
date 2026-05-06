@@ -184,15 +184,14 @@
 .exercise-chip.add-chip {
   border: 2rpx dashed rgba(0, 0, 0, 0.2);
   background: #F5F5F5;
-  justify-content: center;
   box-shadow: none;
+  padding: 12rpx 24rpx;
 }
 
 .exercise-chip.add-chip .add-icon {
-  font-size: 32rpx;
+  font-size: 28rpx;
   font-weight: 700;
   color: #1A1A1A;
-  margin-right: 8rpx;
 }
 
 /* =====================
@@ -323,7 +322,6 @@
    热身区域
    ===================== */
 .warmup-main {
-  flex: 1;
   padding: 40rpx;
   display: flex;
   flex-direction: column;
@@ -453,8 +451,8 @@
   flex-direction: column;
   align-items: center;
   gap: 12rpx;
-  margin-top: auto;
-  padding-top: 16rpx;
+  margin-top: 40rpx;
+  padding: 0 40rpx;
 }
 
 .warmup-actions .btn-primary {
@@ -757,7 +755,7 @@
    ===================== */
 .complete-action {
   margin-top: auto;
-  padding-top: 16rpx;
+  padding: 16rpx 40rpx 0;
 }
 
 .btn {

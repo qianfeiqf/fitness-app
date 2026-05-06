@@ -36,8 +36,10 @@
       </view>
     </view>
     <view class="exercise-chip add-chip" bindtap="onAddExercise">
-      <text class="chip-name add-icon">+</text>
-      <text class="chip-sets">添加</text>
+      <view class="chip-content">
+        <text class="chip-name add-icon">+</text>
+        <text class="chip-sets">添加</text>
+      </view>
     </view>
   </scroll-view>
 

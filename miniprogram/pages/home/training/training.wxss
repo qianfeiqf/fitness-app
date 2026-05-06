@@ -5,6 +5,7 @@
   background: #FFFFFF;
   display: flex;
   flex-direction: column;
+  padding-top: env(safe-area-inset-top);
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
 }
 

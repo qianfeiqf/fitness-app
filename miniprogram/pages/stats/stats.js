@@ -516,9 +516,9 @@ Page({
 
     // 留一些边距（至少留 1 防止所有值相等时除以零）
     const valueRange = maxValue - minValue;
-    const padding = Math.max(valueRange * 0.1, 0.5);
-    const yMin = Math.max(0, minValue - padding);
-    const yMax = maxValue + padding;
+    const valueMargin = Math.max(valueRange * 0.1, 0.5);
+    const yMin = Math.max(0, minValue - valueMargin);
+    const yMax = maxValue + valueMargin;
 
     const timeRange = maxTime - minTime || 1;
 

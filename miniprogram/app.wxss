@@ -7,7 +7,7 @@
 /* =====================
    设计 Token 变量
    ===================== */
-:root {
+page {
   /* === 色彩 — WeUI 规范 === */
   /* 主色（WeUI 绿） */
   --color-primary: #07C160;
@@ -176,8 +176,8 @@ button.btn::after {
 
 /* 用 button.btn-primary 提升优先级，覆盖 button.btn { background: none } */
 button.btn-primary {
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
+  background: #07C160 !important;
+  color: #FFFFFF !important;
 }
 
 button.btn-primary:active {
@@ -186,8 +186,8 @@ button.btn-primary:active {
 
 /* 主按钮禁用态 — 灰色，明确区分可操作/不可操作 */
 button.btn-primary[disabled] {
-  background: #E5E5E5;
-  color: #B0B0B0;
+  background: #E5E5E5 !important;
+  color: #B0B0B0 !important;
   opacity: 1;
 }
 

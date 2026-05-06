@@ -756,12 +756,13 @@
    ===================== */
 .complete-action {
   margin-top: 40rpx;
-  padding: 0 40rpx;
+  padding: 0;
 }
 
 /* 训练页按钮覆盖 — 药丸圆角 + 大尺寸 */
 .page-training .btn {
   border-radius: 9999rpx;
+  box-sizing: border-box;
 }
 
 .page-training .btn-primary {
@@ -772,6 +773,7 @@
 .page-training .btn-lg {
   height: 120rpx;
   font-size: 36rpx;
+  padding: 0 48rpx;
 }
 
 .btn-complete-icon {

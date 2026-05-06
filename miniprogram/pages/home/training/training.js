@@ -1058,13 +1058,13 @@ Page({
   },
 
   /**
-   * 放弃训练
+   * 结束训练
    */
   async onAbandonTraining() {
     const result = await UI.showDialog({
-      title: '确认放弃',
-      content: '确定要放弃本次训练吗？已记录的数据会保留',
-      confirmText: '放弃',
+      title: '确认结束训练',
+      content: '确定要结束本次训练吗？已记录的数据会保留',
+      confirmText: '结束训练',
       cancelText: '继续训练'
     });
 

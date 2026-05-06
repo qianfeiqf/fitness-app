@@ -235,7 +235,7 @@
     </view>
     <view class="bottom-btn danger" bindtap="onAbandonTraining">
       <text class="bottom-icon">✕</text>
-      <text class="bottom-label">放弃</text>
+      <text class="bottom-label">结束训练</text>
     </view>
   </view>
 

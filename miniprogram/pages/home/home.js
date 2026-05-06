@@ -12,7 +12,12 @@ Page({
     userInfo: null,
     isLoggedIn: false,
 
-    // 今日训练
+    // 多计划切换
+    activePlans: [],
+    planDataList: [],
+    currentPlanIndex: 0,
+
+    // 今日训练（当前选中计划）
     todayPlan: null,
     todaySession: null,
     todayExercises: [],
@@ -125,17 +130,20 @@ Page({
   },
 
   /**
-   * 加载今日训练
+   * 加载今日训练 — 支持多计划
    */
   async loadTodayTraining() {
     this.setData({ loading: true });
 
     try {
-      // 获取当前激活的计划
-      const activePlan = findOne('plans', { status: 'active' });
+      // 获取所有激活的计划
+      const allPlans = getCollection('plans');
+      const activePlans = allPlans.filter(p => p.status === 'active');
 
-      if (!activePlan) {
+      if (activePlans.length === 0) {
         this.setData({
+          activePlans: [],
+          planDataList: [],
           todayPlan: null,
           loading: false,
           showDeloadReminder: false
@@ -143,84 +151,42 @@ Page({
         return;
       }
 
-      // 检查是否需要 Deload 提醒
+      // 检查是否需要 Deload 提醒（全局，基于所有计划）
       const showDeloadReminder = this.checkDeloadReminder();
 
-      // 获取今日应该训练的内容
-      const today = new Date().getDay(); // 0=周日, 1=周一...
-      const dayOfWeek = today === 0 ? 7 : today; // 转换为1-7
+      // 预计算每个计划的数据
+      const planDataList = activePlans.map(plan => this._buildPlanData(plan));
 
-      // 查询今日的训练动作
-      const planExercises = find('plan_exercises', { plan_id: activePlan.id });
+      // 计算本周训练进度和 Streak（全局）
+      const planExercises = find('plan_exercises', { plan_id: activePlans[0].id });
+      const weekProgress = this.calcWeekProgress(activePlans[0], planExercises);
+      const streak = this.calcStreak();
 
-      // 根据周期类型筛选今日动作
-      let todayExercises = [];
-
-      if (activePlan.cycle_type === 'natural_week') {
-        // 自然周模式：按dayOfWeek筛选
-        todayExercises = planExercises.filter(pe => pe.day_of_week === dayOfWeek);
-      } else {
-        // 训练日循环模式：根据当前处于第几天计算
-        const cycleDay = this.calculateCycleDay(activePlan);
-        todayExercises = planExercises.filter(pe => pe.cycle_label === cycleDay);
-      }
-
-      // 获取动作详情
-      const exercisesWithDetails = todayExercises.map(pe => {
-        const exercise = findOne('exercises', { id: pe.exercise_id });
-        if (!exercise) {
-          console.warn('动作不存在:', pe.exercise_id);
-          return null;
-        }
-        return {
-          ...exercise,
-          plan_exercise_id: pe.id,
-          target_sets: pe.target_sets,
-          target_reps: pe.target_reps,
-          target_weight: pe.initial_weight,
-          rest_seconds: pe.rest_seconds || 120
-        };
-      }).filter(e => e !== null);
-
-      // 检查今日是否已有进行中的会话
-      const todayStr = this.formatDate(new Date());
-      const existingSession = findOne('sessions', {
-        plan_id: activePlan.id,
-        scheduled_date: todayStr,
-        status: { $in: ['in_progress', 'paused'] }
-      });
-
-      // 计算统计数据
+      // 当前日期
       const now = new Date();
       const todayDate = now.getDate();
       const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
       const todayWeek = weekDays[now.getDay()];
 
-      // 估算时长和总组数
-      const totalSets = exercisesWithDetails.reduce((sum, e) => sum + (e.target_sets || 0), 0);
-      const estimatedMinutes = exercisesWithDetails.length * 8; // 每个动作约8分钟
-
-      // 肌群去重
-      const muscleSet = new Set(exercisesWithDetails.map(e => e.muscle_group));
-      const muscleGroups = Array.from(muscleSet).join('/');
-
-      // 计算本周训练进度和 Streak
-      const weekProgress = this.calcWeekProgress(activePlan, planExercises);
-      const streak = this.calcStreak();
-      const isRestDay = todayExercises.length === 0;
+      const currentIndex = this.data.currentPlanIndex || 0;
+      const safeIndex = Math.min(currentIndex, activePlans.length - 1);
+      const currentData = planDataList[safeIndex];
 
       this.setData({
-        todayPlan: activePlan,
-        todayExercises: exercisesWithDetails,
-        todaySession: existingSession,
+        activePlans,
+        planDataList,
+        currentPlanIndex: safeIndex,
+        todayPlan: currentData.plan,
+        todayExercises: currentData.exercises,
+        todaySession: currentData.session,
         todayDate,
         todayWeek,
-        estimatedMinutes,
-        totalSets,
-        muscleGroups,
+        estimatedMinutes: currentData.estimatedMinutes,
+        totalSets: currentData.totalSets,
+        muscleGroups: currentData.muscleGroups,
         weekProgress,
         streak,
-        isRestDay,
+        isRestDay: currentData.isRestDay,
         showDeloadReminder,
         loading: false
       });
@@ -236,9 +202,92 @@ Page({
   },
 
   /**
+   * 构建单个计划的今日数据
+   */
+  _buildPlanData(plan) {
+    const today = new Date().getDay();
+    const dayOfWeek = today === 0 ? 7 : today;
+    const planExercises = find('plan_exercises', { plan_id: plan.id });
+
+    let todayExercises = [];
+    if (plan.cycle_type === 'natural_week') {
+      todayExercises = planExercises.filter(pe => pe.day_of_week === dayOfWeek);
+    } else {
+      const cycleDay = this.calculateCycleDay(plan);
+      todayExercises = planExercises.filter(pe => pe.cycle_label === cycleDay);
+    }
+
+    const exercisesWithDetails = todayExercises.map(pe => {
+      const exercise = findOne('exercises', { id: pe.exercise_id });
+      if (!exercise) return null;
+      return {
+        ...exercise,
+        plan_exercise_id: pe.id,
+        target_sets: pe.target_sets,
+        target_reps: pe.target_reps,
+        target_weight: pe.initial_weight,
+        rest_seconds: pe.rest_seconds || 120
+      };
+    }).filter(e => e !== null);
+
+    const todayStr = this.formatDate(new Date());
+    const session = findOne('sessions', {
+      plan_id: plan.id,
+      scheduled_date: todayStr,
+      status: { $in: ['in_progress', 'paused'] }
+    });
+
+    const totalSets = exercisesWithDetails.reduce((sum, e) => sum + (e.target_sets || 0), 0);
+    const estimatedMinutes = exercisesWithDetails.length * 8;
+    const muscleSet = new Set(exercisesWithDetails.map(e => e.muscle_group));
+    const muscleGroups = Array.from(muscleSet).join('/');
+
+    return {
+      plan,
+      exercises: exercisesWithDetails,
+      session,
+      totalSets,
+      estimatedMinutes,
+      muscleGroups,
+      isRestDay: todayExercises.length === 0
+    };
+  },
+
+  /**
+   * Swiper 切换计划
+   */
+  onPlanChange(e) {
+    const index = e.detail.current;
+    this.switchToPlan(index);
+  },
+
+  /**
+   * 切换到指定计划
+   */
+  switchToPlan(index) {
+    const { planDataList } = this.data;
+    if (index < 0 || index >= planDataList.length) return;
+
+    const planData = planDataList[index];
+    this.setData({
+      currentPlanIndex: index,
+      todayPlan: planData.plan,
+      todayExercises: planData.exercises,
+      todaySession: planData.session,
+      estimatedMinutes: planData.estimatedMinutes,
+      totalSets: planData.totalSets,
+      muscleGroups: planData.muscleGroups,
+      isRestDay: planData.isRestDay
+    });
+  },
+
+  /**
    * 计算本周训练进度
    */
   calcWeekProgress(activePlan, planExercises) {
+    if (!activePlan) {
+      return { plannedDays: 0, completedDays: 0, percent: 0 };
+    }
     const now = new Date();
     const dayOfWeek = now.getDay(); // 0=周日
     // 计算本周一和本周日
@@ -421,14 +470,15 @@ Page({
   },
 
   /**
-   * 开始训练
+   * 开始训练（指定计划）
    */
-  onStartTraining() {
-    if (!this.data.todayPlan || this.data.todayExercises.length === 0) {
-      wx.showToast({
-        title: '今日无训练计划',
-        icon: 'none'
-      });
+  onStartTrainingForPlan(e) {
+    const planId = e.currentTarget.dataset.planId;
+    const planData = this.data.planDataList.find(pd => pd.plan.id === planId);
+    if (!planData) return;
+
+    if (planData.exercises.length === 0) {
+      wx.showToast({ title: '今日无训练计划', icon: 'none' });
       return;
     }
 
@@ -438,34 +488,43 @@ Page({
       return;
     }
 
-    // 创建新的训练会话
-    const session = this.createTrainingSession();
-
-    this.setData({
-      currentSession: session,
-      isTraining: true
-    });
-
+    const session = this._createSessionForPlan(planData);
+    this.setData({ currentSession: session, isTraining: true });
     wx.navigateTo({
       url: '/pages/home/training/training?sessionId=' + session.id
     });
   },
 
   /**
-   * 创建训练会话
+   * 继续训练（指定计划）
    */
-  createTrainingSession() {
-    const todayStr = this.formatDate(new Date());
+  onResumeTrainingForPlan(e) {
+    const sessionId = e.currentTarget.dataset.sessionId;
+    if (!sessionId) return;
 
+    const session = findOne('sessions', { id: sessionId });
+    if (session) {
+      this.setData({ currentSession: session, isTraining: true });
+      wx.navigateTo({
+        url: '/pages/home/training/training?sessionId=' + session.id
+      });
+    }
+  },
+
+  /**
+   * 为指定计划创建训练会话
+   */
+  _createSessionForPlan(planData) {
+    const todayStr = this.formatDate(new Date());
     const session = {
       id: 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-      plan_id: this.data.todayPlan.id,
-      plan_name: this.data.todayPlan.name,
+      plan_id: planData.plan.id,
+      plan_name: planData.plan.name,
       scheduled_date: todayStr,
       status: 'in_progress',
       started_at: Date.now(),
       completed_sets: [],
-      pending_exercises: this.data.todayExercises.map(e => ({
+      pending_exercises: planData.exercises.map(e => ({
         exercise_id: e.id,
         exercise_name: e.name,
         target_sets: e.target_sets,
@@ -480,9 +539,25 @@ Page({
       updated_at: Date.now(),
       sync_status: 'pending'
     };
-
     insert('sessions', session);
     return session;
+  },
+
+  /**
+   * 开始训练（兼容旧入口）
+   */
+  onStartTraining() {
+    this.onStartTrainingForPlan({
+      currentTarget: { dataset: { planId: this.data.todayPlan?.id } }
+    });
+  },
+
+  /**
+   * 创建训练会话（兼容旧入口）
+   */
+  createTrainingSession() {
+    const pd = this.data.planDataList.find(p => p.plan.id === this.data.todayPlan?.id);
+    return this._createSessionForPlan(pd || this.data.planDataList[0]);
   },
 
   /**

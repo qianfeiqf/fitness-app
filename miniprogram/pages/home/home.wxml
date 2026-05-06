@@ -78,75 +78,101 @@
       </view>
     </view>
 
-    <!-- 休息日提示 -->
-    <view wx:if="{{isRestDay}}" class="rest-day-banner">
-      <text class="rest-day-icon">☕</text>
-      <view class="rest-day-content">
-        <text class="rest-day-title">今日是休息日</text>
-        <text class="rest-day-desc">适当放松，让身体恢复，明天继续加油</text>
+    <!-- 多计划切换指示器 -->
+    <view wx:if="{{activePlans.length > 1}}" class="plan-switcher">
+      <view class="plan-dots">
+        <view
+          wx:for="{{activePlans}}"
+          wx:key="id"
+          class="plan-dot {{index === currentPlanIndex ? 'active' : ''}}"
+        />
       </view>
+      <text class="plan-count">{{currentPlanIndex + 1}} / {{activePlans.length}}</text>
     </view>
 
-    <!-- 主训练卡片 -->
-    <view class="training-card">
-      <view class="card-accent"></view>
+    <!-- 主训练卡片 — 支持左右滑动切换计划 -->
+    <swiper
+      wx:if="{{planDataList.length > 0}}"
+      class="plan-swiper"
+      current="{{currentPlanIndex}}"
+      bindchange="onPlanChange"
+      duration="300"
+    >
+      <swiper-item wx:for="{{planDataList}}" wx:key="plan.id" wx:for-item="pd">
+        <view class="training-card">
+          <view class="card-accent"></view>
 
-      <view class="card-header-modern">
-        <view class="card-meta">
-          <text class="card-label">TODAY</text>
-          <text class="card-title">{{todayPlan.name}}</text>
-        </view>
-        <view class="card-badge">
-          <text class="badge-pill">{{todayExercises.length}} 个动作</text>
-        </view>
-      </view>
+          <!-- 休息日提示（在卡片内） -->
+          <view wx:if="{{pd.isRestDay}}" class="rest-day-inline">
+            <text class="rest-day-inline-icon">☕</text>
+            <view class="rest-day-inline-content">
+              <text class="rest-day-inline-title">今日是休息日</text>
+              <text class="rest-day-inline-desc">适当放松，让身体恢复，明天继续加油</text>
+            </view>
+          </view>
 
-      <!-- 训练数据网格 -->
-      <view class="stats-grid">
-        <view class="stat-item">
-          <view class="stat-icon-wrap">
-            <text class="stat-icon">⏱</text>
-          </view>
-          <text class="stat-value">{{estimatedMinutes}}</text>
-          <text class="stat-label">分钟</text>
-        </view>
-        <view class="stat-divider"></view>
-        <view class="stat-item">
-          <view class="stat-icon-wrap">
-            <text class="stat-icon">🔥</text>
-          </view>
-          <text class="stat-value">{{totalSets}}</text>
-          <text class="stat-label">组数</text>
-        </view>
-        <view class="stat-divider"></view>
-        <view class="stat-item">
-          <view class="stat-icon-wrap">
-            <text class="stat-icon">💎</text>
-          </view>
-          <text class="stat-value-sm">{{muscleGroups}}</text>
-          <text class="stat-label">肌群</text>
-        </view>
-      </view>
+          <view wx:else>
+            <view class="card-header-modern">
+              <view class="card-meta">
+                <text class="card-label">TODAY</text>
+                <text class="card-title">{{pd.plan.name}}</text>
+              </view>
+              <view class="card-badge">
+                <text class="badge-pill">{{pd.exercises.length}} 个动作</text>
+              </view>
+            </view>
 
-      <!-- 主按钮 -->
-      <view class="card-action">
-        <button wx:if="{{!todaySession || todaySession.status === 'completed' || todaySession.status === 'aborted'}}"
-                class="btn-start"
-                bindtap="onStartTraining">
-          <text class="btn-start-icon">▶</text>
-          <text class="btn-start-text">开始训练</text>
-        </button>
-        <button wx:else
-                class="btn-resume"
-                bindtap="onRecoverTraining">
-          <text class="btn-start-icon">▶</text>
-          <text class="btn-start-text">继续训练</text>
-        </button>
-      </view>
-    </view>
+            <!-- 训练数据网格 -->
+            <view class="stats-grid">
+              <view class="stat-item">
+                <view class="stat-icon-wrap">
+                  <text class="stat-icon">⏱</text>
+                </view>
+                <text class="stat-value">{{pd.estimatedMinutes}}</text>
+                <text class="stat-label">分钟</text>
+              </view>
+              <view class="stat-divider"></view>
+              <view class="stat-item">
+                <view class="stat-icon-wrap">
+                  <text class="stat-icon">🔥</text>
+                </view>
+                <text class="stat-value">{{pd.totalSets}}</text>
+                <text class="stat-label">组数</text>
+              </view>
+              <view class="stat-divider"></view>
+              <view class="stat-item">
+                <view class="stat-icon-wrap">
+                  <text class="stat-icon">💎</text>
+                </view>
+                <text class="stat-value-sm">{{pd.muscleGroups}}</text>
+                <text class="stat-label">肌群</text>
+              </view>
+            </view>
+
+            <!-- 主按钮 -->
+            <view class="card-action">
+              <button wx:if="{{!pd.session || pd.session.status === 'completed' || pd.session.status === 'aborted'}}"
+                      class="btn-start"
+                      data-plan-id="{{pd.plan.id}}"
+                      bindtap="onStartTrainingForPlan">
+                <text class="btn-start-icon">▶</text>
+                <text class="btn-start-text">开始训练</text>
+              </button>
+              <button wx:else
+                      class="btn-resume"
+                      data-session-id="{{pd.session.id}}"
+                      bindtap="onResumeTrainingForPlan">
+                <text class="btn-start-icon">▶</text>
+                <text class="btn-start-text">继续训练</text>
+              </button>
+            </view>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
 
     <!-- 动作预览列表 -->
-    <view class="exercises-section">
+    <view class="exercises-section" wx:if="{{todayExercises.length > 0}}">
       <view class="section-header">
         <text class="section-title">动作预览</text>
         <view class="section-link" bindtap="onPreviewPlan">

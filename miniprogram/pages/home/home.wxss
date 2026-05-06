@@ -420,6 +420,89 @@
 }
 
 /* =====================
+   多计划切换指示器
+   ===================== */
+.plan-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.plan-dots {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.plan-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: #E5E5E5;
+  transition: all 0.3s ease;
+}
+
+.plan-dot.active {
+  width: 24rpx;
+  border-radius: 4rpx;
+  background: #1A1A1A;
+}
+
+.plan-count {
+  font-size: 22rpx;
+  color: #999999;
+  font-weight: 600;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+/* =====================
+   计划卡片 Swiper
+   ===================== */
+.plan-swiper {
+  height: 520rpx;
+}
+
+.plan-swiper .training-card {
+  margin: 0 4rpx;
+}
+
+/* =====================
+   卡片内休息日提示
+   ===================== */
+.rest-day-inline {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 48rpx 32rpx;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.rest-day-inline-icon {
+  font-size: 48rpx;
+  flex-shrink: 0;
+}
+
+.rest-day-inline-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.rest-day-inline-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.rest-day-inline-desc {
+  font-size: 24rpx;
+  color: #666666;
+  margin-top: 4rpx;
+}
+
+/* =====================
    训练主卡片
    ===================== */
 .training-card {

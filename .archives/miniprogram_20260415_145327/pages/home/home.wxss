@@ -1,0 +1,604 @@
+/* 训练中心首页样式 - UI/UX优化版本 */
+/* 设计规范: 硬核健身风格, 深色主题, 无障碍触摸, 150-300ms动画 */
+
+page {
+  background-color: var(--color-bg-dark);
+}
+
+.page-home {
+  min-height: 100vh;
+  background-color: var(--color-bg-dark);
+  padding: 30rpx;
+  padding-top: calc(30rpx + env(safe-area-inset-top));
+  padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
+}
+
+/* =====================
+   顶部欢迎区
+   ===================== */
+.welcome-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 48rpx;
+}
+
+.welcome-text {
+  flex: 1;
+}
+
+.welcome-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  display: block;
+  letter-spacing: -0.5rpx;
+}
+
+.welcome-subtitle {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  margin-top: 8rpx;
+  display: block;
+}
+
+.date-badge {
+  background-color: var(--color-bg-card);
+  border-radius: 16rpx;
+  padding: 20rpx 28rpx;
+  text-align: center;
+  min-width: 80rpx;
+}
+
+.date-day {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+
+.date-week {
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+  display: block;
+  margin-top: 4rpx;
+}
+
+/* =====================
+   登录引导
+   ===================== */
+.login-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 50rpx;
+  text-align: center;
+}
+
+.login-icon-wrap {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 48rpx;
+  box-shadow: 0 8rpx 32rpx rgba(230, 57, 70, 0.4);
+}
+
+.login-icon-text {
+  font-size: 80rpx;
+  font-weight: 700;
+  color: white;
+}
+
+.login-title {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 16rpx;
+}
+
+.login-desc {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  margin-bottom: 64rpx;
+  line-height: 1.6;
+  max-width: 500rpx;
+}
+
+/* =====================
+   骨架屏加载
+   ===================== */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+}
+
+.skeleton-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-card) 25%,
+    var(--color-bg-input) 50%,
+    var(--color-bg-card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 16rpx;
+}
+
+.skeleton-header {
+  height: 120rpx;
+}
+
+.skeleton-card {
+  height: 280rpx;
+}
+
+.skeleton-list {
+  height: 200rpx;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+}
+
+/* =====================
+   空状态
+   ===================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 50rpx;
+  text-align: center;
+}
+
+.empty-visual {
+  width: 200rpx;
+  height: 200rpx;
+  position: relative;
+  margin-bottom: 48rpx;
+}
+
+.empty-circle {
+  position: absolute;
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 50%;
+  border: 3rpx solid var(--color-border);
+  top: 0;
+  left: 0;
+}
+
+.empty-circle.inner {
+  width: 140rpx;
+  height: 140rpx;
+  top: 30rpx;
+  left: 30rpx;
+  border-color: var(--color-primary);
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 16rpx;
+}
+
+.empty-desc {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  margin-bottom: 64rpx;
+  max-width: 450rpx;
+  line-height: 1.6;
+}
+
+/* =====================
+   今日训练
+   ===================== */
+.today-training {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(24rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =====================
+   训练概览卡片
+   ===================== */
+.training-overview {
+  background: linear-gradient(135deg, var(--color-bg-card) 0%, #1e2a4a 100%);
+  border: 1rpx solid var(--color-border);
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32rpx;
+}
+
+.card-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: block;
+}
+
+.card-subtitle {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  margin-top: 6rpx;
+  display: block;
+}
+
+.training-badge {
+  margin-top: 8rpx;
+}
+
+/* =====================
+   训练信息
+   ===================== */
+.training-info {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: var(--color-bg-dark);
+  border-radius: 16rpx;
+  padding: 32rpx 24rpx;
+  margin-bottom: 40rpx;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100rpx;
+}
+
+.info-icon-wrap {
+  width: 64rpx;
+  height: 64rpx;
+  background-color: var(--color-bg-card);
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+}
+
+.info-icon-text {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.info-value {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.info-value-muscle {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-primary);
+  max-width: 120rpx;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info-label {
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+  margin-top: 6rpx;
+}
+
+.info-divider {
+  width: 1rpx;
+  height: 80rpx;
+  background-color: var(--color-border);
+}
+
+/* =====================
+   按钮
+   ===================== */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #e63946, #c1121f);
+  color: #ffffff;
+  box-shadow: 0 4rpx 24rpx rgba(230, 57, 70, 0.4);
+}
+
+.btn-primary text,
+.btn-primary > text {
+  color: #ffffff !important;
+}
+
+.btn-secondary {
+  background-color: #16213e;
+  color: #ffffff;
+  border: 2rpx solid #2d2d44;
+}
+
+.btn-secondary text,
+.btn-secondary > text {
+  color: #ffffff !important;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  color: #ffffff;
+}
+
+.btn-warning text,
+.btn-warning > text {
+  color: #ffffff !important;
+}
+
+.btn-pressed {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+.btn-pressed-warning {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-lg {
+  height: 112rpx;
+  font-size: 36rpx;
+  border-radius: 56rpx;
+}
+
+.btn-start {
+  gap: 16rpx;
+}
+
+.btn-icon-start {
+  font-size: 28rpx;
+}
+
+/* =====================
+   动作预览
+   ===================== */
+.exercises-preview {
+  margin-top: 40rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.section-link {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 28rpx;
+  color: var(--color-primary);
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.link-pressed {
+  opacity: 0.7;
+}
+
+.link-arrow {
+  font-size: 32rpx;
+  font-weight: 300;
+}
+
+.exercise-list {
+  background-color: var(--color-bg-card);
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.exercise-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 30rpx;
+  border-bottom: 1rpx solid var(--color-divider);
+  transition: background-color 0.15s ease;
+}
+
+.item-pressed {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.exercise-item:last-child {
+  border-bottom: none;
+}
+
+.exercise-order {
+  width: 56rpx;
+  height: 56rpx;
+  background-color: var(--color-bg-input);
+  border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.exercise-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.exercise-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: 6rpx;
+}
+
+.exercise-detail {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  display: block;
+}
+
+.exercise-muscle {
+  margin-left: 20rpx;
+  flex-shrink: 0;
+}
+
+.muscle-tag {
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-input);
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  white-space: nowrap;
+}
+
+/* =====================
+   徽章
+   ===================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36rpx;
+  padding: 0 16rpx;
+  border-radius: 18rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.badge-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* =====================
+   弹窗
+   ===================== */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+  padding: 40rpx;
+}
+
+.modal-content {
+  background-color: var(--color-bg-card);
+  border-radius: 28rpx;
+  padding: 56rpx 48rpx;
+  width: 100%;
+  max-width: 600rpx;
+  text-align: center;
+}
+
+.modal-icon-wrap {
+  width: 100rpx;
+  height: 100rpx;
+  background-color: rgba(230, 57, 70, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 32rpx;
+}
+
+.modal-icon {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.modal-title {
+  font-size: 38rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.modal-desc {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  display: block;
+  margin-bottom: 48rpx;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 24rpx;
+}
+
+.modal-actions .btn {
+  flex: 1;
+  height: 88rpx;
+  font-size: 30rpx;
+}

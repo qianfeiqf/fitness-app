@@ -1,0 +1,406 @@
+/**
+ * 健身训练计划小程序 - 全局样式
+ * 设计风格：硬核健身风格，深色主题 + 红色强调
+ *
+ * TDesign 集成：
+ * 已启用暗色模式支持，主题变量与 TDesign CSS 变量对齐
+ */
+
+/* =====================
+   TDesign 主题变量（暗色模式适配）
+   ===================== */
+page {
+  /* 主色调 - 硬核健身红 */
+  --td-primary-color: #e63946;
+  --td-primary-color-1: #ffeaea;
+  --td-primary-color-2: #ffd4d4;
+  --td-primary-color-3: #ffb3b3;
+  --td-primary-color-4: #ff8585;
+  --td-primary-color-5: #ff6b6b;
+  --td-primary-color-6: #e63946;
+  --td-primary-color-7: #c1121f;
+  --td-primary-color-8: #a10d19;
+  --td-primary-color-9: #7d0812;
+
+  /* 成功色 */
+  --td-success-color: #2ecc71;
+  --td-success-color-1: #e8fdf0;
+
+  /* 警告色 */
+  --td-warning-color: #f39c12;
+
+  /* 错误/危险色 */
+  --td-error-color: #e74c3c;
+
+  /* 背景色（暗色主题） */
+  --td-bg-color: #1a1a2e;
+  --td-bg-color-page: #1a1a2e;
+  --td-bg-color-card: #16213e;
+  --td-bg-color-secondary: #0f0f23;
+
+  /* 文字颜色 */
+  --td-text-color-primary: #ffffff;
+  --td-text-color-secondary: #a0a0a0;
+  --td-text-color-disabled: #666666;
+
+  /* 边框颜色 */
+  --td-border-color: #2d2d44;
+  --td-border-divider: rgba(255, 255, 255, 0.1);
+
+  /* 组件特定变量 */
+  --td-button-border-radius: 44rpx;
+  --td-tab-bar-border-color: #2d2d44;
+  --td-tab-bar-active-color: #e63946;
+}
+
+/* =====================
+   主题色变量
+   ===================== */
+:root {
+  /* 主色调 */
+  --color-primary: #e63946;        /* 硬核红 */
+  --color-primary-dark: #c1121f;
+  --color-primary-light: #ff6b6b;
+
+  /* 背景色 */
+  --color-bg-dark: #1a1a2e;       /* 深蓝黑 */
+  --color-bg-card: #16213e;       /* 卡片背景 */
+  --color-bg-input: #0f0f23;       /* 输入框背景 */
+
+  /* 文字色 */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a0a0a0;
+  --color-text-muted: #666666;
+
+  /* 功能色 */
+  --color-success: #2ecc71;
+  --color-warning: #f39c12;
+  --color-danger: #e74c3c;
+  --color-info: #3498db;
+
+  /* 其他 */
+  --color-border: #2d2d44;
+  --color-divider: rgba(255, 255, 255, 0.1);
+}
+
+/* =====================
+   基础样式
+   ===================== */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-dark);
+}
+
+/* =====================
+   容器
+   ===================== */
+.container {
+  min-height: 100vh;
+  padding: 30rpx;
+  box-sizing: border-box;
+}
+
+.page-content {
+  padding: 30rpx;
+  padding-bottom: 120rpx;
+}
+
+/* =====================
+   卡片
+   ===================== */
+.card {
+  background-color: var(--color-bg-card);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.card-subtitle {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+/* =====================
+   按钮
+   ===================== */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #e63946, #c1121f);
+  color: #ffffff;
+  box-shadow: 0 4rpx 20rpx rgba(230, 57, 70, 0.4);
+}
+
+.btn-primary text,
+.btn-primary > text {
+  color: #ffffff !important;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 10rpx rgba(230, 57, 70, 0.3);
+}
+
+.btn-secondary {
+  background-color: #16213e;
+  color: #ffffff;
+  border: 2rpx solid #2d2d44;
+}
+
+.btn-secondary text,
+.btn-secondary > text {
+  color: #ffffff !important;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #e63946;
+  border: none;
+}
+
+.btn-ghost text,
+.btn-ghost > text {
+  color: #e63946 !important;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-sm {
+  height: 64rpx;
+  font-size: 26rpx;
+  border-radius: 32rpx;
+}
+
+/* =====================
+   输入框
+   ===================== */
+.input-wrapper {
+  background-color: var(--color-bg-input);
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.input-label {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.input {
+  width: 100%;
+  height: 80rpx;
+  background-color: var(--color-bg-dark);
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 30rpx;
+  color: var(--color-text-primary);
+}
+
+.input:focus {
+  outline: 2rpx solid var(--color-primary);
+}
+
+/* =====================
+   徽章
+   ===================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 12rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.badge-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.badge-success {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.badge-warning {
+  background-color: var(--color-warning);
+  color: white;
+}
+
+/* =====================
+   PR徽章动画
+   ===================== */
+@keyframes prBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.2); }
+  50% { transform: scale(0.95); }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.pr-badge {
+  animation: prBounce 0.6s ease-out;
+}
+
+/* =====================
+   进度条
+   ===================== */
+.progress-bar {
+  width: 100%;
+  height: 12rpx;
+  background-color: var(--color-bg-input);
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  border-radius: 6rpx;
+  transition: width 0.3s ease;
+}
+
+/* =====================
+   列表
+   ===================== */
+.list {
+  background-color: var(--color-bg-card);
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid var(--color-divider);
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 16rpx;
+  background-color: var(--color-bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+}
+
+.list-item-content {
+  flex: 1;
+}
+
+.list-item-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.list-item-subtitle {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  margin-top: 4rpx;
+}
+
+.list-item-arrow {
+  width: 40rpx;
+  height: 40rpx;
+  color: var(--color-text-secondary);
+}
+
+/* =====================
+   空状态
+   ===================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 50rpx;
+  text-align: center;
+}
+
+.empty-state-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 16rpx;
+}
+
+.empty-state-desc {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+/* =====================
+   工具类
+   ===================== */
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-muted { color: var(--color-text-muted); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-danger { color: var(--color-danger); }
+
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.font-bold { font-weight: 600; }
+.font-lg { font-size: 36rpx; }
+.font-xl { font-size: 48rpx; }
+
+.mt-10 { margin-top: 10rpx; }
+.mt-20 { margin-top: 20rpx; }
+.mt-30 { margin-top: 30rpx; }
+.mb-10 { margin-bottom: 10rpx; }
+.mb-20 { margin-bottom: 20rpx; }
+.mb-30 { margin-bottom: 30rpx; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-center { align-items: center; justify-content: center; }
+.flex-between { justify-content: space-between; }
+.flex-1 { flex: 1; }

@@ -1,0 +1,163 @@
+<!-- 统计页面 - 现代化风格 -->
+
+<view class="page-stats">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <view class="page-header-left">
+      <text class="page-title">训练统计</text>
+      <text class="page-subtitle">追踪你的进步</text>
+    </view>
+    <view class="history-entry" bindtap="onViewHistory">
+      <text class="history-entry-text">训练历史</text>
+      <text class="history-entry-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 1RM 趋势折线图 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">1RM 趋势</text>
+      <mp-tabs tabs="{{chartPeriodTabs}}" active-tab="{{chartPeriodTabIndex}}" bind:change="onChartPeriodTabChange" />
+    </view>
+    <view class="chart-card">
+      <canvas type="2d" id="rmTrendChart" class="rm-chart"></canvas>
+      <view class="chart-legend">
+        <view class="legend-item">
+          <view class="legend-dot" style="background: #1A1A1A;"></view>
+          <text class="legend-text">卧推</text>
+        </view>
+        <view class="legend-item">
+          <view class="legend-dot" style="background: #666666;"></view>
+          <text class="legend-text">深蹲</text>
+        </view>
+        <view class="legend-item">
+          <view class="legend-dot" style="background: #999999;"></view>
+          <text class="legend-text">硬拉</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 三大项概览 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">三大项</text>
+    </view>
+
+    <view class="big-three-grid">
+      <view wx:for="{{bigThree}}"
+            wx:key="exerciseName"
+            class="big-three-card"
+            hover-class="card-pressed">
+        <view class="card-glow"></view>
+        <view class="card-content">
+          <text class="exercise-name">{{item.exerciseName}}</text>
+
+          <view class="rm-display">
+            <text class="rm-value">{{item.latest1RM ? item.latest1RM : '--'}}</text>
+            <text class="rm-unit">kg</text>
+          </view>
+
+          <view class="rm-trend">
+            <view wx:if="{{item.trend > 0}}" class="trend-badge up">
+              <text class="trend-arrow">↑</text>
+              <text class="trend-value">{{item.trend}}%</text>
+            </view>
+            <view wx:elif="{{item.trend < 0}}" class="trend-badge down">
+              <text class="trend-arrow">↓</text>
+              <text class="trend-value">{{item.trend}}%</text>
+            </view>
+            <view wx:else class="trend-badge flat">
+              <text class="trend-value">持平</text>
+            </view>
+          </view>
+
+          <view class="best-rm">
+            <text class="best-label">历史最佳</text>
+            <text class="best-value">{{item.best1RM ? item.best1RM + 'kg' : '--'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 容量趋势 -->
+  <view class="section">
+    <view class="section-header">
+      <view class="section-title-row">
+        <text class="section-title">容量趋势</text>
+        <mp-tabs tabs="{{periodTabs}}" active-tab="{{periodTabIndex}}" bind:change="onPeriodTabChange" />
+      </view>
+      <view class="total-volume">
+        <text class="total-value">{{periodVolume}}</text>
+        <text class="total-unit">kg</text>
+      </view>
+    </view>
+
+    <view class="volume-card">
+      <view class="volume-chart">
+        <view wx:for="{{volumeTrend}}"
+              wx:key="date"
+              class="volume-bar-item">
+          <view class="volume-bar-container">
+            <view class="volume-bar-track">
+              <view class="volume-bar {{item.volume > 0 ? 'active' : ''}}"
+                    style="height: {{item.volume > 0 ? item.barHeight : 0}}%">
+              </view>
+            </view>
+          </view>
+          <text class="volume-day">{{item.date}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 肌群均衡雷达图 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">肌群训练分布</text>
+      <text class="section-subtitle">近30天</text>
+    </view>
+    <view class="chart-card radar-card">
+      <canvas type="2d" id="muscleRadarChart" class="radar-chart"></canvas>
+      <view wx:if="{{muscleAdvice}}" class="muscle-advice">
+        <text class="advice-icon">💡</text>
+        <text class="advice-text">{{muscleAdvice}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 近期PR -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">近期PR</text>
+    </view>
+
+    <view wx:if="{{recentPRs.length === 0}}" class="empty-state">
+      <view class="empty-visual">
+        <text class="empty-icon">🏆</text>
+      </view>
+      <text class="empty-title">暂无PR记录</text>
+      <text class="empty-desc">完成训练后记录会自动保存</text>
+    </view>
+
+    <view wx:else class="pr-list">
+      <view wx:for="{{recentPRs}}"
+            wx:key="date"
+            class="pr-item"
+            hover-class="item-pressed">
+        <view class="pr-icon-wrap">
+          <text class="pr-icon">🏆</text>
+        </view>
+        <view class="pr-info">
+          <text class="pr-exercise">{{item.exercise}}</text>
+          <text class="pr-date">{{item.date}}</text>
+        </view>
+        <view class="pr-value">
+          <text class="value">{{item.value}}</text>
+          <text class="type">{{item.type}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

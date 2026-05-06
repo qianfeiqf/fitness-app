@@ -1,0 +1,192 @@
+<!-- 训练中心首页 - 浅色简约 -->
+
+<view class="page-home">
+  <!-- 顶部欢迎区 -->
+  <view class="welcome-section">
+    <view class="welcome-content">
+      <text class="welcome-greeting">{{isLoggedIn ? '今日' : '欢迎'}}</text>
+      <text class="welcome-title">{{isLoggedIn ? '开始训练' : '开启硬核之旅'}}</text>
+    </view>
+    <view class="date-widget">
+      <text class="date-day">{{todayDate}}</text>
+      <text class="date-week">{{todayWeek}}</text>
+    </view>
+  </view>
+
+  <!-- 未登录状态 -->
+  <view wx:if="{{!isLoggedIn}}" class="login-section">
+    <view class="login-hero">
+      <view class="login-avatar">
+        <text class="login-avatar-icon">💪</text>
+      </view>
+      <text class="login-headline">准备好突破了</text>
+      <text class="login-subhead">登录后同步训练数据，追踪你的每一步进步</text>
+    </view>
+    <button class="btn-login" bindtap="onLogin">微信一键登录</button>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:elif="{{loading}}" class="loading-section">
+    <view class="skeleton-wrapper">
+      <view class="skeleton-block tall"></view>
+      <view class="skeleton-block medium"></view>
+      <view class="skeleton-block short"></view>
+    </view>
+  </view>
+
+  <!-- 无训练计划 -->
+  <view wx:elif="{{!todayPlan}}" class="empty-section">
+    <view class="empty-visual">
+      <text class="empty-icon">🏋️</text>
+    </view>
+    <text class="empty-title">还没有训练计划</text>
+    <text class="empty-desc">选择一个计划，开始你的健身之旅</text>
+    <button class="btn-cta" bindtap="onGoToPlans">
+      <text>浏览计划库</text>
+      <text class="btn-cta-arrow">→</text>
+    </button>
+  </view>
+
+  <!-- 今日训练 -->
+  <view wx:else class="training-section">
+    <!-- Deload 提醒横幅 -->
+    <view wx:if="{{showDeloadReminder}}" class="deload-banner" bindtap="onDismissDeloadReminder">
+      <text class="deload-icon">⚠</text>
+      <view class="deload-content">
+        <text class="deload-title">建议安排减载周</text>
+        <text class="deload-desc">你已持续高强度训练 6 周，建议本周降低重量 10-20% 进行恢复</text>
+      </view>
+      <text class="deload-dismiss">✕</text>
+    </view>
+
+    <!-- 本周概览：进度与Streak -->
+    <view class="week-overview">
+      <view class="progress-ring-wrap">
+        <view class="progress-ring-bg">
+          <view class="progress-ring-fill" style="background: conic-gradient(#1A1A1A {{weekProgress.percent * 3.6}}deg, #F0F0F0 0deg);"></view>
+          <view class="progress-ring-center">
+            <text class="progress-ring-num">{{weekProgress.completedDays}}</text>
+            <text class="progress-ring-total">/ {{weekProgress.plannedDays}} 天</text>
+          </view>
+        </view>
+        <text class="progress-ring-label">本周训练</text>
+      </view>
+      <view class="streak-wrap" wx:if="{{streak > 0}}">
+        <view class="streak-flame">🔥</view>
+        <text class="streak-num">{{streak}}</text>
+        <text class="streak-label">连续训练天</text>
+      </view>
+    </view>
+
+    <!-- 休息日提示 -->
+    <view wx:if="{{isRestDay}}" class="rest-day-banner">
+      <text class="rest-day-icon">☕</text>
+      <view class="rest-day-content">
+        <text class="rest-day-title">今日是休息日</text>
+        <text class="rest-day-desc">适当放松，让身体恢复，明天继续加油</text>
+      </view>
+    </view>
+
+    <!-- 主训练卡片 -->
+    <view class="training-card">
+      <view class="card-accent"></view>
+
+      <view class="card-header-modern">
+        <view class="card-meta">
+          <text class="card-label">TODAY</text>
+          <text class="card-title">{{todayPlan.name}}</text>
+        </view>
+        <view class="card-badge">
+          <text class="badge-pill">{{todayExercises.length}} 个动作</text>
+        </view>
+      </view>
+
+      <!-- 训练数据网格 -->
+      <view class="stats-grid">
+        <view class="stat-item">
+          <view class="stat-icon-wrap">
+            <text class="stat-icon">⏱</text>
+          </view>
+          <text class="stat-value">{{estimatedMinutes}}</text>
+          <text class="stat-label">分钟</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <view class="stat-icon-wrap">
+            <text class="stat-icon">🔥</text>
+          </view>
+          <text class="stat-value">{{totalSets}}</text>
+          <text class="stat-label">组数</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <view class="stat-icon-wrap">
+            <text class="stat-icon">💎</text>
+          </view>
+          <text class="stat-value-sm">{{muscleGroups}}</text>
+          <text class="stat-label">肌群</text>
+        </view>
+      </view>
+
+      <!-- 主按钮 -->
+      <view class="card-action">
+        <button wx:if="{{!todaySession || todaySession.status === 'completed' || todaySession.status === 'aborted'}}"
+                class="btn-start"
+                bindtap="onStartTraining">
+          <text class="btn-start-icon">▶</text>
+          <text class="btn-start-text">开始训练</text>
+        </button>
+        <button wx:else
+                class="btn-resume"
+                bindtap="onRecoverTraining">
+          <text class="btn-start-icon">▶</text>
+          <text class="btn-start-text">继续训练</text>
+        </button>
+      </view>
+    </view>
+
+    <!-- 动作预览列表 -->
+    <view class="exercises-section">
+      <view class="section-header">
+        <text class="section-title">动作预览</text>
+        <view class="section-link" bindtap="onPreviewPlan">
+          <text>查看详情</text>
+          <text class="link-arrow">›</text>
+        </view>
+      </view>
+
+      <view class="exercise-list">
+        <view wx:for="{{todayExercises}}"
+              wx:key="id"
+              class="exercise-item">
+          <view class="exercise-number">{{index + 1}}</view>
+          <view class="exercise-content">
+            <text class="exercise-name">{{item.name}}</text>
+            <view class="exercise-details">
+              <text class="exercise-sets">{{item.target_sets}}组 × {{item.target_reps}}次</text>
+              <text class="exercise-sep">·</text>
+              <text class="exercise-weight">{{item.target_weight}}kg</text>
+            </view>
+          </view>
+          <view class="exercise-tag">{{item.muscle_group}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 恢复训练弹窗 -->
+  <modal-sheet
+    visible="{{showRecoveryModal}}"
+    title="发现未完成的训练"
+    description="你有一项训练进行中，继续完成还是放弃？"
+    confirmText="继续"
+    cancelText="放弃"
+    bind:confirm="onRecoverTraining"
+    bind:cancel="onAbandonTraining"
+    bind:close="onAbandonTraining"
+  >
+    <view class="modal-icon-wrap" style="text-align:center;margin-bottom:16rpx;">
+      <text style="font-size:64rpx;">⚡</text>
+    </view>
+  </modal-sheet>
+</view>

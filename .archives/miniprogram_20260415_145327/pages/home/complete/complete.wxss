@@ -1,0 +1,214 @@
+/* 训练完成页面样式 */
+
+.page-complete {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  padding: 40rpx 30rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 庆祝彩带动画 */
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 400rpx;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+  width: 20rpx;
+  height: 20rpx;
+  background: #e63946;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+.confetti:nth-child(1) { left: 10%; animation-delay: 0s; }
+.confetti:nth-child(2) { left: 30%; animation-delay: 0.2s; background: #ffd700; }
+.confetti:nth-child(3) { left: 50%; animation-delay: 0.4s; background: #00d4ff; }
+.confetti:nth-child(4) { left: 70%; animation-delay: 0.6s; background: #e63946; }
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100rpx) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(400rpx) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* 完成头部 */
+.complete-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60rpx;
+  margin-bottom: 60rpx;
+}
+
+.complete-icon {
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
+  animation: bounce 0.6s ease-out;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.complete-title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 10rpx;
+}
+
+.complete-subtitle {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* 统计卡片 */
+.stats-cards {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40rpx;
+}
+
+.stat-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16rpx;
+  padding: 30rpx 20rpx;
+  margin: 0 10rpx;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #e63946;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+/* PR区域 */
+.pr-section {
+  margin-bottom: 40rpx;
+}
+
+.pr-banner {
+  background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pr-icon {
+  font-size: 40rpx;
+  margin-right: 16rpx;
+}
+
+.pr-text {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+/* 完成列表 */
+.completed-list {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.completed-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.completed-item:last-child {
+  border-bottom: none;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
+  font-size: 28rpx;
+  color: #ffffff;
+  margin-bottom: 6rpx;
+}
+
+.item-detail {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.pr-badge {
+  background: #ffd700;
+  color: #1a1a2e;
+  font-size: 20rpx;
+  font-weight: bold;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+/* 通用按钮样式 */
+.btn {
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  padding: 24rpx 0;
+  text-align: center;
+}
+
+.btn-primary {
+  background: #e63946;
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.btn-block {
+  width: 100%;
+}

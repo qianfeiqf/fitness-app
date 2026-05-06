@@ -1,0 +1,524 @@
+/* 训练中页面样式 */
+
+.page-training {
+  min-height: 100vh;
+  background-color: var(--color-bg-dark);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部进度条 */
+.progress-header {
+  padding: 30rpx;
+  background-color: var(--color-bg-card);
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.exercise-counter {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+}
+
+.exercise-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* PR徽章 */
+.pr-badges {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(230, 57, 70, 0.15) 100%);
+  padding: 20rpx 30rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  border-bottom: 1rpx solid rgba(255, 215, 0, 0.2);
+}
+
+.pr-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background: linear-gradient(135deg, #ffd700 0%, #ff6b6b 100%);
+  padding: 12rpx 24rpx;
+  border-radius: 24rpx;
+  animation: prGlow 1.5s ease-in-out infinite;
+  box-shadow: 0 0 20rpx rgba(255, 215, 0, 0.5);
+}
+
+.pr-badge-icon {
+  font-size: 28rpx;
+}
+
+.pr-badge-text {
+  font-size: 24rpx;
+  color: #1a1a2e;
+  font-weight: 700;
+}
+
+/* PR金色光晕脉冲动画 */
+@keyframes prGlow {
+  0%, 100% {
+    box-shadow: 0 0 20rpx rgba(255, 215, 0, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 35rpx rgba(255, 215, 0, 0.8), 0 0 50rpx rgba(230, 57, 70, 0.4);
+    transform: scale(1.05);
+  }
+}
+
+/* 休息倒计时 */
+.rest-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(26, 26, 46, 0.98);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.rest-content {
+  text-align: center;
+  width: 500rpx;
+}
+
+.rest-label {
+  font-size: 32rpx;
+  color: var(--color-text-secondary);
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.rest-time {
+  font-size: 160rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+
+.rest-progress {
+  width: 100%;
+  height: 8rpx;
+  background-color: var(--color-bg-input);
+  border-radius: 4rpx;
+  margin: 40rpx 0;
+  overflow: hidden;
+}
+
+.rest-progress-fill {
+  height: 100%;
+  background-color: var(--color-primary);
+  transition: width 1s linear;
+}
+
+.rest-actions {
+  display: flex;
+  gap: 20rpx;
+  align-items: center;
+  justify-content: center;
+}
+
+.rest-actions .btn {
+  min-width: 150rpx;
+}
+
+/* 主训练区域 */
+.training-main {
+  flex: 1;
+  padding: 30rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+
+.muscle-tag {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-card);
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.set-indicator {
+  font-size: 28rpx;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* 目标展示 */
+.target-display {
+  text-align: center;
+  padding: 60rpx 0;
+}
+
+.target-label {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.target-weight {
+  font-size: 80rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.target-separator {
+  font-size: 48rpx;
+  color: var(--color-text-secondary);
+  margin: 0 20rpx;
+}
+
+.target-reps {
+  font-size: 80rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* 实际录入 */
+.actual-input {
+  display: flex;
+  gap: 40rpx;
+  justify-content: center;
+  margin-bottom: 40rpx;
+}
+
+.input-group {
+  flex: 1;
+  max-width: 280rpx;
+}
+
+.input-group .input-label {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  display: block;
+  text-align: center;
+  margin-bottom: 16rpx;
+}
+
+.input-stepper {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-bg-card);
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.stepper-btn {
+  width: 80rpx;
+  height: 80rpx;
+  background-color: #0f0f23;
+  border: none;
+  font-size: 36rpx;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepper-btn:active {
+  background-color: #e63946;
+}
+
+.stepper-btn text,
+.stepper-btn > text {
+  color: #ffffff !important;
+}
+
+.stepper-input {
+  flex: 1;
+  height: 80rpx;
+  text-align: center;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background-color: transparent;
+}
+
+/* RPE选择 */
+.rpe-section {
+  margin-bottom: 40rpx;
+}
+
+.rpe-label {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  display: block;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.rpe-options {
+  display: flex;
+  gap: 16rpx;
+  justify-content: center;
+}
+
+.rpe-btn {
+  padding: 16rpx 24rpx;
+  border-radius: 24rpx;
+  background-color: #16213e;
+  color: #a0a0a0;
+  font-size: 26rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s ease;
+}
+
+.rpe-btn.active {
+  background-color: #e63946;
+  color: #ffffff;
+  border-color: #e63946;
+}
+
+.rpe-btn.active text,
+.rpe-btn.active > text {
+  color: #ffffff !important;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  gap: 20rpx;
+  margin-top: auto;
+}
+
+.action-buttons .btn-primary {
+  flex: 1;
+}
+
+.action-buttons .btn-primary text,
+.action-buttons .btn-primary > text {
+  color: #ffffff !important;
+}
+
+.btn-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+.btn-lg {
+  height: 100rpx;
+  font-size: 36rpx;
+}
+
+/* 底部操作栏 */
+.bottom-bar {
+  display: flex;
+  justify-content: space-around;
+  padding: 30rpx;
+  background-color: var(--color-bg-card);
+  border-top: 1rpx solid var(--color-border);
+}
+
+.btn-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.btn-icon .icon {
+  font-size: 48rpx;
+  margin-bottom: 8rpx;
+}
+
+.btn-icon .icon-label {
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+}
+
+.btn-icon.danger .icon {
+  color: var(--color-danger);
+}
+
+/* 替换动作弹窗 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--color-bg-card);
+  border-radius: 24rpx;
+  padding: 50rpx;
+  width: 600rpx;
+  max-width: 90vw;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: block;
+  text-align: center;
+  margin-bottom: 12rpx;
+}
+
+.modal-desc {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  display: block;
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.alternative-list {
+  margin-bottom: 40rpx;
+}
+
+.alternative-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  background-color: var(--color-bg-input);
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+  text-align: left;
+}
+
+.alternative-item:last-child {
+  margin-bottom: 0;
+}
+
+.alt-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.alt-muscle {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+/* =====================
+   整体进度展示
+   ===================== */
+.overall-progress {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 20rpx 30rpx;
+  background-color: var(--color-bg-card);
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+/* 环形进度（CSS实现） */
+.circle-progress {
+  position: relative;
+  width: 100rpx;
+  height: 100rpx;
+  flex-shrink: 0;
+}
+
+.circle-progress-ring {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--color-primary) 0deg,
+    var(--color-primary) calc(var(--progress-angle, 0) * 3.6deg),
+    var(--color-bg-input) calc(var(--progress-angle, 0) * 3.6deg)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle-progress-inner {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background-color: var(--color-bg-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle-progress-text {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* 动作完成状态列表 */
+.exercise-status-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.exercise-status-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.exercise-status-item.completed {
+  color: var(--color-success);
+}
+
+.exercise-status-item.current {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.status-check {
+  font-size: 20rpx;
+}
+
+.status-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background-color: var(--color-bg-input);
+}
+
+.exercise-status-item.completed .status-dot {
+  background-color: var(--color-success);
+}
+
+.exercise-status-item.current .status-dot {
+  background-color: var(--color-primary);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}

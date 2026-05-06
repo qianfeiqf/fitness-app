@@ -1,0 +1,328 @@
+<!-- 训练中页面 - 沉浸式极简风格 -->
+
+<view class="page-training">
+
+  <!-- 顶部进度条 -->
+  <view class="progress-header">
+    <view class="progress-info">
+      <view class="progress-counter">
+        <text class="counter-num">{{currentExerciseIndex + 1}}</text>
+        <text class="counter-sep">/</text>
+        <text class="counter-total">{{exercises.length}}</text>
+      </view>
+      <text class="exercise-name">{{currentExercise.name}}</text>
+    </view>
+    <view class="progress-bar-track">
+      <view class="progress-bar-fill" style="width: {{(currentExercise.currentSetNumber / currentExercise.target_sets) * 100}}%;"></view>
+    </view>
+  </view>
+
+  <!-- 动作列表 - 横向滚动 -->
+  <scroll-view scroll-x class="exercise-scroll" scroll-left="{{scrollLeft}}">
+    <view class="exercise-list">
+      <view
+        wx:for="{{exercises}}"
+        wx:key="index"
+        class="exercise-chip {{item.completed_sets >= item.target_sets ? 'completed' : ''}} {{index === currentExerciseIndex ? 'current' : ''}}"
+        bindtap="onTapExercise"
+        data-index="{{index}}"
+      >
+        <view class="chip-content">
+          <text class="chip-name">{{item.exercise_name}}</text>
+          <text class="chip-sets">{{item.completed_sets}}/{{item.target_sets}}组</text>
+        </view>
+        <text wx:if="{{item.completed_sets >= item.target_sets}}" class="chip-check done">✓</text>
+        <text wx:elif="{{item.skipped}}" class="chip-check skip">跳过</text>
+      </view>
+    </view>
+    <view class="exercise-chip add-chip" bindtap="onAddExercise">
+      <text class="chip-name add-icon">+</text>
+      <text class="chip-sets">添加</text>
+    </view>
+  </scroll-view>
+
+  <!-- PR徽章展示 -->
+  <view wx:if="{{prBadges.length > 0}}" class="pr-badges">
+    <view wx:for="{{prBadges}}" wx:key="id" class="pr-badge-item">
+      <text class="pr-badge-icon">🏆</text>
+      <text class="pr-badge-text">{{item.exerciseName}} 新PR: {{item.value}}kg</text>
+    </view>
+  </view>
+
+  <!-- 底部浮动休息计时器 -->
+  <view wx:if="{{isResting}}" class="rest-float-bar">
+    <view class="rest-float-content">
+      <view class="rest-float-info">
+        <text class="rest-float-label">组间休息</text>
+        <text class="rest-float-time">{{formatTime(restTimeLeft)}}</text>
+      </view>
+      <view class="rest-float-progress-wrap">
+        <view class="rest-float-progress-track">
+          <view class="rest-float-progress-fill" style="width: {{(restTimeLeft / restTimeTotal) * 100}}%;"></view>
+        </view>
+      </view>
+      <view class="rest-float-actions">
+        <view class="rest-float-btn" bindtap="onReduceRestTime">-30s</view>
+        <view class="rest-float-btn primary" bindtap="onReadyToGo">我准备好了</view>
+        <view class="rest-float-btn" bindtap="onAddRestTime">+30s</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 热身区域 -->
+  <view wx:elif="{{showWarmup}}" class="warmup-main">
+    <view class="warmup-header">
+      <view class="tag tag-warning">热身阶段</view>
+      <view class="warmup-title">
+        <text class="warmup-exercise-name">{{currentExercise.exercise_name}}</text>
+        <text class="warmup-target">目标重量 {{currentExercise.target_weight}}kg</text>
+      </view>
+    </view>
+
+    <view class="warmup-desc">
+      <text class="warmup-desc-text">热身可以降低受伤风险，提升训练表现。请按顺序完成以下热身组：</text>
+    </view>
+
+    <view class="warmup-list">
+      <view
+        wx:for="{{warmupSets}}"
+        wx:key="index"
+        class="warmup-item {{item.completed ? 'completed' : ''}} {{index === currentWarmupIndex ? 'current' : ''}}"
+      >
+        <view class="warmup-check">
+          <text wx:if="{{item.completed}}" class="warmup-check-icon">✓</text>
+          <text wx:else class="warmup-check-num">{{index + 1}}</text>
+        </view>
+        <view class="warmup-info">
+          <text class="warmup-weight">{{item.weight}}kg</text>
+          <text class="warmup-sep">×</text>
+          <text class="warmup-reps">{{item.reps}}次</text>
+        </view>
+        <text class="warmup-label">{{item.label}}</text>
+      </view>
+    </view>
+
+    <view class="warmup-actions">
+      <view
+        wx:if="{{currentWarmupIndex < warmupSets.length}}"
+        class="btn btn-primary btn-block"
+        bindtap="onCompleteWarmupSet"
+      >
+        <text class="btn-complete-icon">✓</text>
+        <text>完成第 {{currentWarmupIndex + 1}} 组热身</text>
+      </view>
+      <view
+        wx:else
+        class="btn btn-primary btn-block"
+        bindtap="onFinishWarmup"
+      >
+        <text>热身完成，开始正式训练</text>
+      </view>
+      <view class="btn btn-text" bindtap="onSkipWarmup">跳过热身</view>
+    </view>
+  </view>
+
+  <!-- 主训练区域 -->
+  <view wx:else class="training-main">
+    <!-- 动作标签 -->
+    <view class="exercise-header">
+      <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
+      <view class="set-indicator">
+        <text class="set-current">{{currentExercise.currentSetNumber}}</text>
+        <text class="set-sep">/</text>
+        <text class="set-total">{{currentExercise.target_sets}}</text>
+        <text class="set-label">组</text>
+      </view>
+    </view>
+
+    <!-- 目标展示 -->
+    <view class="target-display">
+      <text class="target-label">目标</text>
+      <view class="target-values">
+        <text class="target-weight">{{currentExercise.target_weight}}</text>
+        <text class="target-unit">kg</text>
+        <text class="target-sep">×</text>
+        <text class="target-reps">{{currentExercise.target_reps}}</text>
+        <text class="target-unit">次</text>
+      </view>
+    </view>
+
+    <!-- 实际录入 — 刻度拨盘 -->
+    <view class="actual-input">
+      <view class="input-card">
+        <text class="input-card-label">实际重量</text>
+        <dial-picker
+          items="{{weightOptions}}"
+          value="{{currentExercise.actual_weight}}"
+          unit="kg"
+          step="2.5"
+          bind:change="onWeightChange"
+        />
+      </view>
+
+      <view class="input-card">
+        <text class="input-card-label">实际次数</text>
+        <dial-picker
+          items="{{repOptions}}"
+          value="{{currentExercise.actual_reps}}"
+          unit="次"
+          step="1"
+          bind:change="onRepChange"
+        />
+      </view>
+    </view>
+
+    <!-- 更多操作折叠面板 -->
+    <view class="more-section">
+      <view class="more-toggle" bindtap="onToggleMoreActions">
+        <text class="more-toggle-text">{{showMoreActions ? '收起' : '更多选项'}}</text>
+        <text class="more-toggle-arrow {{showMoreActions ? 'open' : ''}}">▼</text>
+      </view>
+
+      <view wx:if="{{showMoreActions}}" class="more-panel">
+        <!-- RPE选择 -->
+        <view class="rpe-section">
+          <text class="rpe-label">自觉力竭程度</text>
+          <view class="rpe-options">
+            <view
+              wx:for="{{rpeOptions}}"
+              wx:key="index"
+              class="rpe-option {{selectedRPE === index ? 'active' : ''}}"
+              bindtap="onSelectRPE"
+              data-value="{{index}}"
+            >
+              <text class="rpe-value">{{item}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 组备注 -->
+        <view class="note-section">
+          <text class="note-label">备注</text>
+          <input
+            class="note-input"
+            type="text"
+            placeholder="记录体感、疼痛点、动作感受等..."
+            value="{{setNote}}"
+            bindinput="onSetNoteChange"
+          />
+        </view>
+
+        <!-- 替换/跳过 -->
+        <view class="secondary-actions">
+          <view class="btn btn-secondary btn-sm" bindtap="onReplaceExercise">替换动作</view>
+          <view class="btn btn-secondary btn-sm" bindtap="onSkipExercise">跳过动作</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 超大完成按钮 -->
+    <view class="complete-action">
+      <view class="btn btn-primary btn-lg btn-block" bindtap="onCompleteSet">
+        <text class="btn-complete-icon">✓</text>
+        <text>完成一组</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="bottom-btn" bindtap="onPauseTraining">
+      <text class="bottom-icon">⏸</text>
+      <text class="bottom-label">暂停</text>
+    </view>
+    <view class="bottom-btn danger" bindtap="onAbandonTraining">
+      <text class="bottom-icon">✕</text>
+      <text class="bottom-label">放弃</text>
+    </view>
+  </view>
+
+  <!-- 跳过动作弹窗 -->
+  <modal-sheet
+    visible="{{showSkipModal}}"
+    title="跳过动作"
+    description="为什么跳过这个动作？"
+    confirmText="确认跳过"
+    cancelText="取消"
+    confirmDisabled="{{selectedSkipReason === -1}}"
+    bind:confirm="onConfirmSkip"
+    bind:cancel="onCancelSkip"
+    bind:close="onCancelSkip"
+  >
+    <view class="skip-reason-list">
+      <view
+        wx:for="{{skipReasons}}"
+        wx:key="index"
+        class="skip-reason-item {{selectedSkipReason === index ? 'selected' : ''}}"
+        bindtap="onSelectSkipReason"
+        data-index="{{index}}"
+      >
+        <text class="skip-reason-text">{{item}}</text>
+        <text wx:if="{{selectedSkipReason === index}}" class="skip-reason-check">✓</text>
+      </view>
+    </view>
+  </modal-sheet>
+
+  <!-- 添加动作弹窗 -->
+  <modal-sheet
+    visible="{{showAddExerciseModal}}"
+    title="添加动作"
+    description="从动作库选择要添加的动作"
+    showConfirm="{{false}}"
+    cancelText="取消"
+    bind:cancel="onCancelAddExercise"
+    bind:close="onCancelAddExercise"
+  >
+    <view class="add-exercise-search">
+      <input
+        class="add-search-input"
+        type="text"
+        placeholder="搜索动作..."
+        value="{{addExerciseSearch}}"
+        bindinput="onAddExerciseSearch"
+      />
+    </view>
+    <scroll-view scroll-y class="add-exercise-list">
+      <view
+        wx:for="{{filteredExercises}}"
+        wx:key="id"
+        class="alternative-item"
+        bindtap="onSelectAddExercise"
+        data-exercise-id="{{item.id}}"
+      >
+        <view class="alt-info">
+          <text class="alt-name">{{item.name}}</text>
+          <text class="alt-muscle">{{item.muscle_group}}</text>
+        </view>
+        <text class="alt-arrow">›</text>
+      </view>
+    </scroll-view>
+  </modal-sheet>
+
+  <!-- 动作替换弹窗 -->
+  <modal-sheet
+    visible="{{showReplaceModal}}"
+    title="替换动作"
+    description="选择同发力模式的替代动作"
+    showConfirm="{{false}}"
+    cancelText="取消"
+    bind:cancel="onCancelReplace"
+    bind:close="onCancelReplace"
+  >
+    <view class="alternative-list">
+      <view
+        wx:for="{{alternativeExercises}}"
+        wx:key="id"
+        class="alternative-item"
+        bindtap="onSelectAlternative"
+        data-exercise-id="{{item.id}}"
+      >
+        <view class="alt-info">
+          <text class="alt-name">{{item.name}}</text>
+          <text class="alt-muscle">{{item.muscle_group}}</text>
+        </view>
+        <text class="alt-arrow">›</text>
+      </view>
+    </view>
+  </modal-sheet>
+</view>

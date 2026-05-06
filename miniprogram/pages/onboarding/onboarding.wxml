@@ -1,0 +1,128 @@
+<view class="page-onboarding">
+  <!-- 顶部进度条 -->
+  <view class="onboarding-progress">
+    <view class="progress-dots">
+      <view class="dot {{step >= 1 ? 'active' : ''}}"></view>
+      <view class="dot {{step >= 2 ? 'active' : ''}}"></view>
+      <view class="dot {{step >= 3 ? 'active' : ''}}"></view>
+      <view class="dot {{step >= 4 ? 'active' : ''}}"></view>
+    </view>
+    <text class="progress-text">第 {{step}} / 4 步</text>
+  </view>
+
+  <!-- 步骤1：健身目标 -->
+  <view wx:if="{{step === 1}}" class="onboarding-step">
+    <view class="step-header">
+      <text class="step-title">你的健身目标是什么？</text>
+      <text class="step-subtitle">我们会根据你的目标推荐最适合的训练计划</text>
+    </view>
+
+    <view class="option-grid">
+      <view
+        wx:for="{{goals}}"
+        wx:key="id"
+        class="option-card {{selectedGoal === item.id ? 'selected' : ''}}"
+        bindtap="onSelectGoal"
+        data-id="{{item.id}}"
+      >
+        <text class="option-icon">{{item.icon}}</text>
+        <text class="option-name">{{item.name}}</text>
+        <text class="option-desc">{{item.desc}}</text>
+        <view wx:if="{{selectedGoal === item.id}}" class="option-check">✓</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 步骤2：训练天数 -->
+  <view wx:if="{{step === 2}}" class="onboarding-step">
+    <view class="step-header">
+      <text class="step-title">每周能练几天？</text>
+      <text class="step-subtitle">选择你每周可以稳定投入训练的天数</text>
+    </view>
+
+    <view class="day-options">
+      <view
+        wx:for="{{dayOptions}}"
+        wx:key="days"
+        class="day-card {{selectedDays === item.days ? 'selected' : ''}}"
+        bindtap="onSelectDays"
+        data-days="{{item.days}}"
+      >
+        <text class="day-number">{{item.days}}</text>
+        <text class="day-label">天</text>
+        <text class="day-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 步骤3：训练经验 -->
+  <view wx:if="{{step === 3}}" class="onboarding-step">
+    <view class="step-header">
+      <text class="step-title">你的训练经验？</text>
+      <text class="step-subtitle">如实填写，这会影响计划的难度推荐</text>
+    </view>
+
+    <view class="experience-options">
+      <view
+        wx:for="{{experienceOptions}}"
+        wx:key="id"
+        class="exp-card {{selectedExperience === item.id ? 'selected' : ''}}"
+        bindtap="onSelectExperience"
+        data-id="{{item.id}}"
+      >
+        <view class="exp-header">
+          <text class="exp-icon">{{item.icon}}</text>
+          <view class="exp-info">
+            <text class="exp-name">{{item.name}}</text>
+            <text class="exp-tag">{{item.tag}}</text>
+          </view>
+        </view>
+        <text class="exp-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 步骤4：推荐计划 -->
+  <view wx:if="{{step === 4}}" class="onboarding-step">
+    <view class="step-header">
+      <text class="step-title">为你推荐</text>
+      <text class="step-subtitle">基于你的目标、时间和经验，以下计划最适合你</text>
+    </view>
+
+    <view class="recommend-list">
+      <view
+        wx:for="{{recommendedPlans}}"
+        wx:key="id"
+        class="recommend-card {{selectedPlan === item.id ? 'selected' : ''}}"
+        bindtap="onSelectPlan"
+        data-id="{{item.id}}"
+      >
+        <view class="recommend-header">
+          <text class="recommend-name">{{item.name}}</text>
+          <view class="recommend-tags">
+            <text class="tag difficulty {{item.difficultyClass}}">{{item.difficulty}}</text>
+            <text class="tag">{{item.training_days}}天/周</text>
+          </view>
+        </view>
+        <text class="recommend-desc">{{item.description}}</text>
+        <view class="recommend-features">
+          <text wx:for="{{item.features}}" wx:for-item="feat" wx:key="*this" class="feature-tag">{{feat}}</text>
+        </view>
+        <view wx:if="{{selectedPlan === item.id}}" class="recommend-check">✓ 已选择</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="onboarding-footer">
+    <view wx:if="{{step > 1}}" class="btn-back" bindtap="onPrevStep">
+      <text>上一步</text>
+    </view>
+    <view class="btn-spacer" wx:if="{{step > 1}}"></view>
+    <button
+      class="btn btn-primary btn-block onboarding-next-btn"
+      disabled="{{!canProceed}}"
+      bindtap="onNextStep"
+    >{{step === 4 ? '开始训练' : '下一步'}}</button>
+  </view>
+</view>

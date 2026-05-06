@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-toast": "tdesign-miniprogram/toast/toast",
+    "t-badge": "tdesign-miniprogram/badge/badge",
+    "t-progress": "tdesign-miniprogram/progress/progress",
+    "t-loading": "tdesign-miniprogram/loading/loading"
+  },
+  "navigationBarTitleText": "训练中心",
+  "navigationStyle": "custom"
+}

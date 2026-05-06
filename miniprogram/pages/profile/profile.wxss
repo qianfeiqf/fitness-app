@@ -1,0 +1,461 @@
+/* 个人中心页面样式 — WeUI 扁平风格 */
+
+.page-profile {
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding: 40rpx;
+  padding-top: calc(40rpx + env(safe-area-inset-top));
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+/* =====================
+   页面头部
+   ===================== */
+.page-header {
+  margin-bottom: 40rpx;
+  padding-top: 20rpx;
+}
+
+.page-title {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+/* =====================
+   登录提示
+   ===================== */
+.login-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 40rpx;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 60rpx 48rpx;
+  border: 1rpx solid #E5E5E5;
+  width: 100%;
+  max-width: 500rpx;
+}
+
+.login-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
+}
+
+.login-avatar-icon {
+  font-size: 48rpx;
+  color: #B0B0B0;
+}
+
+.login-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.login-desc {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  padding: 0 64rpx;
+  background: #07C160;
+  border-radius: 9999rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.login-btn:active {
+  opacity: 0.85;
+}
+
+/* =====================
+   身体档案卡片
+   ===================== */
+.profile-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.card-header {
+  margin-bottom: 28rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.profile-inputs {
+  display: flex;
+  align-items: center;
+}
+
+.profile-input-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.input-icon {
+  width: 64rpx;
+  height: 64rpx;
+  background: #F0F0F0;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #1A1A1A;
+  flex-shrink: 0;
+}
+
+.input-content {
+  flex: 1;
+}
+
+.input-label {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.input {
+  flex: 1;
+  height: 64rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  padding: 0 16rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.input::placeholder {
+  color: #B0B0B0;
+  font-weight: 400;
+}
+
+.input-unit {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.input-divider {
+  width: 1rpx;
+  height: 80rpx;
+  background: rgba(0, 0, 0, 0.06);
+  margin: 0 24rpx;
+}
+
+/* =====================
+   训练目标
+   ===================== */
+.goals-card {
+  margin-bottom: 32rpx;
+}
+
+.goals-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-add-goal {
+  font-size: 26rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+  padding: 8rpx 16rpx;
+  background: #F0F0F0;
+  border-radius: 9999rpx;
+}
+
+.goals-empty {
+  padding: 40rpx 0;
+  text-align: center;
+}
+
+.goals-empty-text {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.goal-item {
+  padding: 24rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+}
+
+.goal-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.goal-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.goal-target {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.goal-current {
+  font-size: 26rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+.goal-arrow {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.goal-dest {
+  font-size: 26rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+.goal-progress {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.progress-track {
+  flex: 1;
+  height: 8rpx;
+  background: #FFFFFF;
+  border-radius: 4rpx;
+  overflow: hidden;
+  background-color: #E5E5E5;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #1A1A1A;
+  border-radius: 4rpx;
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  font-size: 22rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+  flex-shrink: 0;
+  min-width: 50rpx;
+}
+
+.goal-delete {
+  font-size: 22rpx;
+  color: #CCCCCC;
+  padding: 8rpx;
+  margin-left: 8rpx;
+}
+
+.goal-deadline {
+  font-size: 20rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+/* =====================
+   目标表单
+   ===================== */
+.goal-form {
+  margin-bottom: 32rpx;
+}
+
+.form-item {
+  margin-bottom: 24rpx;
+  text-align: left;
+}
+
+.form-label {
+  font-size: 26rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 80rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+
+.form-picker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 80rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+
+.picker-arrow {
+  font-size: 32rpx;
+  color: #CCCCCC;
+}
+
+/* =====================
+   功能菜单
+   ===================== */
+.menu-section {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 24rpx;
+  border-bottom: none;
+  transition: background-color 0.15s ease;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:active {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.menu-icon-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  border: 1rpx solid #E5E5E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.menu-icon {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.menu-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.menu-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.menu-desc {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+}
+
+.menu-arrow {
+  font-size: 36rpx;
+  color: #CCCCCC;
+  flex-shrink: 0;
+}
+
+/* 危险菜单项 — 暗红 */
+.menu-item.danger .menu-icon-wrap {
+  background: rgba(250, 81, 81, 0.06);
+}
+
+.menu-item.danger .menu-icon {
+  color: #FA5151;
+}
+
+.menu-item.danger .menu-title,
+.menu-item.danger .menu-title.logout {
+  color: #FA5151;
+}
+
+/* =====================
+   版本信息
+   ===================== */
+.version-info {
+  text-align: center;
+  padding: 48rpx 0;
+}
+
+.version-text {
+  font-size: 22rpx;
+  color: #999999;
+}

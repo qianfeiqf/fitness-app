@@ -1,0 +1,12 @@
+{
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-toast": "tdesign-miniprogram/toast/toast",
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-empty": "tdesign-miniprogram/empty/empty",
+    "t-progress": "tdesign-miniprogram/progress/progress",
+    "t-badge": "tdesign-miniprogram/badge/badge"
+  },
+  "navigationBarTitleText": "训练统计",
+  "navigationStyle": "custom"
+}

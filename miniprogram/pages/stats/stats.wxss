@@ -1,0 +1,514 @@
+/* 统计页面样式 — WeUI 扁平风格 */
+
+.page-stats {
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding: 40rpx;
+  padding-top: calc(40rpx + env(safe-area-inset-top));
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  color: #1A1A1A;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* =====================
+   页面头部
+   ===================== */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40rpx;
+  padding-top: 20rpx;
+}
+
+.page-header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-title {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.page-subtitle {
+  font-size: 26rpx;
+  color: #666666;
+  margin-top: 6rpx;
+  display: block;
+}
+
+.history-entry {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  background: #FFFFFF;
+  padding: 12rpx 20rpx;
+  border-radius: 9999rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.history-entry-text {
+  font-size: 26rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.history-entry-arrow {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* WeUI 组件样式覆盖 */
+mp-tabs {
+  margin-bottom: 8rpx;
+}
+
+/* =====================
+   1RM 趋势图
+   ===================== */
+
+.chart-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.rm-chart {
+  width: 100%;
+  height: 400rpx;
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 32rpx;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: none;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.legend-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+}
+
+.legend-text {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+/* =====================
+   肌群雷达图
+   ===================== */
+.section-subtitle {
+  font-size: 22rpx;
+  color: #999999;
+  margin-left: 12rpx;
+}
+
+.radar-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.radar-chart {
+  width: 100%;
+  height: 480rpx;
+}
+
+.muscle-advice {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 24rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+  margin-top: 16rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.advice-icon {
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+.advice-text {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.5;
+}
+
+/* =====================
+   章节
+   ===================== */
+.section {
+  margin-bottom: 48rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+/* 周期筛选 */
+.total-volume {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
+.total-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.total-unit {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+/* =====================
+   三大项
+   ===================== */
+.big-three-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+}
+
+.big-three-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx 12rpx;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border: 1rpx solid #E5E5E5;
+}
+
+.big-three-card:active {
+  background-color: #F8F8F8;
+}
+
+.card-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: #1A1A1A;
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.big-three-card .exercise-name {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 12rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rm-display {
+  margin-bottom: 10rpx;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4rpx;
+}
+
+.rm-value {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.rm-unit {
+  font-size: 20rpx;
+  color: #999999;
+}
+
+.rm-trend {
+  margin-bottom: 10rpx;
+}
+
+.trend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4rpx;
+  padding: 6rpx 12rpx;
+  border-radius: 9999rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
+.trend-badge.up {
+  background: #F0F0F0;
+  color: #1A1A1A;
+}
+
+.trend-badge.down {
+  background: #F0F0F0;
+  color: #999999;
+}
+
+.trend-badge.flat {
+  background: #F0F0F0;
+  color: #666666;
+}
+
+.trend-arrow {
+  font-size: 18rpx;
+}
+
+.trend-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.best-rm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rpx;
+}
+
+.best-label {
+  font-size: 18rpx;
+  color: #999999;
+}
+
+.best-value {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #666666;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =====================
+   容量图
+   ===================== */
+.volume-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx 20rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.volume-chart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 180rpx;
+}
+
+.volume-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.volume-bar-container {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 4rpx;
+}
+
+.volume-bar-track {
+  width: 28rpx;
+  height: 100%;
+  background: #F0F0F0;
+  border-radius: 6rpx;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.volume-bar {
+  width: 100%;
+  background: rgba(26, 26, 26, 0.2);
+  border-radius: 6rpx;
+  min-height: 4rpx;
+  transition: all 0.4s ease;
+}
+
+.volume-bar.active {
+  background: #1A1A1A;
+}
+
+.volume-day {
+  font-size: 20rpx;
+  color: #999999;
+  margin-top: 12rpx;
+  font-weight: 500;
+}
+
+/* =====================
+   空状态
+   ===================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx;
+  text-align: center;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.empty-visual {
+  width: 120rpx;
+  height: 120rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24rpx;
+}
+
+.empty-icon {
+  font-size: 48rpx;
+  color: #B0B0B0;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+}
+
+/* =====================
+   PR列表
+   ===================== */
+.pr-list {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  overflow: hidden;
+  border: 1rpx solid #E5E5E5;
+}
+
+.pr-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  border-bottom: none;
+  transition: background-color 0.15s ease;
+}
+
+.pr-item:last-child {
+  border-bottom: none;
+}
+
+.pr-item:active {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.pr-icon-wrap {
+  width: 64rpx;
+  height: 64rpx;
+  background: #F0F0F0;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.pr-icon {
+  font-size: 32rpx;
+}
+
+.pr-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pr-exercise {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.pr-date {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+}
+
+.pr-value {
+  text-align: right;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+.pr-value .value {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  display: block;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.pr-value .type {
+  font-size: 20rpx;
+  color: #999999;
+  display: block;
+  margin-top: 2rpx;
+}

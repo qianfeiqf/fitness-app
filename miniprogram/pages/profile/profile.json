@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "modal-sheet": "../../components/modal-sheet/modal-sheet"
+  },
+  "navigationBarTitleText": "个人中心",
+  "navigationStyle": "custom"
+}

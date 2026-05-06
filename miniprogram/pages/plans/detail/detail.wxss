@@ -1,0 +1,246 @@
+/* 计划详情页面样式 — WeUI 扁平风格 */
+
+.page-detail {
+  min-height: 100vh;
+  background-color: #FFFFFF;
+  padding: 40rpx;
+  padding-top: calc(40rpx + env(safe-area-inset-top));
+  padding-bottom: 200rpx;
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 200rpx 0;
+  gap: 24rpx;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+/* 计划头部 */
+.plan-header {
+  margin-bottom: 40rpx;
+}
+
+.plan-title-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 12rpx;
+}
+
+.plan-name {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.plan-desc {
+  font-size: 26rpx;
+  color: #666666;
+}
+
+/* 徽章 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 12rpx;
+  border-radius: 9999rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.badge-success {
+  background-color: #F0F0F0;
+  color: #1A1A1A;
+}
+
+.badge-secondary {
+  background-color: #F5F5F5;
+  color: #666666;
+}
+
+.badge-warning {
+  background-color: #F0F0F0;
+  color: #666666;
+}
+
+/* 周计划 */
+.week-schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.day-section {
+  background-color: #FFFFFF;
+  border-radius: 24rpx;
+  overflow: hidden;
+  border: 1rpx solid #E5E5E5;
+}
+
+.day-section.has-exercises {
+  /* 用阴影强度区分，不用红色边框 */
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 30rpx;
+  background-color: #F5F5F5;
+}
+
+.day-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.day-count {
+  font-size: 24rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+}
+
+.day-exercises {
+  padding: 20rpx 30rpx;
+}
+
+.exercise-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: none;
+}
+
+.exercise-card:last-child {
+  border-bottom: none;
+}
+
+.exercise-main {
+  flex: 1;
+}
+
+.exercise-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  display: block;
+}
+
+.exercise-sets {
+  font-size: 24rpx;
+  color: #666666;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.exercise-meta {
+  text-align: right;
+}
+
+.exercise-weight {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+.exercise-rest {
+  font-size: 22rpx;
+  color: #999999;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.day-empty {
+  padding: 30rpx;
+  text-align: center;
+}
+
+.day-empty-text {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40rpx;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  background: #FFFFFF;
+  border-top: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: 9999rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  transition: box-shadow 0.15s ease;
+}
+
+.btn-primary {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.btn-primary:active {
+  opacity: 0.85;
+}
+
+.btn-secondary {
+  background-color: #F5F5F5;
+  color: #666666;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #666666;
+  border: 1rpx solid rgba(0, 0, 0, 0.1);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* 返回按钮 */
+.back-button {
+  position: fixed;
+  top: 30rpx;
+  left: 30rpx;
+  width: 80rpx;
+  height: 80rpx;
+  background-color: #FFFFFF;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  border: 1rpx solid #E5E5E5;
+}
+
+.back-icon {
+  font-size: 36rpx;
+  color: #1A1A1A;
+}

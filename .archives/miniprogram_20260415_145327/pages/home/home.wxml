@@ -1,0 +1,150 @@
+<!-- 训练中心首页 - 今日训练面板 -->
+<!-- 设计规范: 硬核健身风格, 深色主题, 无障碍触摸 -->
+
+<view class="page-home">
+  <!-- 顶部欢迎区 -->
+  <view class="welcome-section">
+    <view class="welcome-text">
+      <text class="welcome-title">{{isLoggedIn ? '今日训练' : '欢迎使用'}}</text>
+      <text class="welcome-subtitle">{{isLoggedIn ? (todayPlan ? todayPlan.name : '暂无训练计划') : '登录后开始训练'}}</text>
+    </view>
+    <view class="date-badge">
+      <text class="date-day">{{todayDate}}</text>
+      <text class="date-week">{{todayWeek}}</text>
+    </view>
+  </view>
+
+  <!-- 未登录状态 -->
+  <view wx:if="{{!isLoggedIn}}" class="login-guide">
+    <view class="login-icon-wrap">
+      <text class="login-icon">·</text>
+    </view>
+    <text class="login-title">开启你的硬核训练</text>
+    <text class="login-desc">登录后即可开始训练，享受智能计划追踪</text>
+    <button class="btn btn-primary btn-block btn-lg" bindtap="onLogin" hover-class="btn-pressed">微信一键登录</button>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:elif="{{loading}}" class="loading-state">
+    <view class="skeleton-container">
+      <view class="skeleton skeleton-header"></view>
+      <view class="skeleton skeleton-card"></view>
+      <view class="skeleton skeleton-list"></view>
+    </view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 无训练计划 -->
+  <view wx:elif="{{!todayPlan}}" class="empty-state">
+    <view class="empty-visual">
+      <view class="empty-circle"></view>
+      <view class="empty-circle inner"></view>
+    </view>
+    <text class="empty-title">暂无训练计划</text>
+    <text class="empty-desc">去计划库选择或创建一个训练计划吧</text>
+    <button class="btn btn-primary btn-block" bindtap="onGoToPlans" hover-class="btn-pressed">前往计划库</button>
+  </view>
+
+  <!-- 今日训练卡片 -->
+  <view wx:else class="today-training">
+    <!-- 训练概览卡片 -->
+    <view class="card training-overview">
+      <view class="card-header">
+        <view>
+          <text class="card-title">今日训练</text>
+          <text class="card-subtitle">{{todayPlan.name}}</text>
+        </view>
+        <view class="training-badge">
+          <text class="badge badge-primary">{{todayExercises.length}}个动作</text>
+        </view>
+      </view>
+
+      <!-- 训练信息 -->
+      <view class="training-info">
+        <view class="info-item">
+          <view class="info-icon-wrap">
+            <text class="info-icon-text">T</text>
+          </view>
+          <text class="info-value">{{estimatedMinutes}}</text>
+          <text class="info-label">分钟</text>
+        </view>
+        <view class="info-divider"></view>
+        <view class="info-item">
+          <view class="info-icon-wrap">
+            <text class="info-icon-text">S</text>
+          </view>
+          <text class="info-value">{{totalSets}}</text>
+          <text class="info-label">组</text>
+        </view>
+        <view class="info-divider"></view>
+        <view class="info-item">
+          <view class="info-icon-wrap">
+            <text class="info-icon-text">M</text>
+          </view>
+          <text class="info-value-muscle">{{muscleGroups}}</text>
+          <text class="info-label">肌群</text>
+        </view>
+      </view>
+
+      <!-- 开始训练按钮 -->
+      <button wx:if="{{!todaySession || todaySession.status === 'completed' || todaySession.status === 'aborted'}}"
+              class="btn btn-primary btn-block btn-lg btn-start"
+              bindtap="onStartTraining"
+              hover-class="btn-pressed">
+        <text class="btn-icon-start">▶</text>
+        <text>开始训练</text>
+      </button>
+
+      <button wx:else
+              class="btn btn-warning btn-block btn-lg"
+              bindtap="onRecoverTraining"
+              hover-class="btn-pressed-warning">
+        <text class="btn-icon-start">▶</text>
+        <text>继续未完成的训练</text>
+      </button>
+    </view>
+
+    <!-- 动作列表预览 -->
+    <view class="exercises-preview">
+      <view class="section-header">
+        <text class="section-title">动作预览</text>
+        <view class="section-link" bindtap="onPreviewPlan" hover-class="link-pressed">
+          <text>查看详情</text>
+          <text class="link-arrow">›</text>
+        </view>
+      </view>
+
+      <view class="exercise-list">
+        <view wx:for="{{todayExercises}}"
+              wx:key="id"
+              class="exercise-item"
+              hover-class="item-pressed">
+          <view class="exercise-order">{{index + 1}}</view>
+          <view class="exercise-info">
+            <text class="exercise-name">{{item.name}}</text>
+            <text class="exercise-detail">{{item.target_sets}}组 × {{item.target_reps}}次 · {{item.target_weight}}kg</text>
+          </view>
+          <view class="exercise-muscle">
+            <text class="muscle-tag">{{item.muscle_group}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 恢复训练弹窗 -->
+  <view wx:if="{{showRecoveryModal}}" class="modal-mask" bindtap="onAbandonTraining">
+    <view class="modal-content" catchtap="noop">
+      <view class="modal-icon-wrap">
+        <text class="modal-icon">!</text>
+      </view>
+      <text class="modal-title">发现未完成的训练</text>
+      <text class="modal-desc">你有一项训练进行到一半，是否继续？</text>
+
+      <view class="modal-actions">
+        <button class="btn btn-secondary" bindtap="onAbandonTraining" hover-class="btn-pressed">放弃</button>
+        <button class="btn btn-primary" bindtap="onRecoverTraining" hover-class="btn-pressed">继续训练</button>
+      </view>
+    </view>
+  </view>
+</view>

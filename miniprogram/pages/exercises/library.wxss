@@ -1,0 +1,156 @@
+/* 动作库页面样式 — WeUI 扁平风格 */
+
+.page-library {
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding: 40rpx;
+  padding-top: calc(40rpx + env(safe-area-inset-top));
+  padding-bottom: 140rpx;
+}
+
+/* WeUI 组件样式覆盖 */
+mp-searchbar {
+  margin-bottom: 16rpx;
+}
+
+mp-tabs {
+  margin-bottom: 16rpx;
+}
+
+/* 动作列表 */
+.exercise-list {
+  height: calc(100vh - 400rpx);
+}
+
+.exercise-group {
+  margin-bottom: 32rpx;
+}
+
+.group-header {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 16rpx;
+  padding-left: 8rpx;
+}
+
+.exercise-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 24rpx;
+  margin-bottom: 12rpx;
+}
+
+.exercise-item:active {
+  background-color: #F8F8F8;
+}
+
+.exercise-info {
+  flex: 1;
+}
+
+.exercise-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.exercise-name-en {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+}
+
+.exercise-arrow {
+  font-size: 40rpx;
+  color: #CCCCCC;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 40rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #B0B0B0;
+}
+
+/* 添加自定义动作按钮 */
+.add-custom-btn {
+  position: fixed;
+  bottom: 40rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  width: 400rpx;
+  height: 96rpx;
+  background: #07C160;
+  color: #FFFFFF;
+  border-radius: 9999rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.add-custom-btn:active {
+  opacity: 0.85;
+}
+
+.add-icon {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+/* 弹窗内表单 */
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.form-label {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 88rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+
+.form-picker {
+  width: 100%;
+  height: 88rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.picker-value {
+  font-size: 30rpx;
+  color: #1A1A1A;
+}

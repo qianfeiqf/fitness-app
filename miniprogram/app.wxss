@@ -1,0 +1,516 @@
+/**
+ * 健身训练计划小程序 - 全局样式
+ * 设计系统：WeUI 扁平风格
+ * 遵循微信小程序设计规范，使用 WeUI 组件库
+ */
+
+/* =====================
+   设计 Token 变量
+   ===================== */
+:root {
+  /* === 色彩 — WeUI 规范 === */
+  /* 主色（WeUI 绿） */
+  --color-primary: #07C160;
+  --color-primary-dark: #06AD56;
+
+  /* 背景色 */
+  --color-bg-page: #F6F6F6;
+  --color-bg-card: #FFFFFF;
+  --color-bg-input: #F6F6F6;
+
+  /* 文字色 — WeUI 标准 */
+  --color-text-primary: #333333;
+  --color-text-secondary: #888888;
+  --color-text-placeholder: #B2B2B2;
+  --color-text-inverse: #FFFFFF;
+
+  /* 功能色 */
+  --color-danger: #FA5151;
+  --color-warning: #FFC300;
+
+  /* 边框 */
+  --color-border: #E5E5E5;
+  --color-divider: #E5E5E5;
+
+  /* === 圆角 === */
+  --radius-card: 16rpx;
+  --radius-input: 8rpx;
+  --radius-pill: 9999rpx;
+
+  /* === 间距 === */
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 32rpx;
+  --spacing-xl: 48rpx;
+
+  /* === 排版 — WeUI 标准 === */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+  --font-size-page-title: 40rpx;
+  --font-size-section-title: 34rpx;
+  --font-size-body: 28rpx;
+  --font-size-caption: 24rpx;
+  --font-size-small: 22rpx;
+  --font-weight-bold: 700;
+  --font-weight-semibold: 600;
+  --font-weight-regular: 400;
+}
+
+/* =====================
+   基础样式
+   ===================== */
+page {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =====================
+   容器
+   ===================== */
+.container {
+  min-height: 100vh;
+  padding: 32rpx;
+  padding-top: calc(32rpx + env(safe-area-inset-top));
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background-color: var(--color-bg-page);
+}
+
+.page-content {
+  padding: 32rpx;
+  padding-top: calc(32rpx + env(safe-area-inset-top));
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+/* =====================
+   卡片 — WeUI 扁平风格
+   ===================== */
+.card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  border: 1rpx solid var(--color-border);
+}
+
+.card:active {
+  background-color: #F8F8F8;
+}
+
+.card-flat {
+  border: none;
+  border-bottom: 1rpx solid var(--color-divider);
+  border-radius: 0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.card-title {
+  font-size: var(--font-size-section-title);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.card-subtitle {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  margin-top: 4rpx;
+}
+
+/* =====================
+   原生 button 重置
+   ===================== */
+button.btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  line-height: inherit;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  border-radius: inherit;
+  text-align: center;
+  -webkit-appearance: none;
+}
+
+button.btn::after {
+  border: none;
+}
+
+/* =====================
+   按钮 — WeUI 风格
+   ===================== */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  padding: 0 48rpx;
+  border-radius: var(--radius-card);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  transition: opacity 0.15s ease;
+  border: none;
+}
+
+/* 主按钮 — WeUI 绿 */
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.btn-primary:active {
+  opacity: 0.85;
+}
+
+/* 次要按钮 — 白底灰边 */
+.btn-secondary {
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  border: 1rpx solid var(--color-border);
+}
+
+.btn-secondary:active {
+  background-color: #F8F8F8;
+}
+
+/* 幽灵按钮 — 透明底 */
+.btn-ghost {
+  background: transparent;
+  color: var(--color-primary);
+}
+
+.btn-ghost:active {
+  opacity: 0.7;
+}
+
+/* 文字按钮 */
+.btn-text {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: none;
+}
+
+.btn-text:active {
+  color: var(--color-text-primary);
+}
+
+/* 危险按钮 */
+.btn-danger {
+  background: transparent;
+  color: var(--color-danger);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-sm {
+  height: 64rpx;
+  padding: 0 32rpx;
+  font-size: var(--font-size-caption);
+}
+
+.btn-lg {
+  height: 96rpx;
+  font-size: 32rpx;
+}
+
+/* =====================
+   输入框 — WeUI 风格
+   ===================== */
+.input-wrapper {
+  background-color: var(--color-bg-card);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.input-label {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.input {
+  width: 100%;
+  height: 88rpx;
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-input);
+  border: 1rpx solid var(--color-border);
+  padding: 0 24rpx;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+}
+
+/* =====================
+   徽章
+   ===================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32rpx;
+  height: 36rpx;
+  padding: 0 12rpx;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+}
+
+.badge-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.badge-success,
+.badge-warning,
+.badge-info {
+  background-color: rgba(7, 193, 96, 0.1);
+  color: var(--color-primary);
+}
+
+.badge-danger {
+  background-color: rgba(250, 81, 81, 0.1);
+  color: var(--color-danger);
+}
+
+.badge-secondary {
+  background-color: var(--color-bg-page);
+  color: var(--color-text-secondary);
+}
+
+/* =====================
+   标签
+   ===================== */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40rpx;
+  padding: 0 16rpx;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tag-primary {
+  background: rgba(7, 193, 96, 0.1);
+  color: var(--color-primary);
+}
+
+.tag-secondary {
+  background: var(--color-bg-page);
+  color: var(--color-text-secondary);
+}
+
+/* =====================
+   进度条
+   ===================== */
+.progress-bar {
+  width: 100%;
+  height: 8rpx;
+  background-color: var(--color-bg-page);
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+/* =====================
+   列表 — WeUI Cell 风格
+   ===================== */
+.list {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1rpx solid var(--color-border);
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid var(--color-divider);
+  background: var(--color-bg-card);
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item:active {
+  background-color: #F8F8F8;
+}
+
+.list-item-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: var(--radius-input);
+  background-color: var(--color-bg-page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-md);
+  flex-shrink: 0;
+}
+
+.list-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-item-title {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.list-item-subtitle {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  margin-top: 4rpx;
+}
+
+.list-item-arrow {
+  width: 40rpx;
+  height: 40rpx;
+  color: var(--color-text-placeholder);
+  flex-shrink: 0;
+  margin-left: var(--spacing-sm);
+}
+
+/* =====================
+   空状态
+   ===================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 50rpx;
+  text-align: center;
+}
+
+.empty-state-icon {
+  font-size: 80rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-state-title {
+  font-size: var(--font-size-section-title);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: 12rpx;
+}
+
+.empty-state-desc {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+}
+
+.empty-state-action {
+  margin-top: 32rpx;
+}
+
+/* =====================
+   工具类
+   ===================== */
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-placeholder { color: var(--color-text-placeholder); }
+.text-danger { color: var(--color-danger); }
+.text-inverse { color: var(--color-text-inverse); }
+
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-page-title { font-size: var(--font-size-page-title); }
+.font-section-title { font-size: var(--font-size-section-title); }
+.font-body { font-size: var(--font-size-body); }
+.font-caption { font-size: var(--font-size-caption); }
+
+.mt-8 { margin-top: 8rpx; }
+.mt-16 { margin-top: 16rpx; }
+.mt-24 { margin-top: 24rpx; }
+.mt-32 { margin-top: 32rpx; }
+.mt-48 { margin-top: 48rpx; }
+
+.mb-8 { margin-bottom: 8rpx; }
+.mb-16 { margin-bottom: 16rpx; }
+.mb-24 { margin-bottom: 24rpx; }
+.mb-32 { margin-bottom: 32rpx; }
+.mb-48 { margin-bottom: 48rpx; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-center { align-items: center; justify-content: center; }
+.flex-between { justify-content: space-between; }
+.flex-1 { flex: 1; }
+.flex-wrap { flex-wrap: wrap; }
+
+/* =====================
+   动画
+   ===================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+.animate-slideUp { animation: slideUp 0.3s ease-out; }
+.animate-scaleIn { animation: scaleIn 0.3s ease-out; }
+
+/* =====================
+   骨架屏
+   ===================== */
+.skeleton {
+  background: linear-gradient(90deg, #EDEDED 25%, #E0E0E0 50%, #EDEDED 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--radius-input);
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =====================
+   底部安全区占位
+   ===================== */
+.safe-area-bottom {
+  height: calc(120rpx + env(safe-area-inset-bottom));
+}

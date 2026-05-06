@@ -1,0 +1,29 @@
+<view wx:if="{{visible}}" class="modal-sheet-overlay" bindtap="onMaskTap">
+  <view class="modal-sheet-container" catchtap="noop">
+    <view class="modal-sheet-handle"></view>
+
+    <view wx:if="{{title}}" class="modal-sheet-title">{{title}}</view>
+    <view wx:if="{{description}}" class="modal-sheet-desc">{{description}}</view>
+
+    <view class="modal-sheet-content">
+      <slot />
+    </view>
+
+    <view class="modal-sheet-actions">
+      <view
+        wx:if="{{showCancel}}"
+        class="modal-sheet-btn modal-sheet-btn-cancel"
+        bindtap="onCancel"
+      >
+        {{cancelText}}
+      </view>
+      <view
+        wx:if="{{showConfirm}}"
+        class="modal-sheet-btn modal-sheet-btn-confirm {{confirmDisabled ? 'disabled' : ''}}"
+        bindtap="onConfirm"
+      >
+        {{confirmText}}
+      </view>
+    </view>
+  </view>
+</view>

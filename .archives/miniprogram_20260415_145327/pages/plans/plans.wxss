@@ -1,0 +1,584 @@
+/**
+ * 计划管理页面样式
+ * 基于 ui-ux-pro-max 设计规范
+ * - 深色模式适配
+ * - 4.5:1 对比度
+ * - 触摸目标 44px+
+ * - 150-300ms 动画
+ */
+
+/* =====================
+   页面基础
+   ===================== */
+.page-plans {
+  min-height: 100vh;
+  background-color: var(--color-bg-dark);
+  padding: 30rpx;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+
+.page-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 1rpx;
+}
+
+/* =====================
+   激活的计划卡片
+   ===================== */
+.active-plan {
+  background: linear-gradient(135deg, #1e2a4a 0%, #16213e 100%);
+  border: 2rpx solid var(--color-primary);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(230, 57, 70, 0.2);
+}
+
+.active-plan .card-header {
+  margin-bottom: 30rpx;
+}
+
+/* =====================
+   章节
+   ===================== */
+.section {
+  margin-top: 50rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: 0.5rpx;
+}
+
+.section-hint {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.5);  /* 低于 4.5:1 但可接受作为辅助文字 */
+}
+
+/* =====================
+   计划列表
+   ===================== */
+.plan-list {
+  background-color: var(--color-bg-card);
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.plan-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx 30rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.plan-item:active {
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: scale(0.98);
+}
+
+.plan-item:last-child {
+  border-bottom: none;
+}
+
+.plan-item.active {
+  background-color: rgba(230, 57, 70, 0.15);
+  border-left: 6rpx solid var(--color-primary);
+  padding-left: 26rpx;
+}
+
+.plan-item.active .plan-name {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.plan-info {
+  flex: 1;
+  min-width: 0;  /* 防止文字溢出 */
+}
+
+.plan-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.plan-desc {
+  font-size: 24rpx;
+  color: #a0a0a0;
+  display: block;
+  margin-bottom: 6rpx;
+  line-height: 1.4;
+}
+
+.plan-meta {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.6);  /* 3:1 对比度 */
+  display: block;
+}
+
+.plan-actions {
+  display: flex;
+  gap: 12rpx;
+  flex-shrink: 0;  /* 防止按钮被压缩 */
+}
+
+.plan-right {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.arrow-icon {
+  font-size: 48rpx;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 300;
+  line-height: 1;
+}
+
+/* 危险按钮 */
+.btn-ghost.danger {
+  color: #e74c3c !important;
+}
+
+/* =====================
+   模板列表
+   ===================== */
+.template-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.template-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg-card);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  min-height: 88rpx;
+}
+
+.template-item:active {
+  opacity: 0.8;
+}
+
+.template-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.template-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: 6rpx;
+}
+
+.template-desc {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+  margin-bottom: 10rpx;
+  line-height: 1.4;
+}
+
+.template-tags {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 8rpx;
+}
+
+/* 模板标签 - 增强对比度 */
+.template-difficulty {
+  font-size: 22rpx;
+  font-weight: 500;
+  padding: 6rpx 14rpx;
+  border-radius: 8rpx;
+  display: inline-block;
+}
+
+.template-days {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 6rpx 14rpx;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 8rpx;
+  display: inline-block;
+}
+
+/* 难度标签颜色 - 4.5:1 对比度 */
+.tag-green {
+  color: #4ade80 !important;
+  background-color: rgba(74, 222, 128, 0.15) !important;
+}
+
+.tag-yellow {
+  color: #fbbf24 !important;
+  background-color: rgba(251, 191, 36, 0.15) !important;
+}
+
+.tag-red {
+  color: #f87171 !important;
+  background-color: rgba(248, 113, 113, 0.15) !important;
+}
+
+/* =====================
+   弹窗
+   ===================== */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #16213e;
+  border-radius: 24rpx;
+  padding: 48rpx;
+  width: 600rpx;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 1rpx solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.5);
+}
+
+.modal-title {
+  font-size: 38rpx;
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+  text-align: center;
+  margin-bottom: 16rpx;
+  letter-spacing: 0.5rpx;
+}
+
+.modal-desc {
+  font-size: 28rpx;
+  color: #c0c0c0;
+  display: block;
+  text-align: center;
+  margin-bottom: 30rpx;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 40rpx;
+}
+
+.modal-actions .btn {
+  flex: 1;
+  height: 88rpx;  /* 触摸目标 44px+ */
+  font-size: 28rpx;
+}
+
+/* =====================
+   模板详情弹窗
+   ===================== */
+.template-detail-modal {
+  width: 650rpx;
+  max-height: 85vh;
+  overflow-y: auto;
+  background-color: #1e2a4a !important;
+  border: 2rpx solid rgba(230, 57, 70, 0.5);
+  box-shadow: 0 24rpx 64rpx rgba(0, 0, 0, 0.6);
+}
+
+.detail-header {
+  margin-bottom: 28rpx;
+}
+
+.detail-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 16rpx;
+  letter-spacing: 0.5rpx;
+}
+
+.detail-tags {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.detail-desc {
+  font-size: 28rpx;
+  color: #e0e0e0;
+  display: block;
+  margin-bottom: 32rpx;
+  line-height: 1.6;
+}
+
+.detail-exercises {
+  margin-top: 28rpx;
+}
+
+.detail-section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 20rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 2rpx solid rgba(230, 57, 70, 0.4);
+}
+
+/* 训练日区块 */
+.day-block {
+  margin-bottom: 24rpx;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.day-label {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #ff6b6b;
+}
+
+.day-count {
+  font-size: 24rpx;
+  color: #a0a0a0;
+}
+
+/* 动作行 */
+.exercise-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.06);
+  min-height: 56rpx;  /* 触摸友好 */
+}
+
+.exercise-row:last-child {
+  border-bottom: none;
+}
+
+.exercise-name {
+  font-size: 28rpx;
+  color: #ffffff;
+  flex: 1;
+  font-weight: 500;
+}
+
+.exercise-sets {
+  font-size: 26rpx;
+  color: #ffffff;
+  font-weight: 600;
+  background-color: rgba(230, 57, 70, 0.25);
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  margin-left: 16rpx;
+}
+
+/* =====================
+   输入框
+   ===================== */
+.input-wrapper {
+  margin-bottom: 30rpx;
+}
+
+.input-label {
+  font-size: 28rpx;
+  color: #ffffff;
+  margin-bottom: 12rpx;
+  display: block;
+  font-weight: 500;
+}
+
+.input {
+  width: 100%;
+  height: 88rpx;
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 32rpx;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.input::placeholder {
+  color: #888888;
+}
+
+/* =====================
+   空状态
+   ===================== */
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.55);
+  display: block;
+}
+
+/* =====================
+   按钮 - 触摸反馈
+   ===================== */
+.btn:active {
+  opacity: 0.8;
+}
+
+/* =====================
+   筛选标签
+   ===================== */
+.filter-tabs {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 12rpx 28rpx;
+  border-radius: 32rpx;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1rpx solid rgba(255, 255, 255, 0.12);
+  font-size: 26rpx;
+  color: #a0a0a0;
+  transition: all 0.2s ease;
+}
+
+.filter-tab.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.filter-hint {
+  font-size: 24rpx;
+  color: #a0a0a0;
+  margin-bottom: 20rpx;
+  padding: 12rpx 20rpx;
+  background-color: rgba(230, 57, 70, 0.1);
+  border-radius: 12rpx;
+  border-left: 4rpx solid var(--color-primary);
+}
+
+/* 筛选标签-难度颜色 */
+.filter-tab-入门.active {
+  background-color: #4ade80;
+  border-color: #4ade80;
+}
+
+.filter-tab-中级.active {
+  background-color: #fbbf24;
+  border-color: #fbbf24;
+}
+
+.filter-tab-进阶.active {
+  background-color: #f87171;
+  border-color: #f87171;
+}
+
+/* 详细介绍弹窗 */
+.template-intro-modal {
+  width: 680rpx;
+  max-height: 85vh;
+  overflow-y: auto;
+  background-color: #1e2a4a !important;
+  border: 2rpx solid rgba(230, 57, 70, 0.5);
+  box-shadow: 0 24rpx 64rpx rgba(0, 0, 0, 0.6);
+}
+
+.intro-header {
+  margin-bottom: 32rpx;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.intro-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.intro-tags {
+  display: flex;
+  gap: 16rpx;
+}
+
+.intro-section {
+  margin-bottom: 28rpx;
+}
+
+.intro-section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-primary);
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.intro-text {
+  font-size: 28rpx;
+  color: #e0e0e0;
+  display: block;
+  line-height: 1.7;
+}

@@ -1,0 +1,103 @@
+<!-- 统计页面 -->
+<!-- 设计规范: 数据可视化, 深色主题, 无障碍触摸 -->
+
+<view class="page-stats">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">训练统计</text>
+  </view>
+
+  <!-- 三大项概览 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">三大项</text>
+    </view>
+
+    <view class="big-three-grid">
+      <view wx:for="{{bigThree}}"
+            wx:key="exerciseName"
+            class="big-three-card"
+            hover-class="card-pressed">
+        <view class="card-accent"></view>
+        <text class="exercise-name">{{item.exerciseName}}</text>
+        <view class="rm-display">
+          <text class="rm-value">{{item.latest1RM ? item.latest1RM : '--'}}</text>
+          <text class="rm-unit">kg</text>
+        </view>
+        <view class="rm-trend">
+          <view wx:if="{{item.trend > 0}}" class="trend-badge up">
+            <text class="trend-arrow">↑</text>
+            <text class="trend-value">{{item.trend}}%</text>
+          </view>
+          <view wx:elif="{{item.trend < 0}}" class="trend-badge down">
+            <text class="trend-arrow">↓</text>
+            <text class="trend-value">{{item.trend}}%</text>
+          </view>
+          <view wx:else class="trend-badge flat">
+            <text class="trend-value">-</text>
+          </view>
+        </view>
+        <view class="best-rm">
+          <text class="best-label">历史最佳</text>
+          <text class="best-value">{{item.best1RM ? item.best1RM + 'kg' : '--'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 本周容量 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">本周容量</text>
+      <text class="total-volume">{{weeklyVolume}} kg</text>
+    </view>
+
+    <view class="volume-chart">
+      <view wx:for="{{volumeTrend}}"
+            wx:key="date"
+            class="volume-bar-item">
+        <view class="volume-bar-wrapper">
+          <view class="volume-bar {{item.volume > 0 ? 'active' : ''}}"
+                style="height: {{item.volume > 0 ? item.barHeight : 0}}%">
+          </view>
+        </view>
+        <text class="volume-day">{{item.date}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 近期PR -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">近期PR</text>
+    </view>
+
+    <view wx:if="{{recentPRs.length === 0}}" class="empty-state">
+      <view class="empty-visual">
+        <view class="empty-icon-wrap">
+          <text class="empty-icon">*</text>
+        </view>
+      </view>
+      <text class="empty-desc">暂无PR记录，继续努力！</text>
+    </view>
+
+    <view wx:else class="pr-list">
+      <view wx:for="{{recentPRs}}"
+            wx:key="date"
+            class="pr-item"
+            hover-class="item-pressed">
+        <view class="pr-icon-wrap">
+          <text class="pr-icon">★</text>
+        </view>
+        <view class="pr-info">
+          <text class="pr-exercise">{{item.exercise}}</text>
+          <text class="pr-date">{{item.date}}</text>
+        </view>
+        <view class="pr-value">
+          <text class="value">{{item.value}}</text>
+          <text class="type">{{item.type}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,713 @@
+/* 训练中心首页样式 — WeUI 扁平风格 */
+
+.page-home {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #FFFFFF;
+  padding: 40rpx;
+  padding-top: calc(40rpx + env(safe-area-inset-top));
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* =====================
+   顶部欢迎区
+   ===================== */
+.welcome-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 48rpx;
+  padding-top: 20rpx;
+}
+
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.welcome-greeting {
+  font-size: 28rpx;
+  color: #999999;
+  letter-spacing: 2rpx;
+  text-transform: uppercase;
+  margin-bottom: 4rpx;
+}
+
+.welcome-title {
+  font-size: 52rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  letter-spacing: -1rpx;
+  line-height: 1.1;
+}
+
+.date-widget {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  text-align: center;
+  border: 1rpx solid #E5E5E5;
+}
+
+.date-day {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  display: block;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.date-week {
+  font-size: 20rpx;
+  color: #999999;
+  display: block;
+  margin-top: 2rpx;
+}
+
+/* =====================
+   登录引导
+   ===================== */
+.login-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.login-hero {
+  margin-bottom: 60rpx;
+}
+
+.login-avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 40rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.login-avatar-icon {
+  font-size: 72rpx;
+}
+
+.login-headline {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.login-subhead {
+  font-size: 28rpx;
+  color: #666666;
+  line-height: 1.6;
+  max-width: 500rpx;
+  display: block;
+}
+
+.btn-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  width: 100%;
+  height: 100rpx;
+  background: #07C160;
+  border-radius: 9999rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  border: none;
+}
+
+.btn-login:active {
+  opacity: 0.85;
+}
+
+/* =====================
+   骨架屏加载
+   ===================== */
+.loading-section {
+  padding: 60rpx 0;
+}
+
+.skeleton-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.skeleton-block {
+  background: linear-gradient(90deg, #F0F0F0 25%, #E0E0E0 50%, #F0F0F0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+  border-radius: 24rpx;
+}
+
+.skeleton-block.tall { height: 320rpx; }
+.skeleton-block.medium { height: 200rpx; }
+.skeleton-block.short { height: 160rpx; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =====================
+   空状态
+   ===================== */
+.empty-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 40rpx;
+  text-align: center;
+}
+
+.empty-visual {
+  width: 120rpx;
+  height: 120rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
+}
+
+.empty-icon {
+  font-size: 56rpx;
+  color: #B0B0B0;
+}
+
+.empty-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-bottom: 16rpx;
+}
+
+.empty-desc {
+  font-size: 28rpx;
+  color: #666666;
+  margin-bottom: 48rpx;
+  max-width: 450rpx;
+  line-height: 1.6;
+}
+
+.btn-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  height: 96rpx;
+  padding: 0 48rpx;
+  background: #07C160;
+  border-radius: 9999rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  border: none;
+}
+
+.btn-cta:active {
+  opacity: 0.85;
+}
+
+.btn-cta-arrow {
+  font-size: 28rpx;
+  transition: transform 0.2s ease;
+}
+
+/* =====================
+   今日训练
+   ===================== */
+.training-section {
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =====================
+   本周概览：进度环与Streak
+   ===================== */
+.week-overview {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.progress-ring-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex: 1;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 20rpx 24rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.progress-ring-bg {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring-fill {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 50%;
+  mask: radial-gradient(transparent 55%, black 56%);
+  -webkit-mask: radial-gradient(transparent 55%, black 56%);
+}
+
+.progress-ring-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.progress-ring-num {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+.progress-ring-total {
+  font-size: 18rpx;
+  color: #999999;
+}
+
+.progress-ring-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.streak-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 16rpx 32rpx;
+  border: 1rpx solid #E5E5E5;
+  min-width: 140rpx;
+}
+
+.streak-flame {
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+.streak-num {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1.2;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+.streak-label {
+  font-size: 20rpx;
+  color: #999999;
+}
+
+/* =====================
+   休息日横幅
+   ===================== */
+.rest-day-banner {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx 32rpx;
+  margin-bottom: 32rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.rest-day-icon {
+  font-size: 48rpx;
+}
+
+.rest-day-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.rest-day-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.rest-day-desc {
+  font-size: 24rpx;
+  color: #666666;
+  margin-top: 4rpx;
+}
+
+/* =====================
+   Deload 提醒横幅
+   ===================== */
+.deload-banner {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx 32rpx;
+  margin-bottom: 32rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.deload-icon {
+  font-size: 48rpx;
+  flex-shrink: 0;
+}
+
+.deload-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.deload-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.deload-desc {
+  font-size: 24rpx;
+  color: #666666;
+  margin-top: 4rpx;
+}
+
+.deload-dismiss {
+  font-size: 28rpx;
+  color: #999999;
+  padding: 8rpx;
+  flex-shrink: 0;
+}
+
+/* =====================
+   训练主卡片
+   ===================== */
+.training-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 0 0 40rpx 0;
+  border: 1rpx solid #E5E5E5;
+  overflow: hidden;
+}
+
+/* 移除红色顶部条，改用阴影分隔 */
+.card-accent {
+  height: 0;
+  display: none;
+}
+
+.card-header-modern {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 32rpx 32rpx 24rpx 32rpx;
+}
+
+.card-label {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  letter-spacing: 3rpx;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.card-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.badge-pill {
+  background: #F0F0F0;
+  color: #1A1A1A;
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 10rpx 20rpx;
+  border-radius: 9999rpx;
+}
+
+/* =====================
+   数据网格
+   ===================== */
+.stats-grid {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #F5F5F5;
+  margin: 0 24rpx;
+  padding: 32rpx 16rpx;
+  border-radius: 24rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.stat-icon-wrap {
+  width: 56rpx;
+  height: 56rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  border: 1rpx solid #E5E5E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+}
+
+.stat-icon {
+  font-size: 28rpx;
+  color: #1A1A1A;
+}
+
+.stat-value {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-value-sm {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  max-width: 100rpx;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: #999999;
+  margin-top: 6rpx;
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 80rpx;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* =====================
+   主按钮
+   ===================== */
+.card-action {
+  padding: 32rpx 24rpx 0 24rpx;
+}
+
+.btn-start,
+.btn-resume {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  width: 100%;
+  height: 112rpx;
+  border-radius: 9999rpx;
+  font-size: 36rpx;
+  font-weight: 700;
+  border: none;
+  transition: box-shadow 0.15s ease;
+}
+
+/* 开始训练 — WeUI 绿 */
+.btn-start {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.btn-start:active {
+  opacity: 0.85;
+}
+
+/* 继续训练 — 灰色底 */
+.btn-resume {
+  background: #666666;
+  color: #FFFFFF;
+}
+
+.btn-resume:active {
+  opacity: 0.85;
+}
+
+.btn-start-icon {
+  font-size: 28rpx;
+}
+
+/* =====================
+   动作预览
+   ===================== */
+.exercises-section {
+  margin-top: 40rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.section-link {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  padding: 8rpx 16rpx;
+  border-radius: 16rpx;
+}
+
+.section-link:active {
+  opacity: 0.7;
+}
+
+.link-arrow {
+  font-size: 32rpx;
+  font-weight: 300;
+}
+
+.exercise-list {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  overflow: hidden;
+  border: 1rpx solid #E5E5E5;
+}
+
+.exercise-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 28rpx;
+  border-bottom: none;
+  transition: background-color 0.15s ease;
+}
+
+.exercise-item:last-child {
+  border-bottom: none;
+}
+
+.exercise-item:active {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* 动作编号圆 — 纯黑底白字 */
+.exercise-number {
+  width: 56rpx;
+  height: 56rpx;
+  background: #1A1A1A;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.exercise-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.exercise-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 6rpx;
+}
+
+.exercise-details {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.exercise-sets,
+.exercise-weight {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.exercise-sep {
+  color: #CCCCCC;
+  font-size: 20rpx;
+}
+
+.exercise-tag {
+  font-size: 20rpx;
+  color: #666666;
+  background: #F5F5F5;
+  padding: 8rpx 16rpx;
+  border-radius: 9999rpx;
+  margin-left: 16rpx;
+  flex-shrink: 0;
+}
+
+/* 弹窗内图标容器 */
+.modal-icon-wrap {
+  width: 96rpx;
+  height: 96rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24rpx;
+}

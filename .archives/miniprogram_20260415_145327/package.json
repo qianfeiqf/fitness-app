@@ -1,0 +1,21 @@
+{
+  "name": "fitness-miniprogram",
+  "version": "1.0.0",
+  "description": "健身训练计划小程序",
+  "main": "app.js",
+  "scripts": {
+    "dev": "npm install tdesign-miniprogram --save",
+    "build": "echo 'Build complete'"
+  },
+  "keywords": [
+    "wechat",
+    "miniprogram",
+    "fitness",
+    "tdesign"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "tdesign-miniprogram": "^1.13.2"
+  }
+}

@@ -1,0 +1,169 @@
+/* 训练历史列表页 — WeUI 扁平风格 */
+
+.page-history {
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding-bottom: 40rpx;
+}
+
+/* 顶部统计 — 白色拟物卡片（替代红色背景） */
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: #FFFFFF;
+  margin: 24rpx 30rpx;
+  padding: 48rpx 30rpx 40rpx;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.history-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.history-stat-num {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  line-height: 1;
+}
+
+.history-stat-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+.history-stat-divider {
+  width: 1rpx;
+  height: 60rpx;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* WeUI 组件样式覆盖 */
+mp-tabs {
+  padding: 0 30rpx;
+  margin-bottom: 8rpx;
+}
+
+/* 骨架屏 */
+.loading-wrap {
+  padding: 30rpx;
+}
+
+.skeleton-row {
+  height: 140rpx;
+  background: linear-gradient(90deg, #F0F0F0 25%, #E8E8E8 50%, #F0F0F0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 空状态 */
+.empty-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 48rpx;
+  color: #B0B0B0;
+  margin-bottom: 24rpx;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #666666;
+}
+
+/* 历史列表 */
+.history-list {
+  padding: 20rpx 30rpx;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx 30rpx;
+  margin-bottom: 20rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.history-item:active {
+  background-color: #F8F8F8;
+}
+
+.item-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-date {
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 6rpx;
+}
+
+.item-plan {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: 20rpx;
+}
+
+.item-metric {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 4rpx;
+}
+
+.metric-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+.metric-unit {
+  font-size: 22rpx;
+  color: #999999;
+  margin-left: 4rpx;
+}
+
+.item-meta {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.item-arrow {
+  font-size: 32rpx;
+  color: #CCCCCC;
+}

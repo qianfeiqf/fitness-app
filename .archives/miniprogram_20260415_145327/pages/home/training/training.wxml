@@ -1,0 +1,268 @@
+<!-- 训练中页面 - TDesign 组件版 -->
+
+<view class="page-training">
+  <!-- TDesign Toast 容器 -->
+  <t-toast id="t-toast" />
+  <t-toast id="t-toast-loading" />
+  <t-dialog id="t-dialog" />
+
+  <!-- 顶部进度条 -->
+  <view class="progress-header">
+    <view class="progress-info">
+      <text class="exercise-counter">{{currentExerciseIndex + 1}}/{{exercises.length}}</text>
+      <text class="exercise-name">{{currentExercise.name}}</text>
+    </view>
+    <!-- TDesign 进度条 -->
+    <t-progress
+      percentage="{{(currentExercise.currentSetNumber / currentExercise.target_sets) * 100}}"
+      color="#e63946"
+      stroke-width="12rpx"
+      show-label="{{false}}"
+    />
+  </view>
+
+  <!-- 整体进度展示 -->
+  <view class="overall-progress">
+    <!-- 环形进度 -->
+    <view class="circle-progress">
+      <view
+        class="circle-progress-ring"
+        style="--progress-angle: {{overallProgressAngle}}"
+      >
+        <view class="circle-progress-inner">
+          <text class="circle-progress-text">{{completedExerciseCount}}/{{exercises.length}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 动作完成状态 -->
+    <view class="exercise-status-list">
+      <view
+        wx:for="{{exerciseStatusList}}"
+        wx:key="index"
+        class="exercise-status-item {{item.status}}"
+      >
+        <text class="status-check">{{item.status === 'completed' ? '✓' : item.status === 'current' ? '●' : '○'}}</text>
+        <text class="status-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- PR徽章展示 -->
+  <view wx:if="{{prBadges.length > 0}}" class="pr-badges">
+    <view wx:for="{{prBadges}}" wx:key="id" class="pr-badge-item">
+      <text class="pr-badge-icon">🏆</text>
+      <text class="pr-badge-text">{{item.exerciseName}} 新PR: {{item.value}}kg</text>
+    </view>
+  </view>
+
+  <!-- 休息倒计时 -->
+  <view wx:if="{{isResting}}" class="rest-overlay">
+    <view class="rest-content">
+      <text class="rest-label">组间休息</text>
+
+      <!-- TDesign 倒计时组件 -->
+      <t-count-down
+        time="{{restTimeLeft * 1000}}"
+        format="mm:ss"
+        bind:finish="onRestComplete"
+        auto-size
+        style="font-size: 96rpx; color: #fff;"
+      />
+
+      <!-- TDesign 进度条 -->
+      <t-progress
+        percentage="{{(restTimeLeft / restTimeTotal) * 100}}"
+        color="#e63946"
+        stroke-width="8rpx"
+        show-label="{{false}}"
+        style="margin-top: 40rpx;"
+      />
+
+      <view class="rest-actions">
+        <!-- TDesign 按钮 -->
+        <t-button
+          theme="light"
+          size="small"
+          variant="outline"
+          bind:tap="onReduceRestTime"
+        >-30s</t-button>
+
+        <t-button
+          theme="primary"
+          size="large"
+          block
+          bind:tap="onSkipRest"
+        >跳过休息</t-button>
+
+        <t-button
+          theme="light"
+          size="small"
+          variant="outline"
+          bind:tap="onAddRestTime"
+        >+30s</t-button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 主训练区域 -->
+  <view wx:else class="training-main">
+    <!-- 动作信息 -->
+    <view class="exercise-header">
+      <!-- TDesign 标签 -->
+      <t-tag theme="danger" variant="outline">{{currentExercise.muscle_group}}</t-tag>
+      <text class="set-indicator">第 {{currentExercise.currentSetNumber}} / {{currentExercise.target_sets}} 组</text>
+    </view>
+
+    <!-- 目标展示 -->
+    <view class="target-display">
+      <text class="target-label">目标</text>
+      <text class="target-weight">{{currentExercise.target_weight}} kg</text>
+      <text class="target-separator">×</text>
+      <text class="target-reps">{{currentExercise.target_reps}} 次</text>
+    </view>
+
+    <!-- 实际录入（可调整） -->
+    <view class="actual-input">
+      <view class="input-group">
+        <text class="input-label">实际重量</text>
+        <view class="input-stepper">
+          <!-- TDesign 次级按钮 -->
+          <t-button
+            theme="default"
+            size="small"
+            variant="outline"
+            bind:tap="onAdjustSet"
+            data-type="weight"
+            data-value="{{currentExercise.actual_weight - 2.5}}"
+          >-</t-button>
+
+          <input
+            class="stepper-input"
+            type="digit"
+            value="{{currentExercise.actual_weight}}"
+            data-type="weight"
+            bindinput="onAdjustSet"
+          />
+
+          <t-button
+            theme="default"
+            size="small"
+            variant="outline"
+            bind:tap="onAdjustSet"
+            data-type="weight"
+            data-value="{{currentExercise.actual_weight + 2.5}}"
+          >+</t-button>
+        </view>
+      </view>
+
+      <view class="input-group">
+        <text class="input-label">实际次数</text>
+        <view class="input-stepper">
+          <t-button
+            theme="default"
+            size="small"
+            variant="outline"
+            bind:tap="onAdjustSet"
+            data-type="reps"
+            data-value="{{currentExercise.actual_reps - 1}}"
+          >-</t-button>
+
+          <input
+            class="stepper-input"
+            type="number"
+            value="{{currentExercise.actual_reps}}"
+            data-type="reps"
+            bindinput="onAdjustSet"
+          />
+
+          <t-button
+            theme="default"
+            size="small"
+            variant="outline"
+            bind:tap="onAdjustSet"
+            data-type="reps"
+            data-value="{{currentExercise.actual_reps + 1}}"
+          >+</t-button>
+        </view>
+      </view>
+    </view>
+
+    <!-- RPE选择 -->
+    <view class="rpe-section">
+      <text class="rpe-label">自觉力竭程度 (RPE)</text>
+      <view class="rpe-options">
+        <t-button
+          wx:for="{{rpeOptions}}"
+          wx:key="index"
+          size="small"
+          theme="{{selectedRPE === index ? 'danger' : 'default'}}"
+          variant="{{selectedRPE === index ? 'filled' : 'outline'}}"
+          bind:tap="onSelectRPE"
+          data-value="{{index}}"
+        >{{item}}</t-button>
+      </view>
+    </view>
+
+    <!-- 完成按钮 -->
+    <view class="action-buttons">
+      <t-button
+        theme="default"
+        size="medium"
+        variant="outline"
+        bind:tap="onReplaceExercise"
+      >替换动作</t-button>
+
+      <t-button
+        theme="primary"
+        size="large"
+        block
+        bind:tap="onCompleteSet"
+      >
+        <text>✓</text>
+        <text>完成一组</text>
+      </t-button>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <button class="btn-icon" bindtap="onPauseTraining">
+      <text class="icon">⏸️</text>
+      <text class="icon-label">暂停</text>
+    </button>
+    <button class="btn-icon danger" bindtap="onAbandonTraining">
+      <text class="icon">✖️</text>
+      <text class="icon-label">放弃</text>
+    </button>
+  </view>
+
+  <!-- 动作替换弹窗 -->
+  <view wx:if="{{showReplaceModal}}" class="modal-mask" bindtap="onCancelReplace">
+    <view class="modal-content" catchtap="noop">
+      <text class="modal-title">替换动作</text>
+      <text class="modal-desc">选择同发力模式的替代动作</text>
+
+      <view class="alternative-list">
+        <button
+          wx:for="{{alternativeExercises}}"
+          wx:key="id"
+          class="alternative-item"
+          data-exercise-id="{{item.id}}"
+          bindtap="onSelectAlternative"
+        >
+          <text class="alt-name">{{item.name}}</text>
+          <text class="alt-muscle">{{item.muscle_group}}</text>
+        </button>
+      </view>
+
+      <t-button
+        theme="default"
+        size="large"
+        block
+        variant="outline"
+        bind:tap="onCancelReplace"
+      >取消</t-button>
+    </view>
+  </view>
+</view>

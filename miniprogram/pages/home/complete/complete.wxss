@@ -1,0 +1,246 @@
+/* 训练完成页面样式 — WeUI 扁平风格 */
+
+.page-complete {
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding: 40rpx;
+  padding-top: calc(40rpx + env(safe-area-inset-top));
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  position: relative;
+  overflow: hidden;
+}
+
+/* 完成头部 */
+.complete-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60rpx;
+  margin-bottom: 60rpx;
+  animation: scaleIn 0.4s ease-out;
+}
+
+.complete-icon-wrap {
+  width: 120rpx;
+  height: 120rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24rpx;
+}
+
+.complete-icon {
+  font-size: 56rpx;
+  color: #1A1A1A;
+}
+
+.complete-title {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-bottom: 10rpx;
+}
+
+.complete-subtitle {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+/* 统计卡片 */
+.stats-cards {
+  display: flex;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 40rpx;
+}
+
+.stat-card {
+  flex: 1;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 30rpx 20rpx;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1rpx solid #E5E5E5;
+}
+
+.stat-value {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-bottom: 8rpx;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+/* PR区域 — 黑色背景 */
+.pr-section {
+  margin-bottom: 40rpx;
+}
+
+.pr-banner {
+  background: #07C160;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+}
+
+.pr-icon {
+  font-size: 40rpx;
+}
+
+.pr-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+/* 完成列表 */
+.completed-list {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 40rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.completed-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: none;
+}
+
+.completed-item:last-child {
+  border-bottom: none;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
+  font-size: 28rpx;
+  color: #1A1A1A;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.item-detail {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.pr-badge {
+  background: #07C160;
+  color: #FFFFFF;
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 4rpx 12rpx;
+  border-radius: 9999rpx;
+}
+
+/* 分享按钮 */
+.share-section {
+  margin-bottom: 24rpx;
+}
+
+.btn-share {
+  background: #07C160;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  border-radius: 9999rpx;
+  font-weight: 600;
+  height: 96rpx;
+  font-size: 32rpx;
+}
+
+.btn-share:active {
+  opacity: 0.85;
+}
+
+.share-icon {
+  font-size: 32rpx;
+}
+
+/* 分享画布（隐藏在屏幕外） */
+.share-canvas {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  width: 750px;
+  height: 1000px;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.btn {
+  border-radius: 9999rpx;
+  font-size: 32rpx;
+  padding: 0;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: box-shadow 0.15s ease;
+  border: none;
+}
+
+.btn-primary {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.btn-primary:active {
+  opacity: 0.85;
+}
+
+.btn-secondary {
+  background: #F5F5F5;
+  color: #666666;
+}
+
+.btn-secondary:active {
+  background-color: #F8F8F8;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

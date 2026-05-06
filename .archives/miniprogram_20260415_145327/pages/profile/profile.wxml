@@ -1,0 +1,79 @@
+<!-- 个人中心页面 -->
+
+<view class="page-profile">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">我的</text>
+  </view>
+
+  <!-- 未登录状态 -->
+  <view wx:if="{{!isLoggedIn}}" class="login-required">
+    <text class="login-title">登录后可查看完整数据</text>
+    <button class="btn btn-primary" bindtap="onLogin">微信登录</button>
+  </view>
+
+  <!-- 已登录 -->
+  <view wx:else>
+    <!-- 身体档案 -->
+    <view class="card profile-card">
+      <view class="card-header">
+        <text class="card-title">身体档案</text>
+      </view>
+
+      <view class="profile-inputs">
+        <view class="profile-input">
+          <text class="input-label">体重 (kg)</text>
+          <input class="input"
+                 type="digit"
+                 placeholder="0"
+                 value="{{weight}}"
+                 bindinput="onUpdateWeight" />
+        </view>
+        <view class="profile-input">
+          <text class="input-label">身高 (cm)</text>
+          <input class="input"
+                 type="digit"
+                 placeholder="0"
+                 value="{{height}}"
+                 bindinput="onUpdateHeight" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 功能列表 -->
+    <view class="list">
+      <view class="list-item" bindtap="onExportData">
+        <view class="list-item-icon">📤</view>
+        <view class="list-item-content">
+          <text class="list-item-title">数据导出</text>
+          <text class="list-item-subtitle">导出Markdown或CSV格式</text>
+        </view>
+        <text class="list-item-arrow">›</text>
+      </view>
+
+      <view class="list-item" bindtap="onSyncData">
+        <view class="list-item-icon">🔄</view>
+        <view class="list-item-content">
+          <text class="list-item-title">同步数据</text>
+          <text class="list-item-subtitle">将本地数据同步到云端</text>
+        </view>
+        <text class="list-item-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 账号操作 -->
+    <view class="list">
+      <view class="list-item" bindtap="onLogout">
+        <view class="list-item-icon">🔚</view>
+        <view class="list-item-content">
+          <text class="list-item-title logout">退出登录</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 版本信息 -->
+    <view class="version-info">
+      <text class="version-text">健身训练计划小程序 v1.0.0</text>
+    </view>
+  </view>
+</view>

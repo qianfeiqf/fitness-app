@@ -1,0 +1,74 @@
+<!-- 动作库页面 -->
+<view class="page-library">
+  <!-- 搜索栏 -->
+  <mp-searchbar
+    placeholder="搜索动作名称"
+    value="{{searchKeyword}}"
+    bind:input="onSearchInput"
+    bind:confirm="onSearch"
+    bind:cancel="onClearSearch"
+  />
+
+  <!-- 肌群筛选 -->
+  <mp-tabs tabs="{{muscleGroupTabs}}" active-tab="{{selectedGroupIndex}}" bind:change="onGroupTabChange" />
+
+  <!-- 动作列表 -->
+  <scroll-view class="exercise-list" scroll-y>
+    <view wx:for="{{groupedExercises}}" wx:key="group" class="exercise-group">
+      <view class="group-header">{{item.group}}</view>
+      <view wx:for="{{item.exercises}}" wx:key="id" class="exercise-item"
+            bindtap="onSelectExercise" data-exercise="{{item}}">
+        <view class="exercise-info">
+          <text class="exercise-name">{{item.name}}</text>
+          <text class="exercise-name-en">{{item.name_en}}</text>
+        </view>
+        <view class="exercise-arrow">›</view>
+      </view>
+    </view>
+
+    <!-- 无结果 -->
+    <view wx:if="{{groupedExercises.length === 0}}" class="empty-state">
+      <text class="empty-text">未找到匹配的动作</text>
+    </view>
+  </scroll-view>
+
+  <!-- 添加自定义动作按钮 -->
+  <view class="add-custom-btn" bindtap="onShowAddCustom">
+    <text class="add-icon">+</text>
+    <text>添加自定义动作</text>
+  </view>
+
+  <!-- 添加自定义动作弹窗 -->
+  <modal-sheet
+    visible="{{showAddCustom}}"
+    title="添加自定义动作"
+    confirmText="添加"
+    cancelText="取消"
+    bind:confirm="onConfirmAddCustom"
+    bind:cancel="onCloseAddCustom"
+    bind:close="onCloseAddCustom"
+  >
+    <view class="form-item">
+      <text class="form-label">动作名称</text>
+      <input class="form-input" placeholder="输入动作名称"
+             value="{{customExercise.name}}" bindinput="onInputCustomName" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">英文名称（可选）</text>
+      <input class="form-input" placeholder="输入英文名称"
+             value="{{customExercise.name_en}}" bindinput="onInputCustomNameEn" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">肌群</text>
+      <picker class="form-picker" mode="selector" range="{{muscleGroups}}"
+              value="{{customExercise.muscleGroupIndex}}"
+              bindchange="onSelectMuscleGroup">
+        <view class="picker-value">
+          {{customExercise.muscle_group || '选择肌群'}}
+        </view>
+      </picker>
+    </view>
+  </modal-sheet>
+</view>

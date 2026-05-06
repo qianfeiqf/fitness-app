@@ -1,0 +1,405 @@
+/* 新建计划页面样式 — WeUI 扁平风格 */
+
+.page-create {
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding: 30rpx;
+  padding-bottom: 160rpx;
+}
+
+/* =====================
+   表单区块
+   ===================== */
+.form-section {
+  margin-bottom: 48rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.section-hint {
+  font-size: 24rpx;
+  color: #999999;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 96rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  padding: 0 32rpx;
+  font-size: 30rpx;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+
+/* =====================
+   周期类型选择
+   ===================== */
+.cycle-options {
+  display: flex;
+  gap: 20rpx;
+}
+
+.cycle-option {
+  flex: 1;
+  padding: 32rpx 24rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 24rpx;
+}
+
+.cycle-option.active {
+  background-color: #F8F8F8;
+  border-color: #07C160;
+}
+
+.cycle-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.cycle-option.active .cycle-name {
+  color: #1A1A1A;
+  font-weight: 700;
+}
+
+.cycle-desc {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+}
+
+/* =====================
+   训练日选择
+   ===================== */
+.day-selector {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+}
+
+.day-item {
+  width: 100rpx;
+  height: 100rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-item.active {
+  background: #07C160;
+}
+
+.day-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.day-item.active .day-name {
+  color: #FFFFFF;
+}
+
+/* =====================
+   循环标签
+   ===================== */
+.cycle-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.cycle-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+}
+
+.cycle-label-day {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+
+.cycle-label-picker {
+  padding: 12rpx 24rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 16rpx;
+}
+
+.picker-value {
+  font-size: 26rpx;
+  color: #1A1A1A;
+}
+
+/* =====================
+   训练日动作
+   ===================== */
+.day-exercises {
+  margin-bottom: 40rpx;
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.day-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.day-cycle-tag {
+  padding: 6rpx 16rpx;
+  background: #F0F0F0;
+  color: #1A1A1A;
+  font-size: 22rpx;
+  font-weight: 600;
+  border-radius: 9999rpx;
+}
+
+/* =====================
+   动作卡片
+   ===================== */
+.exercise-card {
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 24rpx;
+  margin-bottom: 16rpx;
+  overflow: hidden;
+}
+
+.exercise-card-header {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: #F5F5F5;
+  border-bottom: none;
+}
+
+.exercise-card-name {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.exercise-card-muscle {
+  font-size: 22rpx;
+  color: #999999;
+  margin-right: 16rpx;
+}
+
+.exercise-card-delete {
+  width: 48rpx;
+  height: 48rpx;
+  background: rgba(250, 81, 81, 0.08);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #FA5151;
+  font-weight: 300;
+}
+
+.exercise-card-body {
+  display: flex;
+  gap: 12rpx;
+  padding: 20rpx 24rpx;
+}
+
+.exercise-param {
+  flex: 1;
+}
+
+.param-label {
+  font-size: 20rpx;
+  color: #999999;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.param-input {
+  width: 100%;
+  height: 72rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  padding: 0 16rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* =====================
+   添加动作按钮
+   ===================== */
+.add-exercise-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  height: 88rpx;
+  background: #F5F5F5;
+  border: 2rpx dashed rgba(0, 0, 0, 0.15);
+  border-radius: 16rpx;
+  margin-top: 16rpx;
+}
+
+.add-icon {
+  font-size: 32rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+}
+
+.add-exercise-btn text:not(.add-icon) {
+  font-size: 28rpx;
+  color: #1A1A1A;
+  font-weight: 500;
+}
+
+/* =====================
+   空提示
+   ===================== */
+.empty-hint {
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.empty-hint text {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* =====================
+   高级选项
+   ===================== */
+.advanced-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-top: none;
+  margin-top: 16rpx;
+}
+
+.advanced-toggle-text {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.advanced-toggle-icon {
+  font-size: 36rpx;
+  color: #999999;
+  transition: transform 0.2s ease;
+}
+
+.advanced-toggle-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.advanced-content {
+  padding-top: 24rpx;
+  animation: fadeIn 0.3s ease;
+}
+
+.advanced-option {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.advanced-option-header {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.advanced-option-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 6rpx;
+}
+
+.advanced-option-hint {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+  line-height: 1.4;
+}
+
+.advanced-switch {
+  transform: scale(0.85);
+}
+
+.cycle-labels-title {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+/* =====================
+   底部操作按钮
+   ===================== */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 30rpx;
+  padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
+  background: #FFFFFF;
+  border-top: none;
+}
+
+.btn-save {
+  width: 100%;
+  height: 100rpx;
+  background: #07C160;
+  color: #FFFFFF;
+  border-radius: 9999rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.btn-save.edit {
+  background: #666666;
+}
+
+.btn-save:active {
+  opacity: 0.85;
+}

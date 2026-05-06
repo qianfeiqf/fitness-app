@@ -1,0 +1,65 @@
+<!-- 训练完成页面 - 浅色简约 -->
+
+<view class="page-complete">
+  <!-- 完成标志 -->
+  <view class="complete-header">
+    <view class="complete-icon-wrap">
+      <text class="complete-icon">✓</text>
+    </view>
+    <text class="complete-title">训练完成</text>
+    <text class="complete-subtitle">{{session ? session.plan_name : ''}}</text>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-cards">
+    <view class="stat-card">
+      <text class="stat-value">{{completedSets.length}}</text>
+      <text class="stat-label">完成组数</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value">{{totalVolume}}</text>
+      <text class="stat-label">总容量(kg)</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value">{{duration}}</text>
+      <text class="stat-label">训练时长</text>
+    </view>
+  </view>
+
+  <!-- PR展示 -->
+  <view wx:if="{{prCount > 0}}" class="pr-section">
+    <view class="pr-banner">
+      <text class="pr-icon">🏆</text>
+      <text class="pr-text">恭喜刷新 {{prCount}} 个个人纪录！</text>
+    </view>
+  </view>
+
+  <!-- 完成动作列表 -->
+  <view class="completed-list">
+    <text class="section-title">完成动作</text>
+    <view wx:for="{{completedSets}}" wx:key="id" class="completed-item">
+      <view class="item-info">
+        <text class="item-name">{{item.exercise_name}}</text>
+        <text class="item-detail">第{{item.set_number}}组 · {{item.actual_weight}}kg × {{item.actual_reps}}次</text>
+      </view>
+      <view wx:if="{{item.is_pr}}" class="pr-badge">PR</view>
+    </view>
+  </view>
+
+  <!-- 分享按钮 -->
+  <view class="share-section">
+    <button class="btn btn-share btn-block" bindtap="onShareCard">
+      <text class="share-icon">📷</text>
+      <text>生成分享卡片</text>
+    </button>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons">
+    <button class="btn btn-secondary btn-block" bindtap="onViewStats">查看统计</button>
+    <button class="btn btn-primary btn-block" bindtap="onBackHome">返回首页</button>
+  </view>
+
+  <!-- 分享画布 (绝对定位在屏幕外) -->
+  <canvas type="2d" id="shareCanvas" class="share-canvas"></canvas>
+</view>

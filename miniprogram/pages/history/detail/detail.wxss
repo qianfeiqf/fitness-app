@@ -1,0 +1,191 @@
+/* 单次训练详情页 — WeUI 扁平风格 */
+
+.page-detail {
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding-bottom: 40rpx;
+}
+
+/* 加载骨架屏 */
+.loading-wrap {
+  padding: 30rpx;
+}
+
+.skeleton-block {
+  background: linear-gradient(90deg, #F0F0F0 25%, #E8E8E8 50%, #F0F0F0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.skeleton-block.tall { height: 240rpx; }
+.skeleton-block.medium { height: 300rpx; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 头部 — 白色拟物卡片（替代深色背景） */
+.detail-header {
+  background: #FFFFFF;
+  margin: 24rpx 30rpx;
+  padding: 40rpx 30rpx 48rpx;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.detail-date {
+  font-size: 24rpx;
+  color: #999999;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.detail-plan {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 32rpx;
+}
+
+.detail-tags {
+  display: flex;
+  gap: 24rpx;
+}
+
+.detail-tag {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+  background: #F5F5F5;
+  padding: 16rpx 24rpx;
+  border-radius: 16rpx;
+}
+
+.tag-value {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+.tag-label {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+/* PR 区域 — 黑色背景 */
+.detail-pr {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-top: 24rpx;
+  background: #1A1A1A;
+  padding: 16rpx 24rpx;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.pr-icon {
+  font-size: 32rpx;
+}
+
+/* 动作分组列表 */
+.exercise-list {
+  padding: 24rpx 30rpx;
+}
+
+.exercise-group {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx 30rpx;
+  margin-bottom: 20rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: none;
+}
+
+.group-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.group-count {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+/* 每组记录 */
+.set-row {
+  padding: 18rpx 0;
+  border-bottom: none;
+}
+
+.set-row:last-child {
+  border-bottom: none;
+}
+
+.set-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.set-number {
+  font-size: 26rpx;
+  color: #666666;
+}
+
+.set-value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.set-meta {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.set-rpe {
+  font-size: 22rpx;
+  color: #666666;
+  background: #F5F5F5;
+  padding: 4rpx 12rpx;
+  border-radius: 9999rpx;
+}
+
+.set-pr {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  background: #07C160;
+  padding: 4rpx 12rpx;
+  border-radius: 9999rpx;
+}
+
+.set-note {
+  margin-top: 10rpx;
+  padding: 10rpx 16rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+}
+
+.set-note text {
+  font-size: 24rpx;
+  color: #666666;
+}

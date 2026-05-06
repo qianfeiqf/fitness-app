@@ -1,0 +1,252 @@
+/* 计划详情页面样式 */
+
+.page-detail {
+  min-height: 100vh;
+  background-color: var(--color-bg-dark);
+  padding: 30rpx;
+  padding-bottom: 200rpx;
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 200rpx 0;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 4rpx solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 30rpx;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+}
+
+/* 计划头部 */
+.plan-header {
+  margin-bottom: 40rpx;
+}
+
+.plan-title-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 12rpx;
+}
+
+.plan-name {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.plan-desc {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+/* 徽章 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 12rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.badge-success {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.badge-secondary {
+  background-color: var(--color-bg-input);
+  color: var(--color-text-secondary);
+}
+
+.badge-warning {
+  background-color: var(--color-warning);
+  color: white;
+}
+
+/* 周计划 */
+.week-schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.day-section {
+  background-color: var(--color-bg-card);
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.day-section.has-exercises {
+  border-left: 4rpx solid var(--color-primary);
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 30rpx;
+  background-color: var(--color-bg-input);
+}
+
+.day-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.day-count {
+  font-size: 24rpx;
+  color: var(--color-primary);
+}
+
+.day-exercises {
+  padding: 20rpx 30rpx;
+}
+
+.exercise-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--color-divider);
+}
+
+.exercise-card:last-child {
+  border-bottom: none;
+}
+
+.exercise-main {
+  flex: 1;
+}
+
+.exercise-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  display: block;
+}
+
+.exercise-sets {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  margin-top: 4rpx;
+  display: block;
+}
+
+.exercise-meta {
+  text-align: right;
+}
+
+.exercise-weight {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-primary);
+  display: block;
+}
+
+.exercise-rest {
+  font-size: 22rpx;
+  color: var(--color-text-muted);
+  margin-top: 4rpx;
+  display: block;
+}
+
+.day-empty {
+  padding: 30rpx;
+  text-align: center;
+}
+
+.day-empty-text {
+  font-size: 26rpx;
+  color: var(--color-text-muted);
+}
+
+/* 操作按钮 */
+.action-buttons {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 30rpx;
+  background: linear-gradient(180deg, transparent 0%, var(--color-bg-dark) 30%);
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #e63946, #c1121f);
+  color: #ffffff;
+}
+
+.btn-primary text,
+.btn-primary > text {
+  color: #ffffff !important;
+}
+
+.btn-secondary {
+  background-color: #16213e;
+  color: #e74c3c;
+  border: 2rpx solid #e74c3c;
+}
+
+.btn-secondary text,
+.btn-secondary > text {
+  color: #e74c3c !important;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* 返回按钮 */
+.back-button {
+  position: fixed;
+  top: 30rpx;
+  left: 30rpx;
+  width: 80rpx;
+  height: 80rpx;
+  background-color: var(--color-bg-card);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.back-icon {
+  font-size: 36rpx;
+  color: var(--color-text-primary);
+}

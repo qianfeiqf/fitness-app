@@ -1,0 +1,62 @@
+<!-- 单次训练详情页 -->
+
+<view class="page-detail">
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <view class="skeleton-block tall"></view>
+    <view class="skeleton-block medium"></view>
+    <view class="skeleton-block medium"></view>
+  </view>
+
+  <!-- 详情内容 -->
+  <view wx:else class="detail-content">
+    <!-- 头部信息 -->
+    <view class="detail-header">
+      <text class="detail-date">{{dateStr}}</text>
+      <text class="detail-plan">{{session.plan_name || '自由训练'}}</text>
+      <view class="detail-tags">
+        <view class="detail-tag">
+          <text class="tag-value">{{sets.length}}</text>
+          <text class="tag-label">组</text>
+        </view>
+        <view class="detail-tag">
+          <text class="tag-value">{{totalVolume}}</text>
+          <text class="tag-label">kg容量</text>
+        </view>
+        <view class="detail-tag">
+          <text class="tag-value">{{duration}}</text>
+          <text class="tag-label">时长</text>
+        </view>
+      </view>
+      <view wx:if="{{prCount > 0}}" class="detail-pr">
+        <text class="pr-icon">🏆</text>
+        <text>本次刷新 {{prCount}} 个 PR</text>
+      </view>
+    </view>
+
+    <!-- 按动作分组的组记录 -->
+    <view class="exercise-list">
+      <view wx:for="{{groupedSets}}" wx:key="exercise_id" class="exercise-group">
+        <view class="group-header">
+          <text class="group-name">{{item.exercise_name}}</text>
+          <text class="group-count">{{item.sets.length}} 组</text>
+        </view>
+        <view class="group-sets">
+          <view wx:for="{{item.sets}}" wx:for-item="set" wx:key="id" class="set-row">
+            <view class="set-main">
+              <text class="set-number">第{{set.set_number}}组</text>
+              <text class="set-value">{{set.actual_weight}}kg × {{set.actual_reps}}次</text>
+            </view>
+            <view class="set-meta">
+              <text wx:if="{{set.rpe}}" class="set-rpe">RPE: {{set.rpe}}</text>
+              <text wx:if="{{set.is_pr}}" class="set-pr">PR</text>
+            </view>
+            <view wx:if="{{set.note}}" class="set-note">
+              <text>💬 {{set.note}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,45 @@
+<!--
+  刻度拨盘组件
+  新拟物化：内凹槽 + 中心指示线 + 上下渐变遮罩
+-->
+<view class="dial-picker">
+  <!-- 上半渐变遮罩 -->
+  <view class="dial-mask dial-mask-top"></view>
+  <!-- 下半渐变遮罩 -->
+  <view class="dial-mask dial-mask-bottom"></view>
+
+  <!-- 中心指示线 -->
+  <view class="dial-center-indicator">
+    <view class="dial-center-line"></view>
+  </view>
+
+  <!-- 可选值列表 -->
+  <scroll-view
+    class="dial-scroll"
+    scroll-y
+    enhanced
+    show-scrollbar="{{false}}"
+    scroll-top="{{scrollTop}}"
+    bindscroll="onScroll"
+    bindscrollend="onScrollEnd"
+  >
+    <!-- 顶部留白：让第 0 项可以居中 -->
+    <view class="dial-spacer"></view>
+
+    <view
+      wx:for="{{items}}"
+      wx:key="index"
+      class="dial-item {{currentIndex === index ? 'dial-item--active' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTapItem"
+    >
+      <text class="dial-item-value">{{item}}</text>
+    </view>
+
+    <!-- 底部留白：让最后一项可以居中 -->
+    <view class="dial-spacer"></view>
+  </scroll-view>
+
+  <!-- 单位文字 -->
+  <view class="dial-unit" wx:if="{{unit}}">{{unit}}</view>
+</view>

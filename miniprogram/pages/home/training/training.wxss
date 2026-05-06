@@ -1,0 +1,1003 @@
+/* 训练中页面 — WeUI 扁平风格 */
+
+.page-training {
+  min-height: 100vh;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+/* =====================
+   进度条（原生替代 t-progress）
+   ===================== */
+.progress-bar-track {
+  width: 100%;
+  height: 8rpx;
+  background: #F0F0F0;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #1A1A1A;
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+/* =====================
+   标签组件
+   ===================== */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44rpx;
+  padding: 0 20rpx;
+  border-radius: 9999rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.tag-primary {
+  background: #F0F0F0;
+  color: #1A1A1A;
+}
+
+.tag-warning {
+  background: #F0F0F0;
+  color: #666666;
+}
+
+/* =====================
+   顶部进度条
+   ===================== */
+.progress-header {
+  padding: 24rpx 40rpx;
+  background: #FFFFFF;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.progress-counter {
+  display: flex;
+  align-items: baseline;
+}
+
+.counter-num {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.counter-sep {
+  font-size: 28rpx;
+  color: #999999;
+  margin: 0 4rpx;
+}
+
+.counter-total {
+  font-size: 28rpx;
+  color: #666666;
+  font-variant-numeric: tabular-nums;
+}
+
+.exercise-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+/* =====================
+   动作列表 - 横向滚动
+   ===================== */
+.exercise-scroll {
+  background: #FFFFFF;
+  padding: 16rpx 40rpx;
+  white-space: nowrap;
+}
+
+.exercise-list {
+  display: inline-flex;
+  gap: 12rpx;
+}
+
+.exercise-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 12rpx 20rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  border: 1rpx solid #E5E5E5;
+  flex-shrink: 0;
+}
+
+.exercise-chip.current {
+  background-color: #07C160;
+  color: #FFFFFF;
+  border-color: #07C160;
+}
+
+.exercise-chip.completed {
+  opacity: 0.5;
+}
+
+.chip-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2rpx;
+}
+
+.chip-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  max-width: 160rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip-sets {
+  font-size: 20rpx;
+  color: #999999;
+}
+
+.chip-check {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.chip-check.done {
+  color: #1A1A1A;
+}
+
+.chip-check.skip {
+  font-size: 20rpx;
+  color: #666666;
+  background: #F0F0F0;
+  padding: 2rpx 8rpx;
+  border-radius: 9999rpx;
+}
+
+.exercise-chip.current .chip-name {
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+.exercise-chip:active {
+  opacity: 0.8;
+}
+
+.exercise-chip.add-chip {
+  border: 2rpx dashed rgba(0, 0, 0, 0.2);
+  background: #F5F5F5;
+  justify-content: center;
+  box-shadow: none;
+}
+
+.exercise-chip.add-chip .add-icon {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-right: 8rpx;
+}
+
+/* =====================
+   PR徽章 — 黑白
+   ===================== */
+.pr-badges {
+  background: #F5F5F5;
+  padding: 16rpx 40rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.pr-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background: #1A1A1A;
+  padding: 10rpx 20rpx;
+  border-radius: 9999rpx;
+}
+
+.pr-badge-icon {
+  font-size: 24rpx;
+}
+
+.pr-badge-text {
+  font-size: 22rpx;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* =====================
+   底部浮动休息计时器
+   ===================== */
+.rest-float-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(120rpx + env(safe-area-inset-bottom));
+  z-index: 100;
+  padding: 0 24rpx;
+  animation: slideUp 0.3s ease-out;
+}
+
+.rest-float-content {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx 32rpx;
+  /* 浮层阴影 */
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.rest-float-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.rest-float-label {
+  font-size: 24rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.rest-float-time {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.rest-float-progress-wrap {
+  margin-bottom: 16rpx;
+}
+
+.rest-float-progress-track {
+  width: 100%;
+  height: 6rpx;
+  background: #FFFFFF;
+  border-radius: 3rpx;
+  overflow: hidden;
+  background-color: #E5E5E5;
+}
+
+.rest-float-progress-fill {
+  height: 100%;
+  background: #1A1A1A;
+  border-radius: 3rpx;
+  transition: width 0.3s ease;
+}
+
+.rest-float-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.rest-float-btn {
+  flex: 1;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  background: #F5F5F5;
+  color: #666666;
+  transition: box-shadow 0.15s ease;
+}
+
+.rest-float-btn:active {
+  background-color: #F8F8F8;
+}
+
+.rest-float-btn.primary {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.rest-float-btn.primary:active {
+  opacity: 0.85;
+}
+
+/* =====================
+   热身区域
+   ===================== */
+.warmup-main {
+  flex: 1;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.warmup-header {
+  margin-bottom: 24rpx;
+}
+
+.warmup-title {
+  margin-top: 16rpx;
+}
+
+.warmup-exercise-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  display: block;
+}
+
+.warmup-target {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+  margin-top: 4rpx;
+}
+
+.warmup-desc {
+  margin-bottom: 24rpx;
+  padding: 16rpx 20rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+}
+
+.warmup-desc-text {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.6;
+}
+
+.warmup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.warmup-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.warmup-item.current {
+  background-color: #F8F8F8;
+}
+
+.warmup-item.completed {
+  opacity: 0.6;
+}
+
+.warmup-check {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: #F0F0F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.warmup-item.completed .warmup-check {
+  background: #07C160;
+}
+
+.warmup-check-icon {
+  font-size: 28rpx;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.warmup-check-num {
+  font-size: 26rpx;
+  color: #666666;
+  font-weight: 600;
+}
+
+.warmup-info {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  flex: 1;
+}
+
+.warmup-weight {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.warmup-sep {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.warmup-reps {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.warmup-label {
+  font-size: 22rpx;
+  color: #999999;
+  flex-shrink: 0;
+}
+
+.warmup-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: auto;
+  padding-top: 16rpx;
+}
+
+.warmup-actions .btn-primary {
+  height: 88rpx;
+  font-size: 30rpx;
+}
+
+.warmup-actions .btn-text {
+  height: auto;
+  padding: 12rpx 24rpx;
+  font-size: 26rpx;
+}
+
+/* =====================
+   主训练区域
+   ===================== */
+.training-main {
+  flex: 1;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.set-indicator {
+  display: flex;
+  align-items: baseline;
+}
+
+.set-current {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.set-sep {
+  font-size: 24rpx;
+  color: #999999;
+  margin: 0 2rpx;
+}
+
+.set-total {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.set-label {
+  font-size: 22rpx;
+  color: #999999;
+  margin-left: 4rpx;
+}
+
+/* =====================
+   目标展示 — DIN 大数字
+   ===================== */
+.target-display {
+  text-align: center;
+  padding: 48rpx 0;
+}
+
+.target-label {
+  font-size: 24rpx;
+  color: #999999;
+  display: block;
+  margin-bottom: 16rpx;
+  letter-spacing: 2rpx;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.target-values {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.target-weight,
+.target-reps {
+  font-size: 96rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.target-unit {
+  font-size: 32rpx;
+  color: #666666;
+  margin-left: 4rpx;
+}
+
+.target-sep {
+  font-size: 48rpx;
+  color: #999999;
+  margin: 0 16rpx;
+}
+
+/* =====================
+   实际录入 — 内凹槽
+   ===================== */
+.actual-input {
+  display: flex;
+  gap: 20rpx;
+  justify-content: center;
+  margin-bottom: 32rpx;
+}
+
+.input-card {
+  flex: 1;
+  max-width: 280rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  /* 内凹槽质感 */
+  border: 1rpx solid #E5E5E5;
+  background-color: #F6F6F6;
+}
+
+.input-card-label {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+  text-align: center;
+  margin-bottom: 12rpx;
+}
+
+.input-stepper {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.stepper-btn {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: all 0.15s ease;
+}
+
+.stepper-btn:active {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.stepper-btn-text {
+  font-size: 36rpx;
+  font-weight: 300;
+  color: #1A1A1A;
+}
+
+.stepper-input {
+  flex: 1;
+  height: 72rpx;
+  text-align: center;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 16rpx;
+}
+
+/* =====================
+   更多操作折叠面板
+   ===================== */
+.more-section {
+  margin-bottom: 32rpx;
+}
+
+.more-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 16rpx 0;
+  cursor: pointer;
+}
+
+.more-toggle-text {
+  font-size: 26rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.more-toggle-arrow {
+  font-size: 20rpx;
+  color: #999999;
+  transition: transform 0.2s ease;
+}
+
+.more-toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
+.more-panel {
+  animation: slideUp 0.2s ease-out;
+}
+
+/* =====================
+   RPE选择
+   ===================== */
+.rpe-section {
+  margin-bottom: 24rpx;
+}
+
+.rpe-label {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+  text-align: center;
+  margin-bottom: 16rpx;
+}
+
+.rpe-options {
+  display: flex;
+  gap: 12rpx;
+  justify-content: center;
+}
+
+.rpe-option {
+  padding: 16rpx 24rpx;
+  border-radius: 16rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+}
+
+.rpe-option.active {
+  background-color: #07C160;
+  border-color: #07C160;
+}
+
+.rpe-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #666666;
+}
+
+.rpe-option.active .rpe-value {
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+/* =====================
+   组备注
+   ===================== */
+.note-section {
+  margin-bottom: 24rpx;
+}
+
+.note-label {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+  text-align: center;
+  margin-bottom: 12rpx;
+}
+
+.note-input {
+  width: 100%;
+  height: 80rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+
+.note-input::placeholder {
+  color: #B0B0B0;
+  font-size: 26rpx;
+}
+
+/* =====================
+   次要操作按钮
+   ===================== */
+.secondary-actions {
+  display: flex;
+  gap: 16rpx;
+  justify-content: center;
+}
+
+/* =====================
+   超大完成按钮
+   ===================== */
+.complete-action {
+  margin-top: auto;
+  padding-top: 16rpx;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  padding: 0 48rpx;
+  border-radius: 9999rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  border: none;
+}
+
+.btn-primary {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.btn-primary:active {
+  opacity: 0.85;
+}
+
+.btn-secondary {
+  background: #F5F5F5;
+  color: #1A1A1A;
+}
+
+.btn-secondary:active {
+  background-color: #F8F8F8;
+}
+
+.btn-text {
+  background: transparent;
+  color: #666666;
+  border: none;
+}
+
+.btn-text:active {
+  color: #1A1A1A;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-sm {
+  height: 72rpx;
+  padding: 0 32rpx;
+  font-size: 26rpx;
+}
+
+.btn-lg {
+  height: 120rpx;
+  font-size: 36rpx;
+}
+
+.btn-xl {
+  height: 240rpx;
+  font-size: 48rpx;
+  font-weight: 700;
+  border-radius: 24rpx;
+}
+
+.btn-complete-icon {
+  margin-right: 12rpx;
+  font-size: 40rpx;
+}
+
+/* =====================
+   底部操作栏
+   ===================== */
+.bottom-bar {
+  display: flex;
+  justify-content: space-around;
+  padding: 24rpx 40rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background: #FFFFFF;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.06);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+}
+
+.bottom-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  padding: 12rpx 40rpx;
+  border-radius: 16rpx;
+  background: transparent;
+  transition: all 0.15s ease;
+}
+
+.bottom-btn:active {
+  background: #F5F5F5;
+}
+
+.bottom-icon {
+  font-size: 36rpx;
+  color: #666666;
+}
+
+.bottom-label {
+  font-size: 22rpx;
+  color: #666666;
+}
+
+.bottom-btn.danger .bottom-icon {
+  color: #FA5151;
+}
+
+.bottom-btn.danger .bottom-label {
+  color: #FA5151;
+}
+
+/* =====================
+   弹窗公共样式
+   ===================== */
+.skip-reason-list {
+  margin-bottom: 32rpx;
+}
+
+.skip-reason-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+  margin-bottom: 12rpx;
+  border: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.skip-reason-item.selected {
+  background-color: #F8F8F8;
+}
+
+.skip-reason-item:active {
+  background: #E5E5E5;
+}
+
+.skip-reason-text {
+  font-size: 30rpx;
+  color: #1A1A1A;
+}
+
+.skip-reason-check {
+  font-size: 28rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+}
+
+/* =====================
+   添加动作弹窗
+   ===================== */
+.add-exercise-search {
+  margin-bottom: 20rpx;
+}
+
+.add-search-input {
+  width: 100%;
+  height: 80rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+
+.add-search-input::placeholder {
+  color: #B0B0B0;
+}
+
+.add-exercise-list {
+  max-height: 400rpx;
+  margin-bottom: 24rpx;
+}
+
+/* =====================
+   动作替换/添加列表
+   ===================== */
+.alternative-list {
+  margin-bottom: 32rpx;
+  max-height: 400rpx;
+  overflow-y: auto;
+}
+
+.alternative-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+  margin-bottom: 12rpx;
+  transition: all 0.15s ease;
+}
+
+.alternative-item:active {
+  background: #E5E5E5;
+}
+
+.alternative-item:last-child {
+  margin-bottom: 0;
+}
+
+.alt-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.alt-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  margin-bottom: 4rpx;
+}
+
+.alt-muscle {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.alt-arrow {
+  font-size: 36rpx;
+  color: #999999;
+  font-weight: 300;
+}
+
+/* =====================
+   动画
+   ===================== */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}

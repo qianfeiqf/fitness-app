@@ -1,0 +1,76 @@
+<!-- 计划详情页面 -->
+
+<view class="page-detail">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-state">
+    <mp-loading type="circular" color="#1A1A1A" size="{{64}}" />
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 计划内容 -->
+  <view wx:else class="plan-content">
+    <!-- 计划头部 -->
+    <view class="plan-header">
+      <view class="plan-title-row">
+        <text class="plan-name">{{plan.name}}</text>
+        <text wx:if="{{plan.status === 'active'}}" class="badge badge-success">进行中</text>
+        <text wx:elif="{{plan.status === 'archived'}}" class="badge badge-secondary">已归档</text>
+        <text wx:else class="badge badge-warning">草稿</text>
+      </view>
+      <text class="plan-desc">{{plan.description || '暂无描述'}}</text>
+    </view>
+
+    <!-- 训练日分组展示 -->
+    <view class="week-schedule">
+      <view wx:for="{{[1, 2, 3, 4, 5, 6, 7]}}"
+            wx:key="day"
+            class="day-section {{groupedExercises[item] ? 'has-exercises' : ''}}">
+        <view class="day-header">
+          <text class="day-name">{{['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'][item]}}</text>
+          <text wx:if="{{groupedExercises[item]}}" class="day-count">{{groupedExercises[item].length}}个动作</text>
+        </view>
+
+        <view wx:if="{{groupedExercises[item]}}" class="day-exercises">
+          <view wx:for="{{groupedExercises[item]}}"
+                wx:key="id"
+                class="exercise-card">
+            <view class="exercise-main">
+              <text class="exercise-name">{{item.exercise_name}}</text>
+              <text class="exercise-sets">{{item.target_sets}}组 × {{item.target_reps}}次</text>
+            </view>
+            <view class="exercise-meta">
+              <text class="exercise-weight">{{item.initial_weight}}kg</text>
+              <text class="exercise-rest">休{{item.rest_seconds}}秒</text>
+            </view>
+          </view>
+        </view>
+
+        <view wx:if="{{!groupedExercises[item]}}" class="day-empty">
+          <text class="day-empty-text">休息日</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button wx:if="{{plan.status !== 'active'}}"
+              class="btn btn-primary btn-block"
+              bindtap="onActivatePlan">
+        激活此计划
+      </button>
+      <button class="btn btn-secondary btn-block"
+              bindtap="onEditPlan">
+        编辑计划
+      </button>
+      <button class="btn btn-outline btn-block"
+              bindtap="onDeletePlan">
+        删除计划
+      </button>
+    </view>
+  </view>
+
+  <!-- 返回按钮 -->
+  <view class="back-button" bindtap="onBack">
+    <text class="back-icon">←</text>
+  </view>
+</view>

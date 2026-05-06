@@ -1,0 +1,187 @@
+<!-- 个人中心页面 - 现代化风格 -->
+
+<view class="page-profile">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">我的</text>
+  </view>
+
+  <!-- 未登录状态 -->
+  <view wx:if="{{!isLoggedIn}}" class="login-section">
+    <view class="login-card">
+      <view class="login-avatar">
+        <text class="login-avatar-icon">👤</text>
+      </view>
+      <text class="login-title">登录后查看完整数据</text>
+      <text class="login-desc">同步训练记录，追踪你的进步</text>
+      <view class="login-btn" bindtap="onLogin">
+        <text>微信登录</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 已登录 -->
+  <view wx:else class="profile-content">
+    <!-- 身体档案卡片 -->
+    <view class="profile-card">
+      <view class="card-header">
+        <text class="card-title">身体档案</text>
+      </view>
+
+      <view class="profile-inputs">
+        <view class="profile-input-item">
+          <view class="input-icon">⚖</view>
+          <view class="input-content">
+            <text class="input-label">体重</text>
+            <view class="input-row">
+              <input class="input"
+                     type="digit"
+                     placeholder="0"
+                     value="{{weight}}"
+                     bindinput="onUpdateWeight" />
+              <text class="input-unit">kg</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="input-divider"></view>
+
+        <view class="profile-input-item">
+          <view class="input-icon">📏</view>
+          <view class="input-content">
+            <text class="input-label">身高</text>
+            <view class="input-row">
+              <input class="input"
+                     type="digit"
+                     placeholder="0"
+                     value="{{height}}"
+                     bindinput="onUpdateHeight" />
+              <text class="input-unit">cm</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 训练目标 -->
+    <view class="profile-card goals-card">
+      <view class="card-header goals-header">
+        <text class="card-title">训练目标</text>
+        <view class="btn-add-goal" bindtap="onShowGoalModal">+ 添加</view>
+      </view>
+
+      <view wx:if="{{goals.length === 0}}" class="goals-empty">
+        <text class="goals-empty-text">还没有设定目标，添加一个激励自己吧</text>
+      </view>
+
+      <view wx:else class="goals-list">
+        <view wx:for="{{goals}}" wx:key="id" class="goal-item">
+          <view class="goal-info">
+            <text class="goal-name">{{item.exercise_name}}</text>
+            <view class="goal-target">
+              <text class="goal-current">{{item.current_1rm}}kg</text>
+              <text class="goal-arrow"> → </text>
+              <text class="goal-dest">{{item.target_weight}}kg</text>
+            </view>
+          </view>
+          <view class="goal-progress">
+            <view class="progress-track">
+              <view class="progress-fill" style="width: {{item.progress}}%"></view>
+            </view>
+            <text class="progress-text">{{item.progress}}%</text>
+            <view class="goal-delete" bindtap="onDeleteGoal" data-id="{{item.id}}">✕</view>
+          </view>
+          <view wx:if="{{item.deadline}}" class="goal-deadline">
+            截止日期: {{item.deadline}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 功能列表 -->
+    <view class="menu-section">
+      <view class="menu-item" bindtap="onExportData">
+        <view class="menu-icon-wrap">
+          <text class="menu-icon">📤</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-title">数据导出</text>
+          <text class="menu-desc">导出Markdown或CSV格式</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-item" bindtap="onSyncData">
+        <view class="menu-icon-wrap">
+          <text class="menu-icon">🔄</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-title">同步数据</text>
+          <text class="menu-desc">将本地数据同步到云端</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 账号操作 -->
+    <view class="menu-section">
+      <view class="menu-item danger" bindtap="onLogout">
+        <view class="menu-icon-wrap">
+          <text class="menu-icon">🚪</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-title logout">退出登录</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 版本信息 -->
+    <view class="version-info">
+      <text class="version-text">健身训练计划小程序 v1.0.0</text>
+    </view>
+  </view>
+
+  <!-- 添加目标弹窗 -->
+  <modal-sheet
+    visible="{{showGoalModal}}"
+    title="添加训练目标"
+    description="设定一个 1RM 目标，追踪你的进步"
+    confirmText="保存目标"
+    cancelText="取消"
+    bind:confirm="onSaveGoal"
+    bind:cancel="onHideGoalModal"
+    bind:close="onHideGoalModal"
+  >
+    <view class="goal-form">
+      <view class="form-item">
+        <text class="form-label">选择动作</text>
+        <picker mode="selector" range="{{goalExercises}}" range-key="name"
+                value="0" bindchange="onSelectGoalExercise">
+          <view class="form-picker">
+            <text>{{goalExercises[0].name}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">目标重量 (kg)</text>
+        <input class="form-input"
+               type="digit"
+               placeholder="例如: 100"
+               value="{{newGoal.target_weight}}"
+               bindinput="onInputGoalWeight" />
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">截止日期</text>
+        <picker mode="date" value="{{newGoal.deadline}}" bindchange="onSelectGoalDeadline">
+          <view class="form-picker">
+            <text>{{newGoal.deadline}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+  </modal-sheet>
+</view>

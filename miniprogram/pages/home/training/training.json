@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "modal-sheet": "../../../components/modal-sheet/modal-sheet",
+    "dial-picker": "../../../components/dial-picker/dial-picker"
+  },
+  "navigationBarTitleText": "训练中心",
+  "navigationStyle": "custom"
+}

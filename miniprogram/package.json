@@ -1,0 +1,14 @@
+{
+  "name": "fitness-miniprogram",
+  "version": "1.0.0",
+  "description": "健身训练计划小程序",
+  "main": "app.js",
+  "scripts": {},
+  "keywords": [
+    "wechat",
+    "miniprogram",
+    "fitness"
+  ],
+  "author": "",
+  "license": "MIT"
+}

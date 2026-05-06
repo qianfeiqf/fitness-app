@@ -1,0 +1,68 @@
+<!--
+此文件为开发者工具生成，生成时间: 2026/5/5下午3:11:46
+使用方法：
+在 /Users/qianfei/Documents/QF/PersonaAI/fitness-app/miniprogram/pages/onboarding/onboarding.wxml 引入模板
+
+```
+<import src="onboarding.skeleton.wxml"/>
+<template is="skeleton" wx:if="{{loading}}" />
+```
+
+在 /Users/qianfei/Documents/QF/PersonaAI/fitness-app/miniprogram/pages/onboarding/onboarding.wxss 中引入样式
+```
+@import "./onboarding.skeleton.wxss";
+```
+
+更多详细信息可以参考文档：https://developers.weixin.qq.com/miniprogram/dev/devtools/skeleton.html
+-->
+<template name="skeleton">
+  <view class="sk-container">
+    <view class="page-onboarding">
+      <view class="onboarding-progress">
+        <view class="progress-dots">
+          <view class="dot active"></view>
+          <view class="dot"></view>
+          <view class="dot"></view>
+          <view class="dot"></view>
+        </view>
+        <text class="progress-text sk-transparent sk-text-16-6667-382 sk-text">第 1 / 4 步</text>
+      </view>
+      <view class="onboarding-step">
+        <view class="step-header">
+          <text class="step-title sk-transparent sk-text-16-6667-421 sk-text">你的健身目标是什么？</text>
+          <text class="step-subtitle sk-transparent sk-text-16-6667-676 sk-text">我们会根据你的目标推荐最适合的训练计划</text>
+        </view>
+        <view class="option-grid">
+          <view class="option-card" data-id="muscle">
+            <text class="option-icon sk-transparent sk-text-16-6667-439 sk-text">💪</text>
+            <text class="option-name sk-transparent sk-text-16-6667-416 sk-text">增肌塑形</text>
+            <text class="option-desc sk-transparent sk-text-14-2857-337 sk-text" style="background-position-x: 50%;">增加肌肉量，改善体型线条</text>
+          </view>
+          <view class="option-card" data-id="fatloss">
+            <text class="option-icon sk-transparent sk-text-16-6667-659 sk-text">🔥</text>
+            <text class="option-name sk-transparent sk-text-16-6667-718 sk-text">减脂瘦身</text>
+            <text class="option-desc sk-transparent sk-text-14-2857-388 sk-text" style="background-position-x: 50%;">降低体脂率，提升代谢水平</text>
+          </view>
+          <view class="option-card" data-id="strength">
+            <text class="option-icon sk-transparent sk-text-16-6667-474 sk-text">🏋</text>
+            <text class="option-name sk-transparent sk-text-16-6667-673 sk-text">力量提升</text>
+            <text class="option-desc sk-transparent sk-text-14-2857-208 sk-text" style="background-position-x: 50%;">提升最大力量，突破重量瓶颈</text>
+          </view>
+          <view class="option-card" data-id="general">
+            <text class="option-icon sk-transparent sk-text-16-6667-880 sk-text">❤</text>
+            <text class="option-name sk-transparent sk-text-16-6667-754 sk-text">综合健康</text>
+            <text class="option-desc sk-transparent sk-text-14-2857-964 sk-text" style="background-position-x: 50%;">全面提升身体素质，保持健康</text>
+          </view>
+        </view>
+      </view>
+      <view class="onboarding-footer">
+        <button activity-type="0" app-parameter="true" data-custom="null" entrance-path="true" form-type="true" hover-class="true" hover-start-time="20" hover-stay-time="70" lang="true" need-show-entrance="true" open-type="true" phone-number-no-quota-toast="true"
+          send-message-img="截图" send-message-path="当前分享路径" send-message-title="当前标题" session-from="true" style="true" class="t-button button--t-button t-button--base button--t-button--base t-button--primary button--t-button--primary t-button--rectangle button--t-button--rectangle t-button--size-large button--t-button--size-large t-button--block button--t-button--block t-button--disabled button--t-button--disabled sk-button sk-pseudo sk-pseudo-circle">
+          <view class="t-button__content button--t-button__content">
+            <text class="sk-transparent sk-text-33-6364-633 sk-text" style="background-position-x: 50%;">下一步</text>
+          </view>
+        </button>
+      </view>
+    </view>
+  </view>
+</template>

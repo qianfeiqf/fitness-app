@@ -44,7 +44,10 @@ Page({
     unfinishedSession: null,
 
     // Deload 提醒
-    showDeloadReminder: false
+    showDeloadReminder: false,
+
+    // Swiper 高度
+    swiperHeight: 1000
   },
 
   // 空操作函数（用于阻止事件冒泡）
@@ -157,9 +160,7 @@ Page({
       // 预计算每个计划的数据
       const planDataList = activePlans.map(plan => this._buildPlanData(plan));
 
-      // 计算本周训练进度和 Streak（全局）
-      const planExercises = find('plan_exercises', { plan_id: activePlans[0].id });
-      const weekProgress = this.calcWeekProgress(activePlans[0], planExercises);
+      // 全局 streak
       const streak = this.calcStreak();
 
       // 当前日期
@@ -184,10 +185,10 @@ Page({
         estimatedMinutes: currentData.estimatedMinutes,
         totalSets: currentData.totalSets,
         muscleGroups: currentData.muscleGroups,
-        weekProgress,
         streak,
         isRestDay: currentData.isRestDay,
         showDeloadReminder,
+        swiperHeight: this.calcSwiperHeight(currentData.exercises.length),
         loading: false
       });
 
@@ -241,6 +242,7 @@ Page({
     const estimatedMinutes = exercisesWithDetails.length * 8;
     const muscleSet = new Set(exercisesWithDetails.map(e => e.muscle_group));
     const muscleGroups = Array.from(muscleSet).join('/');
+    const weekProgress = this.calcWeekProgress(plan, planExercises);
 
     return {
       plan,
@@ -249,8 +251,22 @@ Page({
       totalSets,
       estimatedMinutes,
       muscleGroups,
+      weekProgress,
       isRestDay: todayExercises.length === 0
     };
+  },
+
+  /**
+   * 计算 Swiper 高度（基于动作数量）
+   */
+  calcSwiperHeight(exercisesCount) {
+    // 基础高度：周概览(172) + 卡片(520) + 间距(32)
+    let h = 724;
+    if (exercisesCount > 0) {
+      // 动作预览 header(60) + 每个动作项(88)
+      h += 60 + exercisesCount * 88;
+    }
+    return h;
   },
 
   /**
@@ -277,7 +293,8 @@ Page({
       estimatedMinutes: planData.estimatedMinutes,
       totalSets: planData.totalSets,
       muscleGroups: planData.muscleGroups,
-      isRestDay: planData.isRestDay
+      isRestDay: planData.isRestDay,
+      swiperHeight: this.calcSwiperHeight(planData.exercises.length)
     });
   },
 
@@ -607,14 +624,16 @@ Page({
   },
 
   /**
-   * 预览计划详情
+   * 预览计划详情（指定计划）
    */
-  onPreviewPlan() {
-    if (!this.data.todayPlan) return;
+  onPreviewPlanById(e) {
+    const planId = e.currentTarget.dataset.planId;
+    const pd = this.data.planDataList.find(p => p.plan.id === planId);
+    if (!pd) return;
 
     wx.showModal({
-      title: this.data.todayPlan.name,
-      content: `训练日: ${this.data.todayExercises.length} 个动作\n预计时长: 约 ${this.data.todayExercises.length * 8} 分钟`,
+      title: pd.plan.name,
+      content: `训练日: ${pd.exercises.length} 个动作\n预计时长: 约 ${pd.exercises.length * 8} 分钟`,
       showCancel: true,
       confirmText: '查看详情',
       cancelText: '关闭'

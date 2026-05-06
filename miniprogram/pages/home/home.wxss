@@ -461,7 +461,7 @@
    计划卡片 Swiper
    ===================== */
 .plan-swiper {
-  height: 520rpx;
+  width: 100%;
 }
 
 .plan-swiper .training-card {

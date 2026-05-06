@@ -230,7 +230,7 @@
     </view>
 
     <!-- 步骤2：训练天数 -->
-    <view wx:else-if="{{recommendStep === 2}}" class="wizard-step">
+    <view wx:if="{{recommendStep === 2}}" class="wizard-step">
       <view class="wizard-header">
         <text class="wizard-title">每周能练几天？</text>
         <text class="wizard-subtitle">选择你每周可以稳定投入训练的天数</text>

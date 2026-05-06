@@ -210,19 +210,17 @@
         <text class="wizard-title">你的健身目标是什么？</text>
         <text class="wizard-subtitle">我们会根据你的目标推荐最适合的计划</text>
       </view>
-      <view class="wizard-options">
+      <view class="wizard-options wizard-goal-options">
         <view
           wx:for="{{wizardGoals}}"
           wx:key="id"
-          class="wizard-option {{wizardSelectedGoal === item.id ? 'selected' : ''}}"
+          class="wizard-option wizard-goal-card {{wizardSelectedGoal === item.id ? 'selected' : ''}}"
           bindtap="onWizardSelectGoal"
           data-id="{{item.id}}"
         >
           <text class="wizard-option-icon">{{item.icon}}</text>
-          <view class="wizard-option-info">
-            <text class="wizard-option-name">{{item.name}}</text>
-            <text class="wizard-option-desc">{{item.desc}}</text>
-          </view>
+          <text class="wizard-option-name">{{item.name}}</text>
+          <text class="wizard-option-desc">{{item.desc}}</text>
           <view wx:if="{{wizardSelectedGoal === item.id}}" class="wizard-option-check">✓</view>
         </view>
       </view>
@@ -262,23 +260,22 @@
         <text class="wizard-title">你的训练经验？</text>
         <text class="wizard-subtitle">帮助我们为你匹配适合的计划难度</text>
       </view>
-      <view class="wizard-options">
+      <view class="wizard-options wizard-exp-options">
         <view
           wx:for="{{wizardExpOptions}}"
           wx:key="id"
-          class="wizard-option {{wizardSelectedExp === item.id ? 'selected' : ''}}"
+          class="wizard-option wizard-exp-card {{wizardSelectedExp === item.id ? 'selected' : ''}}"
           bindtap="onWizardSelectExp"
           data-id="{{item.id}}"
         >
-          <text class="wizard-option-icon">{{item.icon}}</text>
-          <view class="wizard-option-info">
-            <view class="wizard-option-row">
+          <view class="wizard-exp-header">
+            <text class="wizard-option-icon">{{item.icon}}</text>
+            <view class="wizard-option-info">
               <text class="wizard-option-name">{{item.name}}</text>
               <text class="wizard-exp-tag">{{item.tag}}</text>
             </view>
-            <text class="wizard-option-desc">{{item.desc}}</text>
           </view>
-          <view wx:if="{{wizardSelectedExp === item.id}}" class="wizard-option-check">✓</view>
+          <text class="wizard-option-desc">{{item.desc}}</text>
         </view>
       </view>
       <view class="wizard-footer">

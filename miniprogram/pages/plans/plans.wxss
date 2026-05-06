@@ -566,3 +566,346 @@ mp-tabs {
   display: block;
   line-height: 1.7;
 }
+
+/* =====================
+   Wizard 进度条
+   ===================== */
+.wizard-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 48rpx;
+  padding-top: 20rpx;
+}
+
+.wizard-dots {
+  display: flex;
+  gap: 12rpx;
+}
+
+.wizard-dot {
+  width: 48rpx;
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: #E5E5E5;
+  transition: all 0.3s ease;
+}
+
+.wizard-dot.active {
+  background: #1A1A1A;
+  width: 64rpx;
+}
+
+.wizard-step-text {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+/* =====================
+   Wizard 步骤头部
+   ===================== */
+.wizard-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.wizard-header {
+  margin-bottom: 48rpx;
+}
+
+.wizard-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.wizard-subtitle {
+  font-size: 28rpx;
+  color: #666666;
+  display: block;
+}
+
+/* =====================
+   目标选项 (Step 1)
+   ===================== */
+.wizard-goal-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+}
+
+.wizard-goal-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 24rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.wizard-goal-card.selected {
+  border-color: #07C160;
+  background-color: #F8F8F8;
+}
+
+.wizard-goal-card .wizard-option-icon {
+  font-size: 48rpx;
+  margin-bottom: 16rpx;
+}
+
+.wizard-goal-card .wizard-option-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 8rpx;
+}
+
+.wizard-goal-card .wizard-option-desc {
+  font-size: 22rpx;
+  color: #999999;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.wizard-option-check {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-size: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =====================
+   天数选项 (Step 2)
+   ===================== */
+.wizard-days-grid {
+  display: flex;
+  gap: 20rpx;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.wizard-day-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 180rpx;
+  height: 180rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+  transition: all 0.2s ease;
+}
+
+.wizard-day-card.selected {
+  border-color: #07C160;
+  background-color: #F8F8F8;
+}
+
+.wizard-day-num {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  line-height: 1;
+}
+
+.wizard-day-label {
+  font-size: 24rpx;
+  color: #666666;
+  margin-top: 4rpx;
+}
+
+.wizard-day-desc {
+  font-size: 20rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+/* =====================
+   经验选项 (Step 3)
+   ===================== */
+.wizard-exp-options {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.wizard-exp-card {
+  padding: 32rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+  transition: all 0.2s ease;
+}
+
+.wizard-exp-card.selected {
+  border-color: #07C160;
+  background-color: #F8F8F8;
+}
+
+.wizard-exp-header {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 12rpx;
+}
+
+.wizard-exp-card .wizard-option-icon {
+  font-size: 48rpx;
+}
+
+.wizard-exp-card .wizard-option-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.wizard-exp-card .wizard-option-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.wizard-exp-tag {
+  font-size: 22rpx;
+  color: #1A1A1A;
+  background: #F0F0F0;
+  padding: 2rpx 12rpx;
+  border-radius: 9999rpx;
+  margin-top: 4rpx;
+  align-self: flex-start;
+}
+
+.wizard-exp-card .wizard-option-desc {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.5;
+}
+
+/* =====================
+   推荐结果 (Step 4)
+   ===================== */
+.wizard-recommend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.wizard-recommend-card {
+  padding: 32rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 1rpx solid #E5E5E5;
+  transition: all 0.2s ease;
+}
+
+.wizard-recommend-card.selected {
+  border-color: #07C160;
+  background-color: #F8F8F8;
+}
+
+.wizard-recommend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.wizard-recommend-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.wizard-recommend-tags {
+  display: flex;
+  gap: 8rpx;
+}
+
+.wizard-recommend-desc {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.5;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.wizard-recommend-features {
+  display: flex;
+  gap: 8rpx;
+  flex-wrap: wrap;
+}
+
+.wizard-recommend-check {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+}
+
+/* =====================
+   Wizard 空状态
+   ===================== */
+.wizard-empty {
+  text-align: center;
+  padding: 80rpx 40rpx;
+}
+
+.wizard-empty-text {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* =====================
+   Wizard 底部按钮
+   ===================== */
+.wizard-footer {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-top: 32rpx;
+  padding-top: 16rpx;
+}
+
+.wizard-btn {
+  flex: 1;
+  padding: 24rpx 0;
+  text-align: center;
+  border-radius: 9999rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.wizard-btn-primary {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.wizard-btn-ghost {
+  padding: 24rpx 32rpx;
+  font-size: 28rpx;
+  color: #666666;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  flex: 0;
+  font-weight: 400;
+}
+
+.wizard-btn.disabled {
+  opacity: 0.4;
+}

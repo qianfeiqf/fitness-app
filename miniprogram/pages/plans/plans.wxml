@@ -257,7 +257,7 @@
     </view>
 
     <!-- 步骤3：训练经验 -->
-    <view wx:elif="{{recommendStep === 3}}" class="wizard-step">
+    <view wx:if="{{recommendStep === 3}}" class="wizard-step">
       <view class="wizard-header">
         <text class="wizard-title">你的训练经验？</text>
         <text class="wizard-subtitle">帮助我们为你匹配适合的计划难度</text>
@@ -288,7 +288,7 @@
     </view>
 
     <!-- 步骤4：推荐计划 -->
-    <view wx:elif="{{recommendStep === 4}}" class="wizard-step">
+    <view wx:if="{{recommendStep === 4}}" class="wizard-step">
       <view class="wizard-header">
         <text class="wizard-title">为你推荐</text>
         <text class="wizard-subtitle">基于你的目标和训练偏好，为你推荐最适合的计划</text>

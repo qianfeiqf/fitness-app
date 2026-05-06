@@ -263,6 +263,13 @@
   gap: 12rpx;
 }
 
+.plan-right button {
+  min-width: 0;
+  overflow: visible;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
 .arrow-icon {
   font-size: 48rpx;
   color: #CCCCCC;
@@ -291,6 +298,13 @@
   padding: 30rpx;
   min-height: 88rpx;
   border: 1rpx solid #E5E5E5;
+}
+
+.template-item button {
+  min-width: 0;
+  overflow: visible;
+  box-sizing: border-box;
+  line-height: 1;
 }
 
 .template-item:active {

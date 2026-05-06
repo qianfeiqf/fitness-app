@@ -33,7 +33,7 @@
           <button class="btn btn-sm btn-ghost"
                   catchtap="onShowClonePlanModal"
                   data-plan-id="{{item.id}}">
-            复制
+            使用
           </button>
           <text class="arrow-icon">›</text>
         </view>
@@ -45,7 +45,7 @@
   <view class="section">
     <view class="section-header">
       <text class="section-title">经典计划</text>
-      <text class="section-hint">点击查看详情，复制到我的计划</text>
+      <text class="section-hint">点击查看详情，使用此计划</text>
     </view>
 
     <!-- 难度筛选 -->
@@ -76,7 +76,7 @@
         <button class="btn btn-sm btn-primary"
                 catchtap="onShowCloneTemplateModal"
                 data-template-id="{{item.id}}">
-          复制
+          使用
         </button>
       </view>
 
@@ -92,7 +92,7 @@
   <modal-sheet
     visible="{{showTemplateDetailModal}}"
     title="{{selectedTemplate.name}}"
-    confirmText="复制此计划"
+    confirmText="使用此计划"
     cancelText="关闭"
     bind:confirm="onShowCloneTemplateFromDetail"
     bind:cancel="onCloseTemplateDetail"
@@ -132,7 +132,7 @@
   <modal-sheet
     visible="{{showTemplateIntroModal}}"
     title="{{selectedTemplate.name}}"
-    confirmText="复制此计划"
+    confirmText="使用此计划"
     cancelText="关闭"
     bind:confirm="onShowCloneTemplateFromIntro"
     bind:cancel="onCloseTemplateIntro"
@@ -169,12 +169,12 @@
     </view>
   </modal-sheet>
 
-  <!-- 复制计划弹窗 -->
+  <!-- 使用计划弹窗 -->
   <modal-sheet
     visible="{{showCloneModal}}"
-    title="复制计划"
-    description="为复制的计划指定一个新名称"
-    confirmText="确认复制"
+    title="使用计划"
+    description="为计划指定一个新名称"
+    confirmText="确认使用"
     cancelText="取消"
     bind:confirm="onConfirmClone"
     bind:cancel="onCancelClone"

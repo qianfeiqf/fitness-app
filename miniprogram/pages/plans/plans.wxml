@@ -315,9 +315,13 @@
           <view wx:if="{{wizardSelectedPlan === item.id}}" class="wizard-recommend-check">✓ 已选择</view>
         </view>
       </view>
+      <view class="wizard-skip-row" bindtap="onCloseRecommend">
+        <text class="wizard-skip-text">暂不使用推荐</text>
+      </view>
       <view class="wizard-footer">
         <view class="wizard-btn wizard-btn-ghost" bindtap="onWizardPrev">上一步</view>
-        <view class="wizard-btn wizard-btn-primary {{!wizardSelectedPlan ? 'disabled' : ''}}" bindtap="onWizardApply">应用推荐</view>
+        <view wx:if="{{wizardRecommended.length === 0}}" class="wizard-btn wizard-btn-primary" bindtap="onCloseRecommend">关闭</view>
+        <view wx:else class="wizard-btn wizard-btn-primary {{!wizardSelectedPlan ? 'disabled' : ''}}" bindtap="onWizardApply">应用推荐</view>
       </view>
     </view>
   </modal-sheet>

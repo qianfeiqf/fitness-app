@@ -902,10 +902,27 @@ mp-tabs {
   flex-shrink: 0;
   background: none;
   border: none;
-  flex: 0;
+  flex: none;
   font-weight: 400;
+  white-space: nowrap;
 }
 
 .wizard-btn.disabled {
   opacity: 0.4;
+}
+
+/* =====================
+   暂不使用推荐
+   ===================== */
+.wizard-skip-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 24rpx;
+  margin-bottom: 8rpx;
+}
+
+.wizard-skip-text {
+  font-size: 26rpx;
+  color: #999999;
+  padding: 12rpx 24rpx;
 }

@@ -4,7 +4,7 @@
   min-height: 100vh;
   background: #FFFFFF;
   padding: 40rpx;
-  padding-top: calc(88rpx + env(safe-area-inset-top));
+  padding-top: calc(88rpx + env(safe-area-inset-top) + 80rpx);
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
 }
 

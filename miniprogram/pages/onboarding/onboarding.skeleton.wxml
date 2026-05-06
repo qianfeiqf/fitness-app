@@ -41,8 +41,7 @@
           <view class="option-card" data-id="fatloss">
             <text class="option-icon sk-transparent sk-text-16-6667-659 sk-text">🔥</text>
             <text class="option-name sk-transparent sk-text-16-6667-718 sk-text">减脂瘦身</text>
-            <text class="option-desc sk-transparent sk-text-14-2857-388 sk-text" style="background-position-x: 50%;">降低体脂率，提升代谢水平</text>
-          </view>
+             </view>
           <view class="option-card" data-id="strength">
             <text class="option-icon sk-transparent sk-text-16-6667-474 sk-text">🏋</text>
             <text class="option-name sk-transparent sk-text-16-6667-673 sk-text">力量提升</text>

@@ -189,41 +189,138 @@
     </view>
   </modal-sheet>
 
-  <!-- 计划推荐弹窗 -->
+  <!-- 计划推荐弹窗 — 4步引导 -->
   <modal-sheet
     visible="{{showRecommendModal}}"
-    title="为你推荐"
-    description="{{recommendHasUserPrefs ? '基于你的目标和训练偏好，为你推荐最适合的计划' : '选择你的目标和时间，获取个性化推荐'}}"
-    confirmText="应用推荐"
-    cancelText="关闭"
-    confirmDisabled="{{!selectedRecommendPlan}}"
-    bind:confirm="onApplyRecommend"
-    bind:cancel="onCloseRecommend"
-    bind:close="onCloseRecommend"
+    showConfirm="{{false}}"
+    showCancel="{{false}}"
+    cancelText="取消"
   >
-    <view wx:if="{{recommendedPlans.length === 0}}" class="recommend-empty">
-      <text class="recommend-empty-text">暂无符合条件的推荐计划</text>
+    <!-- 步骤指示器 -->
+    <view class="wizard-progress">
+      <view class="wizard-dots">
+        <view wx:for="{{4}}" wx:key="index" class="wizard-dot {{recommendStep > index ? 'done' : ''}} {{recommendStep === index + 1 ? 'active' : ''}}"/>
+      </view>
+      <text class="wizard-step-text">第 {{recommendStep}} / 4 步</text>
     </view>
-    <view wx:else class="recommend-list">
-      <view
-        wx:for="{{recommendedPlans}}"
-        wx:key="id"
-        class="recommend-card {{selectedRecommendPlan === item.id ? 'selected' : ''}}"
-        bindtap="onSelectRecommendPlan"
-        data-id="{{item.id}}"
-      >
-        <view class="recommend-header">
-          <text class="recommend-name">{{item.name}}</text>
-          <view class="recommend-tags">
-            <text class="tag template-difficulty {{item.difficultyClass}}">{{item.difficulty}}</text>
-            <text class="tag">{{item.training_days}}天/周</text>
+
+    <!-- 步骤1：健身目标 -->
+    <view wx:if="{{recommendStep === 1}}" class="wizard-step">
+      <view class="wizard-header">
+        <text class="wizard-title">你的健身目标是什么？</text>
+        <text class="wizard-subtitle">我们会根据你的目标推荐最适合的计划</text>
+      </view>
+      <view class="wizard-options">
+        <view
+          wx:for="{{wizardGoals}}"
+          wx:key="id"
+          class="wizard-option {{wizardSelectedGoal === item.id ? 'selected' : ''}}"
+          bindtap="onWizardSelectGoal"
+          data-id="{{item.id}}"
+        >
+          <text class="wizard-option-icon">{{item.icon}}</text>
+          <view class="wizard-option-info">
+            <text class="wizard-option-name">{{item.name}}</text>
+            <text class="wizard-option-desc">{{item.desc}}</text>
           </view>
+          <view wx:if="{{wizardSelectedGoal === item.id}}" class="wizard-option-check">✓</view>
         </view>
-        <text class="recommend-desc">{{item.description}}</text>
-        <view class="recommend-features">
-          <text wx:for="{{item.features}}" wx:for-item="feat" wx:key="*this" class="feature-tag">{{feat}}</text>
+      </view>
+      <view class="wizard-footer">
+        <view class="wizard-btn wizard-btn-primary" bindtap="onWizardNext">下一步</view>
+      </view>
+    </view>
+
+    <!-- 步骤2：训练天数 -->
+    <view wx:else-if="{{recommendStep === 2}}" class="wizard-step">
+      <view class="wizard-header">
+        <text class="wizard-title">每周能练几天？</text>
+        <text class="wizard-subtitle">选择你每周可以稳定投入训练的天数</text>
+      </view>
+      <view class="wizard-days-grid">
+        <view
+          wx:for="{{wizardDayOptions}}"
+          wx:key="days"
+          class="wizard-day-card {{wizardSelectedDays === item.days ? 'selected' : ''}}"
+          bindtap="onWizardSelectDays"
+          data-days="{{item.days}}"
+        >
+          <text class="wizard-day-num">{{item.days}}</text>
+          <text class="wizard-day-label">天</text>
+          <text class="wizard-day-desc">{{item.desc}}</text>
         </view>
-        <view wx:if="{{selectedRecommendPlan === item.id}}" class="recommend-check">✓ 已选择</view>
+      </view>
+      <view class="wizard-footer">
+        <view class="wizard-btn wizard-btn-ghost" bindtap="onWizardPrev">上一步</view>
+        <view class="wizard-btn wizard-btn-primary" bindtap="onWizardNext">下一步</view>
+      </view>
+    </view>
+
+    <!-- 步骤3：训练经验 -->
+    <view wx:elif="{{recommendStep === 3}}" class="wizard-step">
+      <view class="wizard-header">
+        <text class="wizard-title">你的训练经验？</text>
+        <text class="wizard-subtitle">帮助我们为你匹配适合的计划难度</text>
+      </view>
+      <view class="wizard-options">
+        <view
+          wx:for="{{wizardExpOptions}}"
+          wx:key="id"
+          class="wizard-option {{wizardSelectedExp === item.id ? 'selected' : ''}}"
+          bindtap="onWizardSelectExp"
+          data-id="{{item.id}}"
+        >
+          <text class="wizard-option-icon">{{item.icon}}</text>
+          <view class="wizard-option-info">
+            <view class="wizard-option-row">
+              <text class="wizard-option-name">{{item.name}}</text>
+              <text class="wizard-exp-tag">{{item.tag}}</text>
+            </view>
+            <text class="wizard-option-desc">{{item.desc}}</text>
+          </view>
+          <view wx:if="{{wizardSelectedExp === item.id}}" class="wizard-option-check">✓</view>
+        </view>
+      </view>
+      <view class="wizard-footer">
+        <view class="wizard-btn wizard-btn-ghost" bindtap="onWizardPrev">上一步</view>
+        <view class="wizard-btn wizard-btn-primary" bindtap="onWizardNext">下一步</view>
+      </view>
+    </view>
+
+    <!-- 步骤4：推荐计划 -->
+    <view wx:elif="{{recommendStep === 4}}" class="wizard-step">
+      <view class="wizard-header">
+        <text class="wizard-title">为你推荐</text>
+        <text class="wizard-subtitle">基于你的目标和训练偏好，为你推荐最适合的计划</text>
+      </view>
+      <view wx:if="{{wizardRecommended.length === 0}}" class="wizard-empty">
+        <text class="wizard-empty-text">暂无符合条件的推荐计划</text>
+      </view>
+      <view wx:else class="wizard-recommend-list">
+        <view
+          wx:for="{{wizardRecommended}}"
+          wx:key="id"
+          class="wizard-recommend-card {{wizardSelectedPlan === item.id ? 'selected' : ''}}"
+          bindtap="onWizardSelectPlan"
+          data-id="{{item.id}}"
+        >
+          <view class="wizard-recommend-header">
+            <text class="wizard-recommend-name">{{item.name}}</text>
+            <view class="wizard-recommend-tags">
+              <text class="tag {{item.difficultyClass}}">{{item.difficulty}}</text>
+              <text class="tag tag-gray">{{item.training_days}}天/周</text>
+            </view>
+          </view>
+          <text class="wizard-recommend-desc">{{item.description}}</text>
+          <view class="wizard-recommend-features">
+            <text wx:for="{{item.features}}" wx:for-item="feat" wx:key="*this" class="feature-tag">{{feat}}</text>
+          </view>
+          <view wx:if="{{wizardSelectedPlan === item.id}}" class="wizard-recommend-check">✓ 已选择</view>
+        </view>
+      </view>
+      <view class="wizard-footer">
+        <view class="wizard-btn wizard-btn-ghost" bindtap="onWizardPrev">上一步</view>
+        <view class="wizard-btn wizard-btn-primary {{!wizardSelectedPlan ? 'disabled' : ''}}" bindtap="onWizardApply">应用推荐</view>
       </view>
     </view>
   </modal-sheet>

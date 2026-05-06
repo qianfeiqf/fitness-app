@@ -1,6 +1,6 @@
 <!-- 个人中心页面 - 现代化风格 -->
 
-<view class="page-profile">
+<view class="page-profile" style="padding-top: {{navHeight}}px;">
   <!-- 页面标题 -->
   <view class="page-header">
     <text class="page-title">我的</text>

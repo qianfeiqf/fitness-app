@@ -5,7 +5,7 @@
   background: #FFFFFF;
   display: flex;
   flex-direction: column;
-  padding-top: calc(env(safe-area-inset-top) + 80rpx);
+  padding-top: 100rpx; /* JS 动态覆盖 */
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
 }
 

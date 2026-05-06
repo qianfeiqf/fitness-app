@@ -1,6 +1,6 @@
 <!-- 训练中心首页 - 浅色简约 -->
 
-<view class="page-home">
+<view class="page-home" style="padding-top: {{navHeight}}px;">
   <!-- 顶部欢迎区 -->
   <view class="welcome-section">
     <view class="welcome-content">

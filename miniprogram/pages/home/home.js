@@ -45,7 +45,15 @@ Page({
   // 空操作函数（用于阻止事件冒泡）
   noop() {},
 
+  calcNavBarHeight() {
+    const menuButton = wx.getMenuButtonBoundingClientRect();
+    const systemInfo = wx.getSystemInfoSync();
+    const navHeight = menuButton.top + menuButton.height + (menuButton.top - systemInfo.statusBarHeight);
+    this.setData({ navHeight });
+  },
+
   onLoad() {
+    this.calcNavBarHeight();
     console.log('=== 训练中心页面加载 ===');
 
     // 检查是否需要引导

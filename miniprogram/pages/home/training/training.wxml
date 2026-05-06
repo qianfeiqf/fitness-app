@@ -1,6 +1,6 @@
 <!-- 训练中页面 - 沉浸式极简风格 -->
 
-<view class="page-training">
+<view class="page-training" style="padding-top: {{navHeight}}px;">
 
   <!-- 顶部进度条 -->
   <view class="progress-header">

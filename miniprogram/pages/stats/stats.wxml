@@ -1,6 +1,6 @@
 <!-- 统计页面 - 现代化风格 -->
 
-<view class="page-stats">
+<view class="page-stats" style="padding-top: {{navHeight}}px;">
   <!-- 页面标题 -->
   <view class="page-header">
     <view class="page-header-left">

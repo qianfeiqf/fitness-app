@@ -34,7 +34,15 @@ Page({
   },
 
   onLoad() {
+    this.calcNavBarHeight();
     this.checkLoginStatus();
+  },
+
+  calcNavBarHeight() {
+    const menuButton = wx.getMenuButtonBoundingClientRect();
+    const systemInfo = wx.getSystemInfoSync();
+    const navHeight = menuButton.top + menuButton.height + (menuButton.top - systemInfo.statusBarHeight);
+    this.setData({ navHeight });
   },
 
   onShow() {

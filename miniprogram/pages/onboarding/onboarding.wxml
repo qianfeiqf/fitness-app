@@ -1,4 +1,4 @@
-<view class="page-onboarding">
+<view class="page-onboarding" style="padding-top: {{navHeight}}px;">
   <!-- 顶部进度条 -->
   <view class="onboarding-progress">
     <view class="progress-dots">

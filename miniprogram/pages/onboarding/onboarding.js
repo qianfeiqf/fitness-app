@@ -45,7 +45,19 @@ Page({
   },
 
   onLoad() {
+    this.calcNavBarHeight();
     this.updateCanProceed();
+  },
+
+  /**
+   * 计算自定义导航栏高度，避开胶囊按钮
+   */
+  calcNavBarHeight() {
+    const menuButton = wx.getMenuButtonBoundingClientRect();
+    const systemInfo = wx.getSystemInfoSync();
+    // 状态栏高度 + 胶囊顶部间距 + 胶囊高度 + 底部间距
+    const navHeight = menuButton.top + menuButton.height + (menuButton.top - systemInfo.statusBarHeight);
+    this.setData({ navHeight });
   },
 
   /**

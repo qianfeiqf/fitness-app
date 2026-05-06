@@ -224,6 +224,9 @@
           <view wx:if="{{wizardSelectedGoal === item.id}}" class="wizard-option-check">✓</view>
         </view>
       </view>
+      <view class="wizard-skip-row" bindtap="onCloseRecommend">
+        <text class="wizard-skip-text">暂不使用推荐</text>
+      </view>
       <view class="wizard-footer">
         <view class="wizard-btn wizard-btn-primary" bindtap="onWizardNext">下一步</view>
       </view>
@@ -247,6 +250,9 @@
           <text class="wizard-day-label">天</text>
           <text class="wizard-day-desc">{{item.desc}}</text>
         </view>
+      </view>
+      <view class="wizard-skip-row" bindtap="onCloseRecommend">
+        <text class="wizard-skip-text">暂不使用推荐</text>
       </view>
       <view class="wizard-footer">
         <view class="wizard-btn wizard-btn-ghost" bindtap="onWizardPrev">上一步</view>
@@ -277,6 +283,9 @@
           </view>
           <text class="wizard-option-desc">{{item.desc}}</text>
         </view>
+      </view>
+      <view class="wizard-skip-row" bindtap="onCloseRecommend">
+        <text class="wizard-skip-text">暂不使用推荐</text>
       </view>
       <view class="wizard-footer">
         <view class="wizard-btn wizard-btn-ghost" bindtap="onWizardPrev">上一步</view>

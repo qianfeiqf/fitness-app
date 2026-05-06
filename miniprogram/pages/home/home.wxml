@@ -81,6 +81,7 @@
       duration="300"
     >
       <swiper-item wx:for="{{planDataList}}" wx:key="plan.id" wx:for-item="pd">
+        <scroll-view scroll-y class="plan-scroll-view" style="height: {{swiperHeight}}rpx;" show-scrollbar="{{false}}">
         <!-- 本周概览：进度与Streak -->
         <view class="week-overview">
           <view class="progress-ring-wrap">
@@ -198,9 +199,10 @@
             </view>
           </view>
         </view>
-      </swiper-item>
-    </swiper>
-  </view>
+      </scroll-view>
+    </swiper-item>
+  </swiper>
+</view>
 
   <!-- 恢复训练弹窗 -->
   <modal-sheet

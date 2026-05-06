@@ -464,6 +464,11 @@
   width: 100%;
 }
 
+.plan-scroll-view {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .plan-swiper .training-card {
   margin: 0 4rpx;
 }

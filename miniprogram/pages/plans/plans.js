@@ -2,7 +2,7 @@
  * 计划管理页面
  */
 
-const { find, findOne, insert, update, remove, getPlanTemplatesSeedData } = require('../../localdb/db.js');
+const { find, findOne, insert, update, remove, getCollection, getPlanTemplatesSeedData } = require('../../localdb/db.js');
 
 Page({
   data: {
@@ -17,10 +17,10 @@ Page({
     templateExerciseList: [],
     showTemplateIntroModal: false,
     cloneSource: null,
-    filterDays: 0, // 0 表示全部
-    filterOptions: [0, 3, 4, 5, 6], // 全部、3天、4天、5天、6天
-    filterDifficulty: '', // '' 表示全部
-    filterDifficultyOptions: ['', '入门', '中级', '进阶'], // 全部、入门、中级、进阶
+    filterDays: 0,
+    filterOptions: [0, 3, 4, 5, 6],
+    filterDifficulty: '',
+    filterDifficultyOptions: ['', '入门', '中级', '进阶'],
     difficultyTabs: [
       { title: '全部' },
       { title: '入门' },
@@ -35,7 +35,13 @@ Page({
       { title: '5天' },
       { title: '6天' }
     ],
-    daysTabIndex: 0
+    daysTabIndex: 0,
+
+    // 计划推荐
+    showRecommendModal: false,
+    recommendedPlans: [],
+    selectedRecommendPlan: null,
+    recommendHasUserPrefs: false
   },
 
   onLoad() {
@@ -515,6 +521,120 @@ Page({
   onCloseTemplateIntro() {
     this.setData({
       showTemplateIntroModal: false
+    });
+  },
+
+  /**
+   * 打开计划推荐弹窗
+   */
+  onShowRecommend() {
+    const userPref = wx.getStorageSync('user_preference') || {};
+    const recommended = this.generateRecommendations(userPref);
+    this.setData({
+      showRecommendModal: true,
+      recommendedPlans: recommended,
+      selectedRecommendPlan: recommended.length > 0 ? recommended[0].id : null,
+      recommendHasUserPrefs: !!(userPref.goal && userPref.days && userPref.experience)
+    });
+  },
+
+  /**
+   * 生成推荐计划
+   */
+  generateRecommendations(userPref) {
+    const templates = getCollection('plan_templates');
+
+    // 读取引导时保存的用户偏好
+    const goal = userPref.goal || 'general';
+    const days = userPref.days || 3;
+    const experience = userPref.experience || 'beginner';
+
+    // 筛选符合天数要求的模板（允许 ±1 天弹性）
+    let candidates = templates.filter(t => {
+      const dayDiff = Math.abs(t.training_days - days);
+      return dayDiff <= 1;
+    });
+
+    // 按经验筛选难度
+    const difficultyMap = {
+      beginner: ['入门'],
+      intermediate: ['入门', '中级'],
+      advanced: ['中级', '进阶']
+    };
+    const allowedDifficulties = difficultyMap[experience] || ['入门'];
+    candidates = candidates.filter(t => allowedDifficulties.includes(t.difficulty));
+
+    // 按目标加权排序
+    const goalPriority = {
+      muscle: ['5x5', 'PPL', '分化'],
+      fatloss: ['PPL', '5x5', '全身'],
+      strength: ['5x5', 'Strength', 'Texas'],
+      general: ['5x5', 'PPL', '全身']
+    };
+    const priorities = goalPriority[goal] || [];
+
+    candidates.sort((a, b) => {
+      const aScore = priorities.findIndex(p => a.name.includes(p));
+      const bScore = priorities.findIndex(p => b.name.includes(p));
+      return (aScore === -1 ? 999 : aScore) - (bScore === -1 ? 999 : bScore);
+    });
+
+    const diffClassMap = { '入门': 'beginner', '中级': 'intermediate', '进阶': 'advanced' };
+
+    return candidates.slice(0, 3).map(t => ({
+      ...t,
+      difficultyClass: diffClassMap[t.difficulty] || 'beginner',
+      features: this.getPlanFeatures(t)
+    }));
+  },
+
+  /**
+   * 获取计划特性标签
+   */
+  getPlanFeatures(plan) {
+    const features = [];
+    if (plan.difficulty === '入门') features.push('新手友好');
+    if (plan.difficulty === '进阶') features.push('高强度');
+    if (plan.name.includes('5x5')) features.push('经典增力');
+    if (plan.name.includes('PPL')) features.push('肌群分化');
+    if (plan.training_days <= 3) features.push('时间友好');
+    if (!features.length) features.push('系统训练');
+    return features.slice(0, 3);
+  },
+
+  /**
+   * 选择推荐计划
+   */
+  onSelectRecommendPlan(e) {
+    const id = e.currentTarget.dataset.id;
+    this.setData({ selectedRecommendPlan: id });
+  },
+
+  /**
+   * 确认应用推荐计划
+   */
+  onApplyRecommend() {
+    const planId = this.data.selectedRecommendPlan;
+    if (!planId) return;
+
+    const template = this.data.templates.find(t => t.id === planId);
+    if (!template) {
+      wx.showToast({ title: '计划不存在', icon: 'error' });
+      return;
+    }
+
+    this.setData({ showRecommendModal: false });
+    this.onShowCloneTemplateModal({ currentTarget: { dataset: { templateId: planId } } });
+  },
+
+  /**
+   * 关闭推荐弹窗
+   */
+  onCloseRecommend() {
+    this.setData({
+      showRecommendModal: false,
+      recommendedPlans: [],
+      selectedRecommendPlan: null
     });
   }
 });

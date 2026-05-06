@@ -5,7 +5,10 @@
   <view class="section">
     <view class="section-header">
       <text class="section-title">我的计划</text>
-      <text wx:if="{{plans.length > 0}}" class="btn-new" bindtap="onNavigateToCreate">新建</text>
+      <view class="section-actions">
+        <text class="btn-recommend" bindtap="onShowRecommend">计划推荐</text>
+        <text wx:if="{{plans.length > 0}}" class="btn-new" bindtap="onNavigateToCreate">新建</text>
+      </view>
     </view>
 
     <view wx:if="{{plans.length === 0}}" class="empty-card" bindtap="onNavigateToCreate">
@@ -183,6 +186,45 @@
              placeholder="输入计划名称"
              value="{{newPlanName}}"
              bindinput="onInputPlanName" />
+    </view>
+  </modal-sheet>
+
+  <!-- 计划推荐弹窗 -->
+  <modal-sheet
+    visible="{{showRecommendModal}}"
+    title="为你推荐"
+    description="{{recommendHasUserPrefs ? '基于你的目标和训练偏好，为你推荐最适合的计划' : '选择你的目标和时间，获取个性化推荐'}}"
+    confirmText="应用推荐"
+    cancelText="关闭"
+    confirmDisabled="{{!selectedRecommendPlan}}"
+    bind:confirm="onApplyRecommend"
+    bind:cancel="onCloseRecommend"
+    bind:close="onCloseRecommend"
+  >
+    <view wx:if="{{recommendedPlans.length === 0}}" class="recommend-empty">
+      <text class="recommend-empty-text">暂无符合条件的推荐计划</text>
+    </view>
+    <view wx:else class="recommend-list">
+      <view
+        wx:for="{{recommendedPlans}}"
+        wx:key="id"
+        class="recommend-card {{selectedRecommendPlan === item.id ? 'selected' : ''}}"
+        bindtap="onSelectRecommendPlan"
+        data-id="{{item.id}}"
+      >
+        <view class="recommend-header">
+          <text class="recommend-name">{{item.name}}</text>
+          <view class="recommend-tags">
+            <text class="tag template-difficulty {{item.difficultyClass}}">{{item.difficulty}}</text>
+            <text class="tag">{{item.training_days}}天/周</text>
+          </view>
+        </view>
+        <text class="recommend-desc">{{item.description}}</text>
+        <view class="recommend-features">
+          <text wx:for="{{item.features}}" wx:for-item="feat" wx:key="*this" class="feature-tag">{{feat}}</text>
+        </view>
+        <view wx:if="{{selectedRecommendPlan === item.id}}" class="recommend-check">✓ 已选择</view>
+      </view>
     </view>
   </modal-sheet>
 </view>

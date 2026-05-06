@@ -55,6 +55,121 @@
   border-radius: 9999rpx;
 }
 
+/* 操作按钮组 */
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+/* 计划推荐按钮 */
+.btn-recommend {
+  font-size: 26rpx;
+  color: #07C160;
+  font-weight: 600;
+  padding: 8rpx 20rpx;
+  background: rgba(7, 193, 96, 0.08);
+  border-radius: 9999rpx;
+}
+
+.btn-recommend:active {
+  opacity: 0.7;
+}
+
+/* 推荐计划列表 */
+.recommend-list {
+  margin-bottom: 32rpx;
+}
+
+.recommend-empty {
+  text-align: center;
+  padding: 48rpx 0;
+}
+
+.recommend-empty-text {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+.recommend-card {
+  background: #F5F5F5;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.15s ease;
+}
+
+.recommend-card:active {
+  background: #EEEEEE;
+}
+
+.recommend-card.selected {
+  background: #F0F0F0;
+  border-color: #1A1A1A;
+}
+
+.recommend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.recommend-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.recommend-tags {
+  display: flex;
+  gap: 8rpx;
+}
+
+.recommend-desc {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 12rpx;
+  line-height: 1.5;
+}
+
+.recommend-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.feature-tag {
+  font-size: 20rpx;
+  color: #1A1A1A;
+  background: #E5E5E5;
+  padding: 4rpx 12rpx;
+  border-radius: 9999rpx;
+}
+
+.recommend-check {
+  font-size: 24rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+  margin-top: 10rpx;
+}
+
+/* 标签样式 */
+.tag {
+  font-size: 22rpx;
+  font-weight: 500;
+  padding: 6rpx 14rpx;
+  border-radius: 9999rpx;
+  background: #E5E5E5;
+  color: #1A1A1A;
+}
+
+.tag.beginner { background: rgba(7, 193, 96, 0.1); color: #07C160; }
+.tag.intermediate { background: rgba(0, 0, 0, 0.06); color: #1A1A1A; }
+.tag.advanced { background: rgba(0, 0, 0, 0.1); color: #1A1A1A; }
+
 /* 空状态卡片 */
 .empty-card {
   display: flex;

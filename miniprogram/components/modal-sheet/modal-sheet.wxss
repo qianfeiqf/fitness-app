@@ -44,7 +44,7 @@
 
 .modal-sheet-content {
   margin-bottom: 32rpx;
-  max-height: 50vh;
+  max-height: 75vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }

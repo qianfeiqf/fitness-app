@@ -649,6 +649,9 @@ mp-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20rpx;
+  max-height: 400rpx;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .wizard-goal-card {
@@ -710,6 +713,9 @@ mp-tabs {
   gap: 20rpx;
   flex-wrap: wrap;
   justify-content: center;
+  max-height: 400rpx;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .wizard-day-card {
@@ -757,6 +763,9 @@ mp-tabs {
   display: flex;
   flex-direction: column;
   gap: 20rpx;
+  max-height: 400rpx;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .wizard-exp-card {
@@ -817,6 +826,9 @@ mp-tabs {
   display: flex;
   flex-direction: column;
   gap: 20rpx;
+  max-height: 400rpx;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .wizard-recommend-card {

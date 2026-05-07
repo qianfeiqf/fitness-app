@@ -74,6 +74,9 @@ Page({
     this.loadPlans();
   },
 
+  /** 阻止弹窗打开时背景页面滚动 */
+  preventTouchMove() {},
+
   /**
    * 跳转到新建计划页面
    */

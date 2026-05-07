@@ -1,6 +1,6 @@
 <!-- 计划管理页面 -->
 
-<view class="page-plans">
+<view class="page-plans" catchtouchmove="{{showRecommendModal || showTemplateDetailModal || showTemplateIntroModal || showCloneModal ? 'preventTouchMove' : ''}}">
   <!-- 训练计划列表 -->
   <view class="section">
     <view class="section-header">

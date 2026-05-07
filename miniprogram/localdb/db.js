@@ -385,30 +385,6 @@ function getPlanTemplatesSeedData() {
       ]
     },
 
-    // ===== StrongLifts 5x5 =====
-    {
-      id: 'tpl_stronglifts',
-      name: 'StrongLifts 5x5',
-      description: 'StrongLifts经典版本，每周3次，侧重深蹲，适合初学者打基础',
-      difficulty: '入门',
-      training_days: 3,
-      cycle_type: 'natural_week',
-      exercises: [
-        // 周一：A日 - 深蹲卧推划船
-        { exercise_id: 'ex_020', day_of_week: 1, cycle_label: 'A', target_sets: 5, target_reps: 5, initial_weight: 60, rest_seconds: 180 },
-        { exercise_id: 'ex_001', day_of_week: 1, cycle_label: 'A', target_sets: 5, target_reps: 5, initial_weight: 50, rest_seconds: 180 },
-        { exercise_id: 'ex_010', day_of_week: 1, cycle_label: 'A', target_sets: 5, target_reps: 5, initial_weight: 40, rest_seconds: 120 },
-        // 周三：B日 - 深蹲推举硬拉
-        { exercise_id: 'ex_020', day_of_week: 3, cycle_label: 'B', target_sets: 5, target_reps: 5, initial_weight: 65, rest_seconds: 180 },
-        { exercise_id: 'ex_040', day_of_week: 3, cycle_label: 'B', target_sets: 5, target_reps: 5, initial_weight: 35, rest_seconds: 180 },
-        { exercise_id: 'ex_030', day_of_week: 3, cycle_label: 'B', target_sets: 1, target_reps: 5, initial_weight: 80, rest_seconds: 240 },
-        // 周五：A日 - 深蹲卧推划船
-        { exercise_id: 'ex_020', day_of_week: 5, cycle_label: 'A', target_sets: 5, target_reps: 5, initial_weight: 70, rest_seconds: 180 },
-        { exercise_id: 'ex_001', day_of_week: 5, cycle_label: 'A', target_sets: 5, target_reps: 5, initial_weight: 55, rest_seconds: 180 },
-        { exercise_id: 'ex_010', day_of_week: 5, cycle_label: 'A', target_sets: 5, target_reps: 5, initial_weight: 45, rest_seconds: 120 }
-      ]
-    },
-
     // ===== Starting Strength =====
     {
       id: 'tpl_starting',

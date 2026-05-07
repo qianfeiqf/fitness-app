@@ -237,6 +237,7 @@ button.btn-primary[disabled] {
   height: 64rpx;
   padding: 0 32rpx;
   font-size: var(--font-size-caption);
+  min-width: 120rpx;
 }
 
 .btn-lg {

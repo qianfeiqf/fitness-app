@@ -323,11 +323,13 @@ Page({
     const defaultReps = preferTarget ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 0));
     const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2; // rpeOptions索引：0=轻量,1=中等,2=吃力,3=力竭
 
+    const isDone = (exercise.completed_sets || 0) >= (exercise.target_sets || 1);
     this.setData({
       currentExercise: {
         ...exercise,
         ...exerciseDetail,
-        currentSetNumber: exercise.completed_sets + 1,
+        isDone,
+        currentSetNumber: isDone ? (exercise.target_sets || 1) : (exercise.completed_sets || 0) + 1,
         actual_weight: defaultWeight,
         actual_reps: defaultReps
       },
@@ -1461,31 +1463,73 @@ Page({
   },
 
   /**
-   * 自由训练：减少当前动作的目标组数（最低保留当前正在进行的组）
+   * 减少当前动作的组数（未完成组直接减；已完成动作支持确认后撤销最后一组并减组）
    */
   onReduceExtraSet() {
-    const { exercises, currentExerciseIndex, session } = this.data;
+    const { exercises, currentExerciseIndex, session, completedSets } = this.data;
     if (!exercises || exercises.length === 0 || !session) return;
     const target = exercises[currentExerciseIndex];
     if (!target) return;
-    const minSets = Math.max(1, (target.completed_sets || 0) + 1);
-    if ((target.target_sets || 3) <= minSets) {
-      wx.showToast({ title: `最少保留 ${minSets} 组`, icon: 'none' });
+
+    const currentTargetSets = target.target_sets || 3;
+    const doneSets = target.completed_sets || 0;
+
+    // 情况1：还有未完成的剩余组，直接减少目标组数
+    if (currentTargetSets > doneSets && currentTargetSets > 1) {
+      const nextTargetSets = currentTargetSets - 1;
+      const nextExercises = exercises.map((ex, i) =>
+        i === currentExerciseIndex ? { ...ex, target_sets: nextTargetSets } : ex
+      );
+      update('sessions', session.id, {
+        pending_exercises: nextExercises,
+        updated_at: Date.now()
+      });
+      this.setData({ exercises: nextExercises });
+      this.setCurrentExercise();
+      wx.showToast({ title: '已减少 1 组', icon: 'none' });
       return;
     }
 
-    const nextExercises = exercises.map((ex, i) =>
-      i === currentExerciseIndex ? { ...ex, target_sets: (ex.target_sets || 3) - 1 } : ex
-    );
-    update('sessions', session.id, {
-      pending_exercises: nextExercises,
-      updated_at: Date.now()
-    });
-    this.setData({
-      exercises: nextExercises,
-      'currentExercise.target_sets': nextExercises[currentExerciseIndex].target_sets
-    });
-    wx.showToast({ title: '已减少 1 组', icon: 'none' });
+    // 情况2：当前动作已全部做完（或已无多余未完成组），支持撤销该动作最近完成的1组并减组
+    if (doneSets > 0) {
+      wx.showModal({
+        title: '减少一组',
+        content: `「${target.exercise_name || target.name}」已完成 ${doneSets} 组，确定撤销最后完成的第 ${doneSets} 组并减少 1 组吗？`,
+        confirmText: '确认减少',
+        cancelText: '取消',
+        success: (res) => {
+          if (!res.confirm) return;
+          // 找到该动作最后一条已完成记录并删除
+          const nextCompletedSets = [...completedSets];
+          for (let i = nextCompletedSets.length - 1; i >= 0; i--) {
+            if (nextCompletedSets[i].exercise_id === target.exercise_id) {
+              remove('session_sets', nextCompletedSets[i].id);
+              nextCompletedSets.splice(i, 1);
+              break;
+            }
+          }
+          const nextDone = Math.max(0, doneSets - 1);
+          const nextTargetSets = Math.max(1, currentTargetSets - 1);
+          const nextExercises = exercises.map((ex, i) =>
+            i === currentExerciseIndex ? { ...ex, completed_sets: nextDone, target_sets: nextTargetSets } : ex
+          );
+          update('sessions', session.id, {
+            pending_exercises: nextExercises,
+            completed_sets: nextCompletedSets,
+            updated_at: Date.now()
+          });
+          this.setData({
+            exercises: nextExercises,
+            completedSets: nextCompletedSets
+          });
+          this.setCurrentExercise();
+          wx.showToast({ title: '已撤销并减少 1 组', icon: 'success' });
+        }
+      });
+      return;
+    }
+
+    wx.showToast({ title: '最少保留 1 组', icon: 'none' });
   },
 
   /**
@@ -1545,6 +1589,7 @@ Page({
     const { index } = e.currentTarget.dataset;
     const { exercises, isResting } = this.data;
     const targetExercise = exercises[index];
+    if (!targetExercise) return;
 
     // 休息期间不允许切换动作
     if (isResting) {
@@ -1552,17 +1597,7 @@ Page({
       return;
     }
 
-    // 检查目标动作是否已完成
-    if (targetExercise.completed_sets >= targetExercise.target_sets) {
-      UI.showToast({
-        message: '该动作已完成',
-        icon: 'warning',
-        context: this
-      });
-      return;
-    }
-
-    // 切换当前动作并退出完成引导态
+    // 允许切回已完成动作继续加组或减组
     this.setData({
       currentExerciseIndex: index,
       currentSetIndex: targetExercise.completed_sets || 0,
@@ -1570,27 +1605,23 @@ Page({
       showExercisePicker: false
     });
 
-    // 更新当前动作
     this.setCurrentExercise();
-
-    // 保存状态
     this.saveSnapshot();
 
     UI.showToast({
-      message: '已切换到 ' + targetExercise.name,
+      message: '已切换到 ' + (targetExercise.name || targetExercise.exercise_name),
       icon: 'check-circle',
       context: this
     });
   },
 
   /**
-   * 点击状态列表中的动作
+   * 点击状态列表中的动作（支持切回已完成的动作继续加组/减组）
    */
   onTapExercise(e) {
     const { index } = e.currentTarget.dataset;
     const { exercises, isResting } = this.data;
 
-    // 休息时不允许切换
     if (isResting) {
       UI.showToast({
         message: '休息中无法切换',
@@ -1601,16 +1632,7 @@ Page({
     }
 
     const targetExercise = exercises[index];
-
-    // 检查目标动作是否已完成
-    if (targetExercise.completed_sets >= targetExercise.target_sets) {
-      UI.showToast({
-        message: '该动作已完成',
-        icon: 'warning',
-        context: this
-      });
-      return;
-    }
+    if (!targetExercise) return;
 
     // 切换当前动作并退出完成引导态
     this.setData({

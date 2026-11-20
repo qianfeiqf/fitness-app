@@ -147,9 +147,9 @@
           <text class="set-current">{{currentExercise.currentSetNumber}}</text>
           <text class="set-sep">/</text>
           <text class="set-total">{{currentExercise.target_sets}}</text>
-          <text class="set-label">组</text>
+          <text class="set-label">{{currentExercise.isDone ? '组 (已完成)' : '组'}}</text>
         </view>
-        <view wx:if="{{isFreeWorkout}}" class="extra-set-group">
+        <view wx:if="{{isFreeWorkout || currentExercise.isDone}}" class="extra-set-group">
           <view class="extra-set-btn" bindtap="onReduceExtraSet">- 组</view>
           <view class="extra-set-btn" bindtap="onAddExtraSet">+ 加组</view>
         </view>
@@ -241,9 +241,13 @@
       </view>
     </view>
 
-    <!-- 完成按钮 -->
+    <!-- 完成按钮（已完成动作直接变为「+ 加练一组」） -->
     <view class="complete-action">
-      <view class="btn btn-primary btn-md btn-block" bindtap="onCompleteSet">
+      <view wx:if="{{currentExercise.isDone}}" class="btn btn-primary btn-md btn-block" bindtap="onAddExtraSet">
+        <text class="btn-complete-icon">+</text>
+        <text>加练一组（第 {{currentExercise.target_sets + 1}} 组）</text>
+      </view>
+      <view wx:else class="btn btn-primary btn-md btn-block" bindtap="onCompleteSet">
         <text class="btn-complete-icon">✓</text>
         <text>完成一组</text>
       </view>

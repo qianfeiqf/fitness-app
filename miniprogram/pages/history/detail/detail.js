@@ -2,7 +2,7 @@
  * 单次训练详情页
  */
 
-const { findOne, find } = require('../../../localdb/db.js');
+const { findOne, find, update } = require('../../../localdb/db.js');
 
 Page({
   data: {
@@ -14,6 +14,7 @@ Page({
     duration: '',
     dateStr: '',
     prCount: 0,
+    canResumeToday: false,
     loading: true
   },
 
@@ -21,6 +22,12 @@ Page({
     if (options.sessionId) {
       this.setData({ sessionId: options.sessionId });
       this.loadDetail(options.sessionId);
+    }
+  },
+
+  onShow() {
+    if (this.data.sessionId) {
+      this.loadDetail(this.data.sessionId);
     }
   },
 
@@ -76,7 +83,13 @@ Page({
     }
 
     // 日期
-    const date = new Date(session.completed_at);
+    const completedAt = session.completed_at || session.updated_at || Date.now();
+    const date = new Date(completedAt);
+    const now = new Date();
+    const isToday = session.status === 'completed'
+      && date.getFullYear() === now.getFullYear()
+      && date.getMonth() === now.getMonth()
+      && date.getDate() === now.getDate();
     const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 
     this.setData({
@@ -87,7 +100,66 @@ Page({
       duration,
       dateStr,
       prCount,
+      canResumeToday: isToday,
       loading: false
+    });
+  },
+
+  /**
+   * 当天已完成训练重新切回进行中继续补练
+   */
+  onResumeTodayWorkout() {
+    const { session, groupedSets } = this.data;
+    if (!session) return;
+
+    wx.showModal({
+      title: '继续补练',
+      content: '将把本次训练重新切回进行中，原有训练时长和已记录组数都会保留，完成后将覆盖更新本次记录。',
+      confirmText: '去补练',
+      cancelText: '取消',
+      success: (res) => {
+        if (!res.confirm) return;
+
+        let pendingExercises = Array.isArray(session.pending_exercises) && session.pending_exercises.length > 0
+          ? session.pending_exercises
+          : groupedSets.map(g => {
+              const lastSet = g.sets[g.sets.length - 1] || {};
+              return {
+                exercise_id: g.exercise_id,
+                name: g.exercise_name,
+                exercise_name: g.exercise_name,
+                target_sets: g.sets.length,
+                completed_sets: g.sets.length,
+                target_weight: lastSet.actual_weight || 20,
+                target_reps: lastSet.actual_reps || 10,
+                rest_seconds: 90,
+                warmup_completed: true
+              };
+            });
+
+        let targetIdx = 0;
+        if (session.is_free_workout) {
+          targetIdx = pendingExercises.length;
+        } else {
+          const unfinishedIdx = pendingExercises.findIndex(ex => (ex.completed_sets || 0) < (ex.target_sets || 1));
+          targetIdx = unfinishedIdx >= 0 ? unfinishedIdx : Math.max(0, pendingExercises.length - 1);
+        }
+
+        const preservedDuration = Number(session.accumulated_duration_seconds || session.total_duration_seconds || 0);
+
+        update('sessions', session.id, {
+          status: 'in_progress',
+          resumed_at: Date.now(),
+          updated_at: Date.now(),
+          accumulated_duration_seconds: preservedDuration,
+          pending_exercises: pendingExercises,
+          current_exercise_index: targetIdx
+        });
+
+        wx.navigateTo({
+          url: '/pages/home/training/training?sessionId=' + session.id
+        });
+      }
     });
   },
 

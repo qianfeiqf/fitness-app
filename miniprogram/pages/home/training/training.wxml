@@ -267,13 +267,9 @@
       <text class="bottom-icon">{{isPaused ? '▶' : '⏸'}}</text>
       <text class="bottom-label">{{isPaused ? '继续' : '暂停'}}</text>
     </view>
-    <view wx:if="{{isFreeWorkout || completedSets.length > 0}}" class="bottom-btn finish" bindtap="onFinishTraining">
+    <view class="bottom-btn finish" bindtap="onFinishTraining">
       <text class="bottom-icon">✓</text>
       <text class="bottom-label">完成训练</text>
-    </view>
-    <view class="bottom-btn danger" bindtap="onAbandonTraining">
-      <text class="bottom-icon">✕</text>
-      <text class="bottom-label">放弃</text>
     </view>
   </view>
 

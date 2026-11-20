@@ -206,6 +206,17 @@ Page({
   },
 
   /**
+   * 计算当前累计有效训练时长（秒），不含补练/暂停间隔
+   */
+  _getCurrentTotalDurationSeconds() {
+    const base = this.baseDurationSeconds || 0;
+    const seg = this.segmentStartedAt && !this.data.isPaused
+      ? Math.max(0, Math.floor((Date.now() - this.segmentStartedAt) / 1000))
+      : 0;
+    return base + seg;
+  },
+
+  /**
    * 启动训练总时长计时器
    */
   startDurationTimer() {
@@ -213,7 +224,7 @@ Page({
     this.durationTimer = setInterval(() => {
       if (!this.data.isPaused) {
         this.setData({
-          trainingDuration: this.data.trainingDuration + 1
+          trainingDuration: this._getCurrentTotalDurationSeconds()
         });
       }
     }, 1000);
@@ -262,6 +273,12 @@ Page({
     const startIdx = session.current_exercise_index || 0;
     const freeAllDone = isFreeWorkout && exercises.length > 0 && startIdx >= exercises.length;
 
+    // 分段累计时长初始化：恢复/补练时沿用原累计时长，不把离开间隔算进去
+    this.baseDurationSeconds = Number(session.accumulated_duration_seconds || session.total_duration_seconds || 0);
+    this.segmentStartedAt = (this.baseDurationSeconds === 0 && session.started_at && !session.completed_at)
+      ? session.started_at
+      : Date.now();
+
     this.setData({
       session,
       exercises,
@@ -269,7 +286,8 @@ Page({
       freeAllDone,
       completedSets: existingSets,
       currentExerciseIndex: startIdx,
-      currentSetIndex: session.current_set_index || 0
+      currentSetIndex: session.current_set_index || 0,
+      trainingDuration: this._getCurrentTotalDurationSeconds()
     });
 
     // 计算整体进度
@@ -1539,38 +1557,72 @@ Page({
   },
 
   /**
-   * 主动完成训练（自由训练或提前结算）
+   * 统一完成训练入口（0组引导放弃；>=1组支持结算保存或次要放弃）
    */
   onFinishTraining() {
     const { completedSets } = this.data;
     if (!completedSets || completedSets.length === 0) {
       wx.showModal({
         title: '尚未记录训练',
-        content: '还没有完成任何一组动作，确定直接退出吗？',
-        confirmText: '退出',
-        cancelText: '继续添加',
+        content: '还没有完成任何一组动作，确定放弃本次训练吗？',
+        confirmText: '放弃训练',
+        cancelText: '继续训练',
         success: (res) => {
           if (res.confirm) {
-            const { session } = this.data;
-            if (session) {
-              update('sessions', session.id, { status: 'aborted', aborted_at: Date.now(), updated_at: Date.now() });
-            }
-            wx.navigateBack();
+            this._discardCurrentSession();
           }
         }
       });
       return;
     }
 
-    wx.showModal({
-      title: '完成本次训练',
-      content: `已完成 ${completedSets.length} 组动作，现在结算并保存训练记录吗？`,
-      confirmText: '完成并保存',
-      cancelText: '继续训练',
+    wx.showActionSheet({
+      itemList: [
+        `完成并保存（已记录 ${completedSets.length} 组）`,
+        '不保存并放弃本次训练'
+      ],
       success: (res) => {
-        if (res.confirm) {
+        if (res.tapIndex === 0) {
           this.onTrainingComplete();
+        } else if (res.tapIndex === 1) {
+          wx.showModal({
+            title: '放弃本次训练',
+            content: `当前已记录 ${completedSets.length} 组，放弃后本次训练不会计入历史记录，确定放弃吗？`,
+            confirmText: '确认放弃',
+            confirmColor: '#FF4D4F',
+            cancelText: '返回',
+            success: (modalRes) => {
+              if (modalRes.confirm) {
+                this._discardCurrentSession();
+              }
+            }
+          });
         }
+      }
+    });
+  },
+
+  /**
+   * 作废当前训练会话并返回
+   */
+  _discardCurrentSession() {
+    const { session } = this.data;
+    if (session) {
+      update('sessions', session.id, {
+        status: 'aborted',
+        aborted_at: Date.now(),
+        updated_at: Date.now()
+      });
+      const app = getApp();
+      if (app && app.globalData && app.globalData.trainingMinimizedSessionId === session.id) {
+        app.globalData.trainingMinimized = false;
+        app.globalData.trainingMinimizedSessionId = null;
+        app.globalData.trainingSnapshot = null;
+      }
+    }
+    wx.navigateBack({
+      fail: () => {
+        wx.switchTab({ url: '/pages/home/home' });
       }
     });
   },
@@ -1688,18 +1740,22 @@ Page({
   async onTrainingComplete() {
     this.clearRestTimer();
     const { session, completedSets, exercises } = this.data;
+    const totalDurationSeconds = Math.max(60, this._getCurrentTotalDurationSeconds());
+    const shouldCalcProgression = !this.data.isFreeWorkout && !session.progression_calculated;
 
-    // 标记会话完成并保存完整记录
+    // 标记会话完成并保存完整记录（覆盖更新，不把补练间隔计入时长）
     update('sessions', session.id, {
       status: 'completed',
       completed_sets: completedSets,
       pending_exercises: exercises,
       completed_at: Date.now(),
-      total_duration_seconds: Math.max(60, Math.floor((Date.now() - (session.started_at || Date.now())) / 1000))
+      accumulated_duration_seconds: totalDurationSeconds,
+      total_duration_seconds: totalDurationSeconds,
+      progression_calculated: session.progression_calculated || shouldCalcProgression
     });
 
-    // 固定计划模式计算重量演进；自由训练不干扰计划演进
-    if (!this.data.isFreeWorkout) {
+    // 固定计划模式仅首次结算计算重量演进，避免补练重复推高目标；自由训练不干扰计划演进
+    if (shouldCalcProgression) {
       try {
         await calculateProgression(session.id);
       } catch (err) {
@@ -1760,12 +1816,15 @@ Page({
       return;
     }
 
-    // 暂停训练计时
+    // 暂停训练计时，冻结当前累计时长
+    this.baseDurationSeconds = this._getCurrentTotalDurationSeconds();
+    this.segmentStartedAt = null;
     this.setData({ isPaused: true });
 
     update('sessions', session.id, {
       status: 'paused',
       paused_at: Date.now(),
+      accumulated_duration_seconds: this.baseDurationSeconds,
       updated_at: Date.now()
     });
 
@@ -1778,7 +1837,7 @@ Page({
 
     // 只有点击"取消"才恢复训练，点击"好的"保持暂停状态
     if (!result.confirm) {
-      this.setData({ isPaused: false });
+      this.onResumeTraining();
     }
   },
 
@@ -1793,6 +1852,7 @@ Page({
       return;
     }
 
+    this.segmentStartedAt = Date.now();
     this.setData({ isPaused: false });
 
     update('sessions', session.id, {
@@ -1802,30 +1862,6 @@ Page({
     });
 
     UI.showToast({ message: '继续训练', icon: 'none' });
-  },
-
-  /**
-   * 结束训练
-   */
-  async onAbandonTraining() {
-    const result = await UI.showDialog({
-      title: '确认结束训练',
-      content: '确定要结束本次训练吗？已记录的数据会保留',
-      confirmText: '结束训练',
-      cancelText: '继续训练'
-    });
-
-    if (result.confirm) {
-      const { session } = this.data;
-
-      update('sessions', session.id, {
-        status: 'aborted',
-        aborted_at: Date.now(),
-        updated_at: Date.now()
-      });
-
-      wx.navigateBack();
-    }
   },
 
   /**
@@ -1847,6 +1883,7 @@ Page({
       current_exercise_index: currentExerciseIndex,
       current_set_index: currentSetIndex,
       completed_sets: this.data.completedSets,
+      accumulated_duration_seconds: this._getCurrentTotalDurationSeconds(),
       updated_at: Date.now(),
       snapshot: true
     });

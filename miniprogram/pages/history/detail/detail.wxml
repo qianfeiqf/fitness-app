@@ -58,5 +58,13 @@
         </view>
       </view>
     </view>
+
+    <!-- 当天已完成训练的低干扰补练入口 -->
+    <view wx:if="{{canResumeToday}}" class="resume-today-section">
+      <view class="resume-today-btn" bindtap="onResumeTodayWorkout">
+        <text>+ 继续补练 / 追加动作</text>
+      </view>
+      <text class="resume-today-tip">仅限当天记录 · 沿用原有训练时长</text>
+    </view>
   </view>
 </view>

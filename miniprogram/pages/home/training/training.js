@@ -62,10 +62,19 @@ Page({
     skipReasons: ['身体不适/疼痛', '器械被占用', '时间不够', '其他原因'],
     selectedSkipReason: -1,
 
-    // 添加动作
+    // 添加动作（支持肌群筛选 + 多选批量添加 + 自定义动作）
     showAddExerciseModal: false,
     addExerciseSearch: '',
+    addMuscleGroups: ['全部', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
+    selectedAddMuscle: '全部',
     filteredExercises: [],
+    selectedAddIds: [],
+    selectedAddMap: {},
+    canAddCustomExercise: false,
+
+    // 自由训练模式
+    isFreeWorkout: false,
+    freeAllDone: false,
 
     // 更多操作面板
     showMoreActions: false,
@@ -241,11 +250,18 @@ Page({
     }
 
     const exercises = session.pending_exercises || [];
+    const isFreeWorkout = !!session.is_free_workout;
+    const existingSets = session.completed_sets || [];
+    const startIdx = session.current_exercise_index || 0;
+    const freeAllDone = isFreeWorkout && exercises.length > 0 && startIdx >= exercises.length;
 
     this.setData({
       session,
       exercises,
-      currentExerciseIndex: session.current_exercise_index || 0,
+      isFreeWorkout,
+      freeAllDone,
+      completedSets: existingSets,
+      currentExerciseIndex: startIdx,
       currentSetIndex: session.current_set_index || 0
     });
 
@@ -257,9 +273,11 @@ Page({
     // 启动训练总时长计时器
     this.startDurationTimer();
 
-    // 设置当前动作
-    if (exercises.length > 0) {
+    // 设置当前动作；自由训练空列表时自动打开多选动作抽屉
+    if (exercises.length > 0 && !freeAllDone) {
       this.setCurrentExercise();
+    } else if (isFreeWorkout && exercises.length === 0) {
+      this.onAddExercise();
     }
   },
 
@@ -267,25 +285,28 @@ Page({
    * 设置当前动作
    */
   setCurrentExercise() {
-    const { exercises, currentExerciseIndex } = this.data;
+    const { exercises, currentExerciseIndex, isFreeWorkout } = this.data;
     const exercise = exercises[currentExerciseIndex];
 
     if (!exercise) {
+      if (isFreeWorkout) {
+        this.setData({ freeAllDone: exercises.length > 0, currentExercise: null });
+        return;
+      }
       this.onTrainingComplete();
       return;
     }
 
-    // 获取动作详情
-    const exerciseDetail = findOne('exercises', { id: exercise.exercise_id });
-    if (!exerciseDetail) {
-      console.error('动作数据异常:', exercise.exercise_id);
-      UI.showError('动作数据异常', this);
-      this.onSkipExercise();
-      return;
-    }
+    // 获取动作详情（兼容自由训练自定义动作）
+    const exerciseDetail = findOne('exercises', { id: exercise.exercise_id }) || {
+      id: exercise.exercise_id,
+      name: exercise.exercise_name || exercise.name || '自定义动作',
+      muscle_group: exercise.muscle_group || '自由训练',
+      alternatives: []
+    };
 
-    // 检查是否需要热身（目标重量 >= 30kg 且未完成热身）
-    const needsWarmup = (exercise.target_weight || 0) >= 30 && !exercise.warmup_completed;
+    // 自由训练模式不自动弹出热身组面板，直接进入重量/次数记录
+    const needsWarmup = !isFreeWorkout && (exercise.target_weight || 0) >= 30 && !exercise.warmup_completed;
 
     if (needsWarmup) {
       this.showWarmupPanel(exercise, exerciseDetail);
@@ -900,7 +921,12 @@ Page({
         restTimeLeft: 0,
         restMinimized: false
       });
-      this.onTrainingComplete();
+      if (this.data.isFreeWorkout) {
+        // 自由训练做完当前列表不强制结束，让用户选继续加动作/加组或完成训练
+        this.setData({ freeAllDone: true, currentExercise: null });
+      } else {
+        this.onTrainingComplete();
+      }
     } else {
       this._restoreFromRest();
     }
@@ -910,23 +936,27 @@ Page({
    * 休息结束恢复训练 — 合并 setData 避免闪动
    */
   _restoreFromRest() {
-    const { exercises, currentExerciseIndex } = this.data;
+    const { exercises, currentExerciseIndex, isFreeWorkout } = this.data;
     const exercise = exercises[currentExerciseIndex];
 
     if (!exercise) {
       this.setData({ isResting: false, restTimeLeft: 0, restMinimized: false });
-      this.onTrainingComplete();
+      if (isFreeWorkout) {
+        this.setData({ freeAllDone: exercises.length > 0, currentExercise: null });
+      } else {
+        this.onTrainingComplete();
+      }
       return;
     }
 
-    const exerciseDetail = findOne('exercises', { id: exercise.exercise_id });
-    if (!exerciseDetail) {
-      this.setData({ isResting: false, restTimeLeft: 0, restMinimized: false });
-      this.onSkipExercise();
-      return;
-    }
+    const exerciseDetail = findOne('exercises', { id: exercise.exercise_id }) || {
+      id: exercise.exercise_id,
+      name: exercise.exercise_name || exercise.name || '自定义动作',
+      muscle_group: exercise.muscle_group || '自由训练',
+      alternatives: []
+    };
 
-    const needsWarmup = (exercise.target_weight || 0) >= 30 && !exercise.warmup_completed;
+    const needsWarmup = !isFreeWorkout && (exercise.target_weight || 0) >= 30 && !exercise.warmup_completed;
 
     if (needsWarmup) {
       this.setData({
@@ -1179,14 +1209,43 @@ Page({
   },
 
   /**
-   * 添加动作
+   * 添加动作（支持按肌群筛选、一次多选多个动作或输入自定义动作）
    */
   onAddExercise() {
-    const allExercises = getCollection('exercises');
+    const allExercises = getCollection('exercises') || [];
     this.setData({
       showAddExerciseModal: true,
       addExerciseSearch: '',
+      selectedAddMuscle: '全部',
+      selectedAddIds: [],
+      selectedAddMap: {},
+      canAddCustomExercise: false,
       filteredExercises: allExercises
+    });
+  },
+
+  _filterAddExercises(keyword, muscle) {
+    const allExercises = getCollection('exercises') || [];
+    const kw = (keyword || '').trim().toLowerCase();
+    const filtered = allExercises.filter(ex => {
+      const matchMuscle = !muscle || muscle === '全部' || ex.muscle_group === muscle;
+      const matchKw = !kw ||
+        (ex.name && ex.name.toLowerCase().includes(kw)) ||
+        (ex.name_en && ex.name_en.toLowerCase().includes(kw)) ||
+        (ex.muscle_group && ex.muscle_group.toLowerCase().includes(kw));
+      return matchMuscle && matchKw;
+    });
+    const exactMatch = kw && allExercises.some(ex => ex.name && ex.name.toLowerCase() === kw);
+    return { filtered, canAddCustom: !!kw && !exactMatch };
+  },
+
+  onSelectAddMuscle(e) {
+    const muscle = e.currentTarget.dataset.muscle || '全部';
+    const { filtered, canAddCustom } = this._filterAddExercises(this.data.addExerciseSearch, muscle);
+    this.setData({
+      selectedAddMuscle: muscle,
+      filteredExercises: filtered,
+      canAddCustomExercise: canAddCustom
     });
   },
 
@@ -1194,67 +1253,198 @@ Page({
    * 搜索动作
    */
   onAddExerciseSearch(e) {
-    const keyword = e.detail.value.toLowerCase();
-    const allExercises = getCollection('exercises');
-    const filtered = allExercises.filter(ex =>
-      ex.name.toLowerCase().includes(keyword) ||
-      (ex.name_en && ex.name_en.toLowerCase().includes(keyword))
-    );
+    const raw = e.detail.value || '';
+    const { filtered, canAddCustom } = this._filterAddExercises(raw, this.data.selectedAddMuscle);
     this.setData({
-      addExerciseSearch: e.detail.value,
-      filteredExercises: filtered
+      addExerciseSearch: raw,
+      filteredExercises: filtered,
+      canAddCustomExercise: canAddCustom
     });
   },
 
   /**
-   * 选择要添加的动作
+   * 勾选/取消勾选动作（支持一次多选多个）
    */
-  onSelectAddExercise(e) {
+  onToggleAddExercise(e) {
     const { exerciseId } = e.currentTarget.dataset;
-    const exercise = findOne('exercises', { id: exerciseId });
+    if (!exerciseId) return;
+    const { selectedAddIds, selectedAddMap } = this.data;
+    const nextMap = { ...selectedAddMap };
+    let nextIds;
+    if (nextMap[exerciseId]) {
+      delete nextMap[exerciseId];
+      nextIds = selectedAddIds.filter(id => id !== exerciseId);
+    } else {
+      nextMap[exerciseId] = true;
+      nextIds = [...selectedAddIds, exerciseId];
+    }
+    this.setData({
+      selectedAddIds: nextIds,
+      selectedAddMap: nextMap
+    });
+  },
 
-    if (!exercise) return;
-
-    const { exercises, session } = this.data;
-
-    // 添加到动作列表末尾
-    const newExercise = {
-      exercise_id: exercise.id,
-      exercise_name: exercise.name,
-      name: exercise.name,
-      target_sets: 3,
-      target_reps: 10,
-      target_weight: 0,
-      rest_seconds: 120,
-      completed_sets: 0,
-      warmup_completed: true, // 添加的动作默认跳过热身
-      muscle_group: exercise.muscle_group,
-      is_added: true // 标记为临时添加
+  /**
+   * 直接添加自定义动作名称
+   */
+  onAddCustomExercise() {
+    const customName = (this.data.addExerciseSearch || '').trim();
+    if (!customName) return;
+    const customExercise = {
+      id: 'custom_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+      name: customName,
+      muscle_group: this.data.selectedAddMuscle === '全部' ? '自由训练' : this.data.selectedAddMuscle,
+      is_custom: true
     };
+    this._appendExercisesToSession([customExercise]);
+  },
 
-    exercises.push(newExercise);
+  /**
+   * 确认批量添加已选动作
+   */
+  onConfirmAddExercises() {
+    const { selectedAddIds } = this.data;
+    if (!selectedAddIds || selectedAddIds.length === 0) {
+      if (this.data.canAddCustomExercise) {
+        this.onAddCustomExercise();
+        return;
+      }
+      wx.showToast({ title: '请先选择至少一个动作', icon: 'none' });
+      return;
+    }
+    const toAdd = selectedAddIds
+      .map(id => findOne('exercises', { id }))
+      .filter(Boolean);
+    if (toAdd.length === 0) return;
+    this._appendExercisesToSession(toAdd);
+  },
 
-    // 保存到 session
+  /**
+   * 将一个或多个动作加入当前训练会话
+   */
+  _appendExercisesToSession(exerciseList) {
+    const { exercises, session, currentExerciseIndex, freeAllDone } = this.data;
+    const prevLen = exercises.length;
+    const nextExercises = [...exercises];
+
+    exerciseList.forEach(exercise => {
+      const lastRecord = this.getLastExerciseRecord(exercise.id);
+      nextExercises.push({
+        exercise_id: exercise.id,
+        exercise_name: exercise.name,
+        name: exercise.name,
+        target_sets: 3,
+        target_reps: lastRecord ? (lastRecord.actual_reps || 10) : 10,
+        target_weight: lastRecord ? (lastRecord.actual_weight || 20) : 20,
+        rest_seconds: 90,
+        completed_sets: 0,
+        warmup_completed: true,
+        muscle_group: exercise.muscle_group || '自由训练',
+        is_custom: !!exercise.is_custom,
+        is_added: true
+      });
+    });
+
+    const shouldJumpToNew = prevLen === 0 || freeAllDone || currentExerciseIndex >= prevLen;
+    const nextIdx = shouldJumpToNew ? prevLen : currentExerciseIndex;
+
     update('sessions', session.id, {
-      pending_exercises: exercises,
+      pending_exercises: nextExercises,
+      current_exercise_index: nextIdx,
+      current_set_index: shouldJumpToNew ? 0 : this.data.currentSetIndex,
       updated_at: Date.now()
     });
 
     this.setData({
-      exercises,
+      exercises: nextExercises,
+      currentExerciseIndex: nextIdx,
+      currentSetIndex: shouldJumpToNew ? 0 : this.data.currentSetIndex,
+      freeAllDone: false,
       showAddExerciseModal: false,
       addExerciseSearch: '',
+      selectedAddIds: [],
+      selectedAddMap: {},
       filteredExercises: []
     });
 
-    UI.showToast({
-      message: '已添加 ' + exercise.name,
-      icon: 'check-circle',
-      context: this
+    if (shouldJumpToNew) {
+      this.setCurrentExercise();
+    } else {
+      this.calculateOverallProgress();
+    }
+
+    const tip = exerciseList.length === 1
+      ? `已添加 ${exerciseList[0].name}`
+      : `已添加 ${exerciseList.length} 个动作`;
+    wx.showToast({ title: tip, icon: 'success' });
+  },
+
+  /**
+   * 自由训练：为当前动作（或刚完成的最后一个动作）再加一组
+   */
+  onAddExtraSet() {
+    const { exercises, currentExerciseIndex, freeAllDone, session } = this.data;
+    if (!exercises || exercises.length === 0 || !session) return;
+    const targetIdx = freeAllDone ? exercises.length - 1 : currentExerciseIndex;
+    const target = exercises[targetIdx];
+    if (!target) return;
+
+    const nextExercises = exercises.map((ex, i) =>
+      i === targetIdx ? { ...ex, target_sets: (ex.target_sets || 3) + 1 } : ex
+    );
+
+    update('sessions', session.id, {
+      pending_exercises: nextExercises,
+      current_exercise_index: targetIdx,
+      current_set_index: nextExercises[targetIdx].completed_sets || 0,
+      updated_at: Date.now()
     });
 
-    // 更新整体进度
-    this.calculateOverallProgress();
+    this.setData({
+      exercises: nextExercises,
+      currentExerciseIndex: targetIdx,
+      currentSetIndex: nextExercises[targetIdx].completed_sets || 0,
+      freeAllDone: false
+    });
+    this.setCurrentExercise();
+    wx.showToast({ title: '已增加 1 组', icon: 'none' });
+  },
+
+  /**
+   * 主动完成训练（自由训练或提前结算）
+   */
+  onFinishTraining() {
+    const { completedSets } = this.data;
+    if (!completedSets || completedSets.length === 0) {
+      wx.showModal({
+        title: '尚未记录训练',
+        content: '还没有完成任何一组动作，确定直接退出吗？',
+        confirmText: '退出',
+        cancelText: '继续添加',
+        success: (res) => {
+          if (res.confirm) {
+            const { session } = this.data;
+            if (session) {
+              update('sessions', session.id, { status: 'aborted', aborted_at: Date.now(), updated_at: Date.now() });
+            }
+            wx.navigateBack();
+          }
+        }
+      });
+      return;
+    }
+
+    wx.showModal({
+      title: '完成本次训练',
+      content: `已完成 ${completedSets.length} 组动作，现在结算并保存训练记录吗？`,
+      confirmText: '完成并保存',
+      cancelText: '继续训练',
+      success: (res) => {
+        if (res.confirm) {
+          this.onTrainingComplete();
+        }
+      }
+    });
   },
 
   /**
@@ -1264,6 +1454,8 @@ Page({
     this.setData({
       showAddExerciseModal: false,
       addExerciseSearch: '',
+      selectedAddIds: [],
+      selectedAddMap: {},
       filteredExercises: []
     });
   },
@@ -1387,21 +1579,30 @@ Page({
    */
   async onTrainingComplete() {
     this.clearRestTimer();
-    const { session, completedSets, prBadges } = this.data;
+    const { session, completedSets, exercises } = this.data;
 
-    // 标记会话完成
+    // 标记会话完成并保存完整记录
     update('sessions', session.id, {
       status: 'completed',
+      completed_sets: completedSets,
+      pending_exercises: exercises,
       completed_at: Date.now(),
-      total_duration_seconds: Math.floor((Date.now() - session.started_at) / 1000)
+      total_duration_seconds: Math.max(60, Math.floor((Date.now() - (session.started_at || Date.now())) / 1000))
     });
 
-    // 计算演进
-    let progressions = [];
-    try {
-      progressions = await calculateProgression(session.id);
-    } catch (err) {
-      console.error('计算演进失败:', err);
+    // 固定计划模式计算重量演进；自由训练不干扰计划演进
+    if (!this.data.isFreeWorkout) {
+      try {
+        await calculateProgression(session.id);
+      } catch (err) {
+        console.error('计算演进失败:', err);
+      }
+    }
+
+    // 异步同步到云端
+    const app = getApp();
+    if (app && typeof app.startSync === 'function') {
+      app.startSync();
     }
 
     this.setData({ isCompleted: true });

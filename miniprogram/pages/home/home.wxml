@@ -40,15 +40,30 @@
       <text class="empty-icon">🏋️</text>
     </view>
     <text class="empty-title">还没有训练计划</text>
-    <text class="empty-desc">选择一个计划，开始你的健身之旅</text>
+    <text class="empty-desc">选择一个计划，或者直接进入自由训练边练边记</text>
     <button class="btn-cta" bindtap="onGoToPlans">
       <text>浏览计划库</text>
       <text class="btn-cta-arrow">→</text>
     </button>
+    <view class="free-workout-empty-btn" bindtap="onStartFreeWorkout">
+      <text class="free-workout-plus">+</text>
+      <text>开始自由训练</text>
+    </view>
   </view>
 
   <!-- 今日训练 -->
   <view wx:else class="training-section">
+    <!-- 自由训练快捷入口 -->
+    <view class="free-workout-bar" bindtap="onStartFreeWorkout">
+      <view class="free-workout-left">
+        <text class="free-workout-icon">⚡</text>
+        <view class="free-workout-info">
+          <text class="free-workout-title">自由训练</text>
+          <text class="free-workout-desc">不按计划，直接进记录页边练边加动作</text>
+        </view>
+      </view>
+      <text class="free-workout-btn">开始 ›</text>
+    </view>
     <!-- Deload 提醒横幅 -->
     <view wx:if="{{showDeloadReminder}}" class="deload-banner" bindtap="onDismissDeloadReminder">
       <text class="deload-icon">⚠</text>

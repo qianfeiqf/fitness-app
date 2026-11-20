@@ -4,7 +4,7 @@
   min-height: 100vh;
   background: #FFFFFF;
   padding: 30rpx;
-  padding-bottom: 160rpx;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
 /* =====================
@@ -380,7 +380,7 @@
   padding: 30rpx;
   padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
   background: #FFFFFF;
-  border-top: none;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
 }
 
 .btn-save {

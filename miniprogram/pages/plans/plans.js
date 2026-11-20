@@ -62,7 +62,10 @@ Page({
     ],
     wizardSelectedExp: null,
     wizardRecommended: [],
-    wizardSelectedPlan: null
+    wizardSelectedPlan: null,
+
+    // 训练悬浮窗
+    trainingFloat: null
   },
 
   onLoad() {
@@ -72,6 +75,35 @@ Page({
 
   onShow() {
     this.loadPlans();
+    this.checkTrainingFloat();
+  },
+
+  /**
+   * 检查是否有最小化的训练悬浮窗
+   */
+  checkTrainingFloat() {
+    const app = getApp();
+    if (app.globalData.trainingMinimized && app.globalData.trainingSnapshot) {
+      this.setData({ trainingFloat: app.globalData.trainingSnapshot });
+    } else {
+      this.setData({ trainingFloat: null });
+    }
+  },
+
+  /**
+   * 点击悬浮窗返回训练页
+   */
+  onTapTrainingFloat() {
+    const app = getApp();
+    const snapshot = app.globalData.trainingSnapshot;
+    if (snapshot && snapshot.sessionId) {
+      // 清除悬浮窗标记，避免训练页加载时混乱
+      app.globalData.trainingMinimized = false;
+      app.globalData.trainingMinimizedSessionId = null;
+      wx.navigateTo({
+        url: '/pages/home/training/training?sessionId=' + snapshot.sessionId
+      });
+    }
   },
 
   /** 阻止弹窗打开时背景页面滚动 */
@@ -419,49 +451,9 @@ Page({
    */
   onViewTemplateDetail(e) {
     const { templateId } = e.currentTarget.dataset;
-    const template = this.data.templates.find(t => t.id === templateId);
-
-    if (template) {
-      // 获取动作名称映射
-      const exercises = find('exercises') || [];
-      const exerciseMap = {};
-      exercises.forEach(ex => {
-        exerciseMap[ex.id] = ex.name;
-      });
-
-      // 构建训练安排展示列表
-      const dayLabels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-      const exerciseList = [];
-
-      if (template.exercises && template.exercises.length > 0) {
-        // 按训练日分组
-        const dayGroups = {};
-        template.exercises.forEach(ex => {
-          const day = ex.day_of_week || 0;
-          if (!dayGroups[day]) {
-            dayGroups[day] = [];
-          }
-          // 添加动作名称
-          ex.name = exerciseMap[ex.exercise_id] || ex.exercise_id;
-          dayGroups[day].push(ex);
-        });
-
-        // 转换为展示列表
-        Object.keys(dayGroups).sort().forEach(day => {
-          exerciseList.push({
-            day: parseInt(day),
-            dayLabel: dayLabels[parseInt(day)] || '第' + (parseInt(day) + 1) + '天',
-            exercises: dayGroups[day]
-          });
-        });
-      }
-
-      this.setData({
-        showTemplateDetailModal: true,
-        selectedTemplate: template,
-        templateExerciseList: exerciseList
-      });
-    }
+    wx.navigateTo({
+      url: '/pages/plans/detail/detail?templateId=' + templateId
+    });
   },
 
   /**

@@ -3,6 +3,7 @@
  */
 
 const jwt = require('jsonwebtoken');
+const { TOKEN_EXPIRES_JWT } = require('../constants');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -71,5 +72,4 @@ function generateToken(userId) {
 module.exports = {
   verifyToken,
   generateToken
-};
 };

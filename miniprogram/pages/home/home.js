@@ -47,7 +47,10 @@ Page({
     showDeloadReminder: false,
 
     // Swiper 高度
-    swiperHeight: 1000
+    swiperHeight: 1000,
+
+    // 训练悬浮窗
+    trainingFloat: null
   },
 
   // 空操作函数（用于阻止事件冒泡）
@@ -55,8 +58,8 @@ Page({
 
   calcNavBarHeight() {
     const menuButton = wx.getMenuButtonBoundingClientRect();
-    const systemInfo = wx.getSystemInfoSync();
-    const navHeight = menuButton.top + menuButton.height + (menuButton.top - systemInfo.statusBarHeight);
+    const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const navHeight = menuButton.top + menuButton.height + (menuButton.top - windowInfo.statusBarHeight);
     this.setData({ navHeight });
   },
 
@@ -82,6 +85,35 @@ Page({
   onShow() {
     console.log('=== 训练中心页面显示 ===');
     this.checkLoginAndLoadData();
+    this.checkTrainingFloat();
+  },
+
+  /**
+   * 检查是否有最小化的训练悬浮窗
+   */
+  checkTrainingFloat() {
+    const app = getApp();
+    if (app.globalData.trainingMinimized && app.globalData.trainingSnapshot) {
+      this.setData({ trainingFloat: app.globalData.trainingSnapshot });
+    } else {
+      this.setData({ trainingFloat: null });
+    }
+  },
+
+  /**
+   * 点击悬浮窗返回训练页
+   */
+  onTapTrainingFloat() {
+    const app = getApp();
+    const snapshot = app.globalData.trainingSnapshot;
+    if (snapshot && snapshot.sessionId) {
+      // 清除悬浮窗标记，避免训练页加载时混乱
+      app.globalData.trainingMinimized = false;
+      app.globalData.trainingMinimizedSessionId = null;
+      wx.navigateTo({
+        url: '/pages/home/training/training?sessionId=' + snapshot.sessionId
+      });
+    }
   },
 
   /**
@@ -139,9 +171,11 @@ Page({
     this.setData({ loading: true });
 
     try {
-      // 获取所有激活的计划
+      // 获取所有激活的计划（最新创建/更新的排在最前，确保新建计划立即可见）
       const allPlans = getCollection('plans');
-      const activePlans = allPlans.filter(p => p.status === 'active');
+      const activePlans = allPlans
+        .filter(p => p.status === 'active')
+        .sort((a, b) => (b.updated_at || b.created_at || 0) - (a.updated_at || a.created_at || 0));
 
       if (activePlans.length === 0) {
         this.setData({
@@ -177,9 +211,9 @@ Page({
         activePlans,
         planDataList,
         currentPlanIndex: safeIndex,
-        todayPlan: currentData.plan,
-        todayExercises: currentData.exercises,
-        todaySession: currentData.session,
+        todayPlan: currentData.plan || null,
+        todayExercises: currentData.exercises || [],
+        todaySession: currentData.session || null,
         todayDate,
         todayWeek,
         estimatedMinutes: currentData.estimatedMinutes,
@@ -211,10 +245,11 @@ Page({
     const planExercises = find('plan_exercises', { plan_id: plan.id });
 
     let todayExercises = [];
-    if (plan.cycle_type === 'natural_week') {
-      todayExercises = planExercises.filter(pe => pe.day_of_week === dayOfWeek);
+    const cycleType = plan.cycle_type || 'natural_week';
+    if (cycleType === 'natural_week') {
+      todayExercises = planExercises.filter(pe => Number(pe.day_of_week) === dayOfWeek);
     } else {
-      const cycleDay = this.calculateCycleDay(plan);
+      const cycleDay = this.calculateCycleDay(plan, planExercises);
       todayExercises = planExercises.filter(pe => pe.cycle_label === cycleDay);
     }
 
@@ -245,6 +280,7 @@ Page({
     const weekProgress = this.calcWeekProgress(plan, planExercises);
 
     return {
+      id: plan.id,
       plan,
       exercises: exercisesWithDetails,
       session,
@@ -287,9 +323,9 @@ Page({
     const planData = planDataList[index];
     this.setData({
       currentPlanIndex: index,
-      todayPlan: planData.plan,
-      todayExercises: planData.exercises,
-      todaySession: planData.session,
+      todayPlan: planData.plan || null,
+      todayExercises: planData.exercises || [],
+      todaySession: planData.session || null,
       estimatedMinutes: planData.estimatedMinutes,
       totalSets: planData.totalSets,
       muscleGroups: planData.muscleGroups,
@@ -415,17 +451,19 @@ Page({
   /**
    * 计算当前处于循环的第几天
    */
-  calculateCycleDay(plan) {
-    // 计算从计划开始到现在过了多少天
-    const startDate = new Date(plan.created_at);
+  calculateCycleDay(plan, planExercises = []) {
+    const startDate = new Date(plan.created_at || Date.now());
     const now = new Date();
-    const daysPassed = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+    const daysPassed = Math.max(0, Math.floor((now - startDate) / (1000 * 60 * 60 * 24)));
 
-    // 从计划配置读取循环长度，默认4天
+    // 优先使用计划动作中实际配置的 cycle_label 列表轮换（兼容中文标签如「上肢/下肢」和英文 A/B/C/D）
+    const uniqueLabels = [...new Set(planExercises.map(pe => pe.cycle_label).filter(Boolean))];
+    if (uniqueLabels.length > 0) {
+      return uniqueLabels[daysPassed % uniqueLabels.length];
+    }
+
     const cycleLength = plan.cycle_length || 4;
     const dayInCycle = daysPassed % cycleLength;
-
-    // 将循环日映射为 A/B/C/D... 支持最多14天
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     return alphabet[dayInCycle] || 'A';
   },
@@ -598,7 +636,7 @@ Page({
    */
   onSyncCompleted() {
     console.log('同步完成，刷新数据');
-    this.loadTodayTraining();
+    this.checkLoginAndLoadData();
   },
 
   /**
@@ -611,10 +649,11 @@ Page({
       confirmText: '去登录',
       success: (res) => {
         if (res.confirm) {
-          // 触发全局登录
+          // 触发全局登录并同步更新首页登录态
           const app = getApp();
           app.wxLogin().then(() => {
-            this.loadTodayTraining();
+            this.checkLoginAndLoadData();
+            wx.showToast({ title: '登录成功', icon: 'success' });
           }).catch(() => {
             wx.showToast({ title: '登录失败，请重试', icon: 'error' });
           });
@@ -631,12 +670,9 @@ Page({
     const pd = this.data.planDataList.find(p => p.plan.id === planId);
     if (!pd) return;
 
-    wx.showModal({
-      title: pd.plan.name,
-      content: `训练日: ${pd.exercises.length} 个动作\n预计时长: 约 ${pd.exercises.length * 8} 分钟`,
-      showCancel: true,
-      confirmText: '查看详情',
-      cancelText: '关闭'
+    // 跳转到计划详情页
+    wx.navigateTo({
+      url: `/pages/plans/detail/detail?planId=${planId}`
     });
   },
 

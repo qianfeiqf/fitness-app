@@ -55,8 +55,8 @@
         </view>
       </view>
       <view class="onboarding-footer">
-        <button activity-type="0" app-parameter="true" data-custom="null" entrance-path="true" form-type="true" hover-class="true" hover-start-time="20" hover-stay-time="70" lang="true" need-show-entrance="true" open-type="true" phone-number-no-quota-toast="true"
-          send-message-img="截图" send-message-path="当前分享路径" send-message-title="当前标题" session-from="true" style="true" class="t-button button--t-button t-button--base button--t-button--base t-button--primary button--t-button--primary t-button--rectangle button--t-button--rectangle t-button--size-large button--t-button--size-large t-button--block button--t-button--block t-button--disabled button--t-button--disabled sk-button sk-pseudo sk-pseudo-circle">
+        <button activity-type="" app-parameter="" data-custom="" entrance-path="" form-type="" hover-class="" hover-start-time="20" hover-stay-time="70" lang="" need-show-entrance="" open-type="" phone-number-no-quota-toast=""
+          send-message-img="" send-message-path="" send-message-title="" session-from="" style="" class="t-button button--t-button t-button--base button--t-button--base t-button--primary button--t-button--primary t-button--rectangle button--t-button--rectangle t-button--size-large button--t-button--size-large t-button--block button--t-button--block t-button--disabled button--t-button--disabled sk-button sk-pseudo sk-pseudo-circle">
           <view class="t-button__content button--t-button__content">
             <text class="sk-transparent sk-text-33-6364-633 sk-text" style="background-position-x: 50%;">下一步</text>
           </view>

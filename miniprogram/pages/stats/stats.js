@@ -51,7 +51,10 @@ Page({
     muscleAdvice: '',
 
     // 加载状态
-    loading: true
+    loading: true,
+
+    // 训练悬浮窗
+    trainingFloat: null
   },
 
   onLoad() {
@@ -68,6 +71,35 @@ Page({
 
   onShow() {
     this.loadStats();
+    this.checkTrainingFloat();
+  },
+
+  /**
+   * 检查是否有最小化的训练悬浮窗
+   */
+  checkTrainingFloat() {
+    const app = getApp();
+    if (app.globalData.trainingMinimized && app.globalData.trainingSnapshot) {
+      this.setData({ trainingFloat: app.globalData.trainingSnapshot });
+    } else {
+      this.setData({ trainingFloat: null });
+    }
+  },
+
+  /**
+   * 点击悬浮窗返回训练页
+   */
+  onTapTrainingFloat() {
+    const app = getApp();
+    const snapshot = app.globalData.trainingSnapshot;
+    if (snapshot && snapshot.sessionId) {
+      // 清除悬浮窗标记，避免训练页加载时混乱
+      app.globalData.trainingMinimized = false;
+      app.globalData.trainingMinimizedSessionId = null;
+      wx.navigateTo({
+        url: '/pages/home/training/training?sessionId=' + snapshot.sessionId
+      });
+    }
   },
 
   /**

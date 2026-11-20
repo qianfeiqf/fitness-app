@@ -1,22 +1,16 @@
 /**
  * 健身训练计划小程序 - 应用入口
- *
- * CloudBase 集成说明：
- * 本项目使用微信云托管（Cloud Hosting）作为后端，使用 REST API 进行通信。
- * 如需迁移到 CloudBase 数据库，可按以下步骤：
- * 1. 在 app.js 中添加 wx.cloud.init({ env: 'your-env-id' })
- * 2. 使用 wx.cloud.database() 替代 localdb/db.js
- * 3. 使用 wx.cloud.callFunction() 调用云函数获取 openid
+ * 数据架构：本地优先（localdb） + 微信云开发（CloudBase NoSQL）双向同步
  */
 
 // 导入本地数据库
-const { initDatabase, getDatabase, getCollection } = require('./localdb/db.js');
+const { initDatabase, getCollection } = require('./localdb/db.js');
 
 // 导入同步服务
 const syncService = require('./services/sync.js');
 
-// 云托管 API 配置
-const { CLOUD_API_BASE } = require('./config/cloud.js');
+// 云开发环境配置
+const { CLOUD_ENV_ID } = require('./config/cloud.js');
 
 // ============================================
 // 简单的自定义事件总线（替代 wx.eventCenter）
@@ -73,70 +67,105 @@ App({
     userId: null,
     openId: null,
     isLoggedIn: false,
+    isCloudReady: false,
+    isOfflineMode: false,
     isSyncing: false,
     lastSyncTime: null,
     dbReady: false,
     needsOnboarding: false,
     unfinishedSession: null,
-    accessToken: null,
-    // CloudBase 配置占位（未来迁移用）
-    cloudBaseEnv: null,
-    isCloudBaseEnabled: false
+    cloudEnvId: CLOUD_ENV_ID,
+    // 隐私授权回调暂存
+    pendingPrivacyResolve: null,
+    privacyContractName: '《小程序隐私保护指引》'
   },
 
   // 小程序初始化
   onLaunch(options) {
     console.log('=== 小程序启动 ===', options);
 
-    // 1. 初始化本地数据库（同步完成）
+    // 1. 初始化本地数据库
     this.initLocalDatabase();
 
-    // 2. 尝试初始化 CloudBase（可选，未来迁移用）
-    this.initCloudBase();
+    // 2. 初始化微信云开发（CloudBase）
+    this.initCloud();
 
-    // 3. 检查登录状态
+    // 3. 注册微信小程序隐私保护指引监听
+    this.initPrivacyListener();
+
+    // 4. 检查登录状态
     this.checkLoginStatus();
 
-    // 4. 检查新用户引导
+    // 5. 检查新用户引导
     this.checkOnboarding();
 
-    // 5. 检查是否有未完成的训练会话
+    // 6. 检查是否有未完成的训练会话
     this.checkUnfinishedSession();
   },
 
-  // ============================================
-  // CloudBase 初始化（可选，未来迁移用）
-  // ============================================
-  initCloudBase() {
-    // 检查是否已配置 CloudBase
-    const cloudBaseConfig = wx.getStorageSync('cloudBaseConfig');
-    if (!cloudBaseConfig || !cloudBaseConfig.envId) {
-      console.log('[CloudBase] 未配置，跳过初始化');
+  /**
+   * 初始化微信云开发（cloud1-1g20tdh446a011c5）
+   */
+  initCloud() {
+    if (!wx.cloud) {
+      console.error('[CloudBase] 请使用 2.2.3 或以上的基础库以使用云能力');
+      this.globalData.isCloudReady = false;
       return;
     }
 
     try {
-      // 初始化 CloudBase
       wx.cloud.init({
-        env: cloudBaseConfig.envId,
+        env: CLOUD_ENV_ID,
         traceUser: true
       });
-      this.globalData.cloudBaseEnv = cloudBaseConfig.envId;
-      this.globalData.isCloudBaseEnabled = true;
-      console.log('[CloudBase] 初始化成功, env:', cloudBaseConfig.envId);
+      this.globalData.isCloudReady = true;
+      console.log('[CloudBase] 初始化成功, env:', CLOUD_ENV_ID);
     } catch (err) {
       console.error('[CloudBase] 初始化失败:', err);
-      this.globalData.isCloudBaseEnabled = false;
+      this.globalData.isCloudReady = false;
+    }
+  },
+
+  /**
+   * 监听微信小程序隐私授权需求（wx.onNeedPrivacyAuthorization）
+   */
+  initPrivacyListener() {
+    if (typeof wx.getPrivacySetting === 'function') {
+      wx.getPrivacySetting({
+        success: (res) => {
+          if (res.privacyContractName) {
+            this.globalData.privacyContractName = res.privacyContractName;
+          }
+        }
+      });
+    }
+
+    if (typeof wx.onNeedPrivacyAuthorization === 'function') {
+      wx.onNeedPrivacyAuthorization((resolve) => {
+        this.globalData.pendingPrivacyResolve = resolve;
+        triggerEvent('needPrivacyAuthorization', {
+          contractName: this.globalData.privacyContractName
+        });
+      });
+    }
+  },
+
+  /**
+   * 由 privacy-popup 组件回调，通知微信隐私授权结果
+   */
+  resolvePrivacyAuthorization(result) {
+    const resolver = this.globalData.pendingPrivacyResolve;
+    this.globalData.pendingPrivacyResolve = null;
+    if (typeof resolver === 'function') {
+      resolver(result);
     }
   },
 
   // 初始化本地数据库
   initLocalDatabase() {
     try {
-      console.log('初始化本地数据库...');
       initDatabase();
       this.globalData.dbReady = true;
-      console.log('本地数据库初始化完成');
     } catch (err) {
       console.error('本地数据库初始化失败:', err);
     }
@@ -145,25 +174,18 @@ App({
   // 检查新用户引导
   checkOnboarding() {
     const completed = wx.getStorageSync('onboarding_completed');
-    if (!completed) {
-      // 新用户，需要引导
-      console.log('新用户，需要引导');
-      this.globalData.needsOnboarding = true;
-    } else {
-      this.globalData.needsOnboarding = false;
-    }
+    this.globalData.needsOnboarding = !completed;
   },
 
   // 检查登录状态
   checkLoginStatus() {
     const userInfo = wx.getStorageSync('userInfo');
-    const accessToken = wx.getStorageSync('accessToken');
-    if (userInfo && userInfo.openId) {
-      this.globalData.userId = userInfo.id;
-      this.globalData.openId = userInfo.openId;
+    if (userInfo && (userInfo.id || userInfo.openId)) {
+      this.globalData.userId = userInfo.id || userInfo.openId;
+      this.globalData.openId = userInfo.openId || null;
+      this.globalData.isOfflineMode = !!userInfo.isOfflineMode;
       this.globalData.isLoggedIn = true;
-      this.globalData.accessToken = accessToken || null;
-      console.log('用户已登录:', userInfo.openId);
+      console.log('用户已登录:', this.globalData.userId);
     } else {
       console.log('用户未登录');
     }
@@ -172,31 +194,20 @@ App({
   // 检查未完成的训练会话（用于杀后台恢复）
   checkUnfinishedSession() {
     try {
-      // 检查数据库是否就绪
-      if (!this.globalData.dbReady) {
-        console.log('数据库未就绪，跳过未完成会话检查');
-        return;
-      }
-
+      if (!this.globalData.dbReady) return;
       const sessions = getCollection('sessions');
-      if (!sessions) {
-        console.log('sessions集合不存在');
-        return;
-      }
+      if (!sessions) return;
 
-      // 查找进行中或暂停的会话
       let unfinished = null;
       for (let i = 0; i < sessions.length; i++) {
         const s = sessions[i];
-        if (s.status === 'in_progress' || s.status === 'paused') {
+        if (s.status === 'in_progress' || s.status === 'paused' || s.status === 'active') {
           unfinished = s;
           break;
         }
       }
 
       if (unfinished) {
-        console.log('发现未完成的训练会话:', unfinished.id || unfinished._id);
-        // 存储到 globalData，供首页 onLoad 时检查（事件在 onLaunch 触发时页面尚未注册监听）
         this.globalData.unfinishedSession = unfinished;
       }
     } catch (err) {
@@ -204,191 +215,118 @@ App({
     }
   },
 
-  // 微信登录
-  async wxLogin() {
-    return new Promise((resolve, reject) => {
-      wx.login({
-        success: async (res) => {
-          if (res.code) {
-            console.log('获取到wx.login code:', res.code);
-            try {
-              // 优先尝试 CloudBase 云函数获取 openid（未来迁移用）
-              if (this.globalData.isCloudBaseEnabled) {
-                try {
-                  const cloudResult = await this.loginWithCloudBase(res.code);
-                  if (cloudResult) {
-                    console.log('CloudBase 登录成功');
-                    resolve(cloudResult);
-                    return;
-                  }
-                } catch (cloudErr) {
-                  console.warn('[CloudBase] 登录失败，降级到云托管:', cloudErr.message);
-                }
-              }
-
-              // 调用云托管认证接口（登录不需要认证token）
-              const result = await this.requestCloudAPI({
-                url: '/api/v1/auth/wx-login',
-                method: 'POST',
-                data: { code: res.code }
-              }, false);
-
-              if (result.success && result.data) {
-                const { accessToken, user } = result.data;
-                // 保存 accessToken
-                this.globalData.accessToken = accessToken;
-                wx.setStorageSync('accessToken', accessToken);
-                this.setGlobalUserData(user);
-                console.log('云端登录成功, userId:', user.id);
-                resolve(user);
-              } else {
-                reject(new Error(result.error || '登录失败'));
-              }
-            } catch (err) {
-              console.error('云端登录失败，使用离线模式:', err.message);
-              // 云端登录失败时，降级为离线模式（本地mock）
-              const mockUser = {
-                id: 'local_' + Date.now(),
-                openId: 'mock_offline_' + res.code,
-                isNewUser: true,
-                isOfflineMode: true
-              };
-              this.setGlobalUserData(mockUser);
-              resolve(mockUser);
-            }
-          } else {
-            reject(new Error('获取code失败'));
-          }
-        },
-        fail: reject
-      });
-    });
-  },
-
-  // ============================================
-  // CloudBase 登录（未来迁移用）
-  // 获取 openid 的标准方式
-  // ============================================
-  async loginWithCloudBase(code) {
-    return new Promise((resolve, reject) => {
-      wx.cloud.callFunction({
-        name: 'getOpenid',  // 需要创建云函数返回 openid
-        data: { code: code },
-        success: res => {
-          if (res.result && res.result.openid) {
-            const user = {
-              id: res.result.openid,
-              openId: res.result.openid,
-              isNewUser: false,
-              isCloudBase: true
-            };
-            this.setGlobalUserData(user);
-            resolve(user);
-          } else {
-            reject(new Error('CloudBase 未返回 openid'));
-          }
-        },
-        fail: err => {
-          reject(err);
-        }
-      });
-    });
-  },
-
   /**
-   * 调用云托管 API
-   * @param {Object} options - wx.request 选项
-   * @param {boolean} needAuth - 是否需要认证 token
+   * 微信云开发登录（免后端服务器、免配合法域名）
+   * 微信云开发自动注入 _openid，数据按「仅创建者可读写」隔离
    */
-  async requestCloudAPI(options, needAuth = true) {
-    const { url, method = 'GET', data, header = {} } = options;
-
-    // 附加认证 header
-    if (needAuth && this.globalData.accessToken) {
-      header['Authorization'] = 'Bearer ' + this.globalData.accessToken;
+  async wxLogin() {
+    if (!this.globalData.isCloudReady) {
+      this.initCloud();
     }
-    header['Content-Type'] = 'application/json';
 
-    return new Promise((resolve, reject) => {
-      wx.request({
-        url: CLOUD_API_BASE + url,
-        method,
-        data,
-        header,
-        success: (res) => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(res.data);
-          } else if (res.statusCode === 401) {
-            // Token 过期，清除登录状态
-            this.globalData.isLoggedIn = false;
-            this.globalData.accessToken = null;
-            wx.removeStorageSync('accessToken');
-            reject(new Error('认证已过期，请重新登录'));
-          } else {
-            reject(new Error(res.data?.error || '请求失败'));
-          }
-        },
-        fail: (err) => {
-          reject(new Error(err.errMsg || '网络请求失败'));
+    // 验证云开发连通性（若已部署 getOpenid 云函数可拿到精确 openid，否则直接通过云数据库免鉴权通道登录）
+    let openId = null;
+    let isOfflineMode = false;
+
+    if (this.globalData.isCloudReady) {
+      try {
+        // 先轻量探测云数据库连通性，确认当前环境可用
+        const cloudDb = wx.cloud.database({ env: CLOUD_ENV_ID });
+        await cloudDb.collection('profiles').limit(1).get();
+        openId = 'wx_cloud_user';
+      } catch (err) {
+        // 如果只是集合尚未创建（-502005），仍视为云环境连通但提示建集合；其他网络错误降级离线
+        const msg = (err && (err.errMsg || err.message)) || '';
+        if (msg.includes('-502005') || msg.includes('collection not exists')) {
+          console.warn('[CloudBase] 云环境已连通，但数据库集合尚未创建:', msg);
+          openId = 'wx_cloud_user';
+        } else {
+          console.warn('[CloudBase] 云开发连接失败，降级为本地离线模式:', msg);
+          isOfflineMode = true;
         }
-      });
-    });
+      }
+    } else {
+      isOfflineMode = true;
+    }
+
+    const existing = wx.getStorageSync('userInfo');
+    const user = {
+      id: (existing && existing.id) || (isOfflineMode ? 'local_' + Date.now() : 'cb_' + Date.now()),
+      openId: openId || (existing && existing.openId) || ('local_' + Date.now()),
+      isNewUser: !existing,
+      isOfflineMode
+    };
+
+    this.setGlobalUserData(user);
+
+    // 云开发就绪时立即触发一次双向同步（拉取云端历史 + 推送本地记录）
+    if (!isOfflineMode) {
+      this.startSync();
+    }
+
+    return user;
   },
 
   // 设置全局用户数据
   setGlobalUserData(userInfo) {
     this.globalData.userId = userInfo.id;
-    this.globalData.openId = userInfo.openId;
+    this.globalData.openId = userInfo.openId || null;
+    this.globalData.isOfflineMode = !!userInfo.isOfflineMode;
     this.globalData.isLoggedIn = true;
 
     wx.setStorageSync('userInfo', {
       id: userInfo.id,
-      openId: userInfo.openId,
-      isNewUser: userInfo.isNewUser || false
+      openId: userInfo.openId || null,
+      isNewUser: userInfo.isNewUser || false,
+      isOfflineMode: !!userInfo.isOfflineMode
     });
   },
 
-  // 发起同步
+  // 发起双向同步（本地 <-> 微信云数据库）
   async startSync() {
     if (this.globalData.isSyncing) {
-      console.log('同步正在进行中');
-      return;
+      return { success: false, reason: 'syncing' };
     }
 
-    if (!this.globalData.isLoggedIn) {
-      console.log('用户未登录，跳过同步');
-      return;
+    if (!this.globalData.isLoggedIn || !this.globalData.isCloudReady || this.globalData.isOfflineMode) {
+      console.log('[Sync] 未登录或处于离线模式，跳过云端同步');
+      return { success: false, reason: 'offline' };
     }
 
     this.globalData.isSyncing = true;
     triggerEvent('syncStarted');
 
     try {
-      await syncService.syncAll();
+      const result = await syncService.syncAll();
       this.globalData.lastSyncTime = Date.now();
-      triggerEvent('syncCompleted');
-      console.log('同步完成');
+      triggerEvent('syncCompleted', result);
+      return result;
     } catch (err) {
       console.error('同步失败:', err);
       triggerEvent('syncFailed', err);
+      return { success: false, error: err.message };
     } finally {
       this.globalData.isSyncing = false;
     }
   },
 
+  /**
+   * 永久删除当前用户在云数据库中的全部数据（供账号注销使用）
+   */
+  async deleteCloudUserData() {
+    if (!this.globalData.isCloudReady) return;
+    await syncService.clearCloudUserData();
+  },
+
   // 小程序进入前台
   onShow() {
-    console.log('=== 小程序进入前台 ===');
-    // 自动同步
-    if (this.globalData.isLoggedIn) {
+    if (this.globalData.isLoggedIn && this.globalData.isCloudReady && !this.globalData.isOfflineMode) {
       this.startSync();
     }
   },
 
   // 小程序进入后台
   onHide() {
-    console.log('=== 小程序进入后台 ===');
-    // 触发快照保存
     triggerEvent('appHidden');
   },
 

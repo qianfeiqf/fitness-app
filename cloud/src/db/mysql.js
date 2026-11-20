@@ -31,9 +31,8 @@ function getPool() {
     };
 
     // 检查配置完整性
-    const missing = Object.entries(config)
-      .filter(([k, v]) => k !== 'port' && k !== 'keepAliveInitialDelay' && k !== 'enableKeepAlive' && !v)
-      .map(([k]) => k);
+    const requiredKeys = ['host', 'user', 'password', 'database'];
+    const missing = requiredKeys.filter(k => !config[k]);
 
     if (missing.length > 0) {
       console.warn(`[DB] MySQL配置不完整，缺少: ${missing.join(', ')}，将使用内存存储`);
@@ -142,6 +141,7 @@ async function initSchema() {
       decrement_rate DECIMAL(3,2) DEFAULT 0.1,
       rest_seconds INT DEFAULT 120,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_plan_id (plan_id),
       FOREIGN KEY (plan_id) REFERENCES plans(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
@@ -169,6 +169,7 @@ async function initSchema() {
 
     `CREATE TABLE IF NOT EXISTS session_sets (
       id VARCHAR(64) PRIMARY KEY,
+      user_id VARCHAR(64),
       session_id VARCHAR(64) NOT NULL,
       exercise_id VARCHAR(32) NOT NULL,
       exercise_name VARCHAR(128),
@@ -183,6 +184,8 @@ async function initSchema() {
       status VARCHAR(16) DEFAULT 'completed',
       completed_at DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_user_id (user_id),
       INDEX idx_session_id (session_id),
       INDEX idx_exercise_id (exercise_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
@@ -199,6 +202,7 @@ async function initSchema() {
       is_new_pr TINYINT DEFAULT 0,
       recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_user_id (user_id),
       INDEX idx_exercise_id (exercise_id),
       INDEX idx_recorded_at (recorded_at)
@@ -215,6 +219,7 @@ async function initSchema() {
       increment DECIMAL(6,2),
       reason TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_user_id (user_id),
       INDEX idx_exercise_id (exercise_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,

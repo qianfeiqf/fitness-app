@@ -45,6 +45,10 @@ Page({
       });
       wx.setNavigationBarTitle({ title: '编辑计划' });
       this.loadPlanForEdit(options.planId);
+    } else if (options.templateId) {
+      // 从模板创建
+      wx.setNavigationBarTitle({ title: '使用计划' });
+      this.loadTemplateForCreate(options.templateId);
     }
   },
 
@@ -113,6 +117,73 @@ Page({
       planExercises: exercisesWithDetails
     });
     console.log('loadPlanForEdit selectedDays:', selectedDays, 'selectedDaysIndex:', selectedDaysIndex);
+
+    this.updateSelectedDaysDisplay();
+  },
+
+  /**
+   * 从模板加载数据创建计划
+   */
+  loadTemplateForCreate(templateId) {
+    const { findOne, find } = require('../../../localdb/db.js');
+    const template = findOne('plan_templates', { id: templateId });
+    if (!template) {
+      wx.showToast({ title: '模板不存在', icon: 'error' });
+      return;
+    }
+
+    // 获取动作详情
+    const allExercises = find('exercises') || [];
+    const exerciseMap = {};
+    allExercises.forEach(ex => { exerciseMap[ex.id] = ex; });
+
+    const exercisesWithDetails = (template.exercises || []).map(ex => {
+      const exercise = exerciseMap[ex.exercise_id];
+      if (!exercise) return null;
+      return {
+        id: ex.exercise_id,
+        dayOfWeek: ex.day_of_week || 1,
+        cycle_label: ex.cycle_label,
+        target_sets: ex.target_sets,
+        target_reps: ex.target_reps,
+        initial_weight: ex.initial_weight,
+        rest_seconds: ex.rest_seconds || 120,
+        name: exercise.name,
+        muscle_group: exercise.muscle_group
+      };
+    }).filter(e => e !== null);
+
+    // 获取已选训练日
+    const selectedDays = [...new Set(exercisesWithDetails.map(e => e.dayOfWeek))].sort();
+    const selectedDaysIndex = [false, false, false, false, false, false, false];
+    selectedDays.forEach(d => { selectedDaysIndex[d - 1] = true; });
+
+    // 获取循环标签
+    const dayLabels = {};
+    exercisesWithDetails.forEach(ex => {
+      if (ex.cycle_label) {
+        const labelIndex = this.data.cycleLabels.indexOf(ex.cycle_label);
+        if (labelIndex !== -1) {
+          dayLabels[ex.dayOfWeek] = labelIndex;
+        }
+      }
+    });
+
+    // 加载循环长度
+    const cycleLength = template.cycle_length || 4;
+    const cycleLabels = this.generateCycleLabels(cycleLength);
+
+    this.setData({
+      planName: template.name + ' (副本)',
+      cycleType: template.cycle_type || 'natural_week',
+      showAdvancedOptions: template.cycle_type === 'cycle',
+      cycleLength,
+      cycleLabels,
+      selectedDays,
+      selectedDaysIndex,
+      dayLabels,
+      planExercises: exercisesWithDetails
+    });
 
     this.updateSelectedDaysDisplay();
   },

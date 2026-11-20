@@ -80,7 +80,7 @@
       bindchange="onPlanChange"
       duration="300"
     >
-      <swiper-item wx:for="{{planDataList}}" wx:key="plan.id" wx:for-item="pd">
+      <swiper-item wx:for="{{planDataList}}" wx:key="id" wx:for-item="pd">
         <scroll-view scroll-y class="plan-scroll-view" style="height: {{swiperHeight}}rpx;" show-scrollbar="{{false}}">
         <!-- 本周概览：进度与Streak -->
         <view class="week-overview">
@@ -219,4 +219,19 @@
       <text style="font-size:64rpx;">⚡</text>
     </view>
   </modal-sheet>
+
+  <!-- 训练悬浮窗 -->
+  <view wx:if="{{trainingFloat}}" class="training-float" bindtap="onTapTrainingFloat">
+    <view class="training-float-content">
+      <text class="training-float-icon">💪</text>
+      <view class="training-float-info">
+        <text class="training-float-name">{{trainingFloat.exerciseName}}</text>
+        <text class="training-float-set">第 {{trainingFloat.currentSet}}/{{trainingFloat.totalSets}} 组</text>
+      </view>
+      <text class="training-float-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 微信隐私保护指引弹窗 -->
+  <privacy-popup />
 </view>

@@ -15,54 +15,102 @@
         <text class="plan-name">{{plan.name}}</text>
         <text wx:if="{{plan.status === 'active'}}" class="badge badge-success">进行中</text>
         <text wx:elif="{{plan.status === 'archived'}}" class="badge badge-secondary">已归档</text>
+        <text wx:elif="{{plan.status === 'template'}}" class="badge badge-info">经典计划</text>
         <text wx:else class="badge badge-warning">草稿</text>
       </view>
       <text class="plan-desc">{{plan.description || '暂无描述'}}</text>
+
+      <!-- 模板标签 -->
+      <view wx:if="{{isTemplate}}" class="template-tags">
+        <text class="template-tag {{plan.difficulty === '入门' ? 'tag-green' : plan.difficulty === '进阶' ? 'tag-red' : 'tag-yellow'}}">{{plan.difficulty}}</text>
+        <text class="template-tag tag-gray">每周{{plan.training_days}}天</text>
+      </view>
+
+      <!-- 模板介绍展开 -->
+      <view wx:if="{{isTemplate && (plan.background || plan.suitable_for || plan.notes)}}" class="intro-section">
+        <view class="intro-toggle" bindtap="onToggleIntro">
+          <text class="intro-toggle-text">{{showIntro ? '收起介绍' : '查看详细介绍'}}</text>
+          <text class="intro-toggle-icon">{{showIntro ? '▲' : '▼'}}</text>
+        </view>
+        <view wx:if="{{showIntro}}" class="intro-content">
+          <view wx:if="{{plan.background}}" class="intro-block">
+            <text class="intro-title">产生背景</text>
+            <text class="intro-text">{{plan.background}}</text>
+          </view>
+          <view wx:if="{{plan.suitable_for}}" class="intro-block">
+            <text class="intro-title">适用对象</text>
+            <text class="intro-text">{{plan.suitable_for}}</text>
+          </view>
+          <view wx:if="{{plan.notes}}" class="intro-block">
+            <text class="intro-title">注意事项</text>
+            <text class="intro-text">{{plan.notes}}</text>
+          </view>
+        </view>
+      </view>
     </view>
 
-    <!-- 训练日分组展示 -->
+    <!-- 周期安排标题 -->
+    <view class="schedule-header">
+      <text class="schedule-title">训练安排</text>
+      <text class="schedule-subtitle">每周 {{plan.training_days || exercises.length > 0 ? (exercises.length > 0 ? '训练日已安排' : '') : ''}}</text>
+    </view>
+
+    <!-- 周训练安排 -->
     <view class="week-schedule">
-      <view wx:for="{{[1, 2, 3, 4, 5, 6, 7]}}"
+      <view wx:for="{{weekSchedule}}"
             wx:key="day"
-            class="day-section {{groupedExercises[item] ? 'has-exercises' : ''}}">
+            class="day-section {{item.isRest ? 'rest-day' : 'has-exercises'}}">
         <view class="day-header">
-          <text class="day-name">{{['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'][item]}}</text>
-          <text wx:if="{{groupedExercises[item]}}" class="day-count">{{groupedExercises[item].length}}个动作</text>
+          <view class="day-label-group">
+            <text class="day-name">{{item.dayName}}</text>
+            <text wx:if="{{!item.isRest}}" class="day-count">{{item.exercises.length}}个动作</text>
+          </view>
+          <text wx:if="{{item.isRest}}" class="rest-badge">休息日</text>
         </view>
 
-        <view wx:if="{{groupedExercises[item]}}" class="day-exercises">
-          <view wx:for="{{groupedExercises[item]}}"
+        <view wx:if="{{!item.isRest}}" class="day-exercises">
+          <view wx:for="{{item.exercises}}"
+                wx:for-item="ex"
                 wx:key="id"
                 class="exercise-card">
             <view class="exercise-main">
-              <text class="exercise-name">{{item.exercise_name}}</text>
-              <text class="exercise-sets">{{item.target_sets}}组 × {{item.target_reps}}次</text>
-            </view>
-            <view class="exercise-meta">
-              <text class="exercise-weight">{{item.initial_weight}}kg</text>
-              <text class="exercise-rest">休{{item.rest_seconds}}秒</text>
+              <view class="exercise-name-row">
+                <text class="exercise-name">{{ex.exercise_name}}</text>
+                <view wx:if="{{ex.video_url}}" class="video-btn"
+                      bindtap="onViewVideo"
+                      data-video-url="{{ex.video_url}}"
+                      data-exercise-name="{{ex.exercise_name}}">
+                  <text class="video-icon">▶</text>
+                  <text class="video-text">教学</text>
+                </view>
+              </view>
+              <text wx:if="{{ex.muscle_group}}" class="exercise-muscle">{{ex.muscle_group}}</text>
+              <text class="exercise-sets">{{ex.target_sets}}组 × {{ex.target_reps}}次 · 初始 {{ex.initial_weight}}kg · 休{{ex.rest_seconds}}秒</text>
             </view>
           </view>
-        </view>
-
-        <view wx:if="{{!groupedExercises[item]}}" class="day-empty">
-          <text class="day-empty-text">休息日</text>
         </view>
       </view>
     </view>
 
     <!-- 操作按钮 -->
     <view class="action-buttons">
-      <button wx:if="{{plan.status !== 'active'}}"
+      <!-- 模板模式：使用此计划 -->
+      <button wx:if="{{isTemplate}}"
+              class="btn btn-primary btn-block"
+              bindtap="onUseTemplate">
+        使用此计划
+      </button>
+      <!-- 用户计划模式 -->
+      <button wx:if="{{!isTemplate && plan.status !== 'active'}}"
               class="btn btn-primary btn-block"
               bindtap="onActivatePlan">
         激活此计划
       </button>
-      <button class="btn btn-secondary btn-block"
+      <button wx:if="{{!isTemplate}}" class="btn btn-secondary btn-block"
               bindtap="onEditPlan">
         编辑计划
       </button>
-      <button class="btn btn-outline btn-block"
+      <button wx:if="{{!isTemplate}}" class="btn btn-outline btn-block"
               bindtap="onDeletePlan">
         删除计划
       </button>

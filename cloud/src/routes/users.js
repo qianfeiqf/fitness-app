@@ -62,7 +62,6 @@ router.patch('/me', verifyToken, async (req, res, next) => {
 
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
-        // 数值类型校验
         if ((field === 'weight' || field === 'height') && req.body[field] !== null) {
           const num = Number(req.body[field]);
           if (isNaN(num) || num < 0) {
@@ -93,6 +92,37 @@ router.patch('/me', verifyToken, async (req, res, next) => {
         ...updates,
         updatedAt: new Date().toISOString()
       }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * 注销账号并清除该用户的云端数据
+ */
+router.delete('/me', verifyToken, async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+
+    if (storage.isMySQL()) {
+      await storage.query(
+        `DELETE ss FROM session_sets ss INNER JOIN sessions s ON ss.session_id = s.id WHERE s.user_id = ?`,
+        [userId]
+      );
+      await storage.query(`DELETE FROM rm_history WHERE user_id = ?`, [userId]);
+      await storage.query(`DELETE FROM progressions WHERE user_id = ?`, [userId]);
+      await storage.query(`DELETE FROM failure_counts WHERE user_id = ?`, [userId]);
+      await storage.query(`DELETE FROM sessions WHERE user_id = ?`, [userId]);
+      await storage.query(`DELETE FROM plans WHERE user_id = ?`, [userId]);
+      await storage.query(`DELETE FROM users WHERE id = ?`, [userId]);
+    } else {
+      storage.deleteFromStore('users', userId);
+    }
+
+    res.json({
+      success: true,
+      message: '账号及云端数据已永久删除'
     });
   } catch (err) {
     next(err);

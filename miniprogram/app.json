@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/onboarding/onboarding",
     "pages/home/home",
+    "pages/onboarding/onboarding",
     "pages/home/training/training",
     "pages/home/complete/complete",
     "pages/plans/plans",
@@ -55,6 +55,7 @@
   "useExtendedLib": {
     "weui": true
   },
+  "__usePrivacyCheck__": true,
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents"
 }

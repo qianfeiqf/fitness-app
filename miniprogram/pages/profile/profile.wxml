@@ -22,6 +22,15 @@
 
   <!-- 已登录 -->
   <view wx:else class="profile-content">
+    <!-- 从训练页引导填写体重时的返回提示条 -->
+    <view wx:if="{{returnTrainingSessionId}}" class="return-training-banner" bindtap="onReturnToTraining">
+      <view class="return-banner-text">
+        <text class="return-banner-title">填写体重后返回继续训练</text>
+        <text class="return-banner-desc">输入体重会自动保存，点此直接回到刚才的训练</text>
+      </view>
+      <text class="return-banner-btn">返回训练 ›</text>
+    </view>
+
     <!-- 身体档案卡片 -->
     <view class="profile-card">
       <view class="card-header">
@@ -86,7 +95,7 @@
           </view>
           <view class="goal-progress">
             <view class="progress-track">
-              <view class="progress-fill" style="width: {{item.progress}}%"></view>
+              <view class="progress-fill" style="{{item.progressStyle}}"></view>
             </view>
             <text class="progress-text">{{item.progress}}%</text>
             <view class="goal-delete" bindtap="onDeleteGoal" data-id="{{item.id}}">✕</view>
@@ -106,7 +115,7 @@
         </view>
         <view class="menu-content">
           <text class="menu-title">数据导出</text>
-          <text class="menu-desc">导出Markdown或CSV格式</text>
+          <text class="menu-desc">导出 Markdown 报告或 JSON 备份</text>
         </view>
         <text class="menu-arrow">›</text>
       </view>
@@ -121,6 +130,28 @@
         </view>
         <text class="menu-arrow">›</text>
       </view>
+
+      <view class="menu-item" bindtap="onOpenPrivacyPolicy">
+        <view class="menu-icon-wrap">
+          <text class="menu-icon">🛡️</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-title">隐私保护指引</text>
+          <text class="menu-desc">了解我们如何保护你的个人信息</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-item" bindtap="onOpenUserAgreement">
+        <view class="menu-icon-wrap">
+          <text class="menu-icon">📄</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-title">用户服务协议</text>
+          <text class="menu-desc">查看使用条款与免责声明</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
     </view>
 
     <!-- 账号操作 -->
@@ -131,6 +162,16 @@
         </view>
         <view class="menu-content">
           <text class="menu-title logout">退出登录</text>
+        </view>
+      </view>
+
+      <view class="menu-item danger" bindtap="onDeleteAccount">
+        <view class="menu-icon-wrap">
+          <text class="menu-icon">🗑️</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-title logout">注销账号</text>
+          <text class="menu-desc">永久删除账号及所有训练数据</text>
         </view>
       </view>
     </view>
@@ -156,9 +197,9 @@
       <view class="form-item">
         <text class="form-label">选择动作</text>
         <picker mode="selector" range="{{goalExercises}}" range-key="name"
-                value="0" bindchange="onSelectGoalExercise">
+                value="{{selectedGoalExerciseIndex}}" bindchange="onSelectGoalExercise">
           <view class="form-picker">
-            <text>{{goalExercises[0].name}}</text>
+            <text>{{goalExercises[selectedGoalExerciseIndex].name}}</text>
             <text class="picker-arrow">›</text>
           </view>
         </picker>
@@ -184,4 +225,19 @@
       </view>
     </view>
   </modal-sheet>
+
+  <!-- 训练悬浮窗 -->
+  <view wx:if="{{trainingFloat}}" class="training-float" bindtap="onTapTrainingFloat">
+    <view class="training-float-content">
+      <text class="training-float-icon">💪</text>
+      <view class="training-float-info">
+        <text class="training-float-name">{{trainingFloat.exerciseName}}</text>
+        <text class="training-float-set">第 {{trainingFloat.currentSet}}/{{trainingFloat.totalSets}} 组</text>
+      </view>
+      <text class="training-float-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 微信隐私保护指引弹窗 -->
+  <privacy-popup />
 </view>

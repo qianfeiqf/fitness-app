@@ -90,6 +90,8 @@ function initCollections() {
     'exercises',
     'exercise_alternatives',
     'rm_history',
+    'progressions',
+    'failure_counts',
     'sync_queue',
     'settings',
     'plan_templates',
@@ -154,6 +156,15 @@ function getCollection(name) {
 }
 
 /**
+ * 持久化当前内存数据库到本地存储
+ */
+function saveDatabase() {
+  if (db) {
+    db._save();
+  }
+}
+
+/**
  * 插入数据
  */
 function insert(collectionName, data) {
@@ -164,8 +175,8 @@ function insert(collectionName, data) {
     id: id,
     _id: id,
     created_at: data.created_at || Date.now(),
-    updated_at: Date.now(),
-    sync_status: 'pending'
+    updated_at: data.updated_at || Date.now(),
+    sync_status: data.sync_status || 'pending'
   };
   collection.push(doc);
   db._save();
@@ -182,8 +193,8 @@ function update(collectionName, id, data) {
     collection[index] = {
       ...collection[index],
       ...data,
-      updated_at: Date.now(),
-      sync_status: 'pending'
+      updated_at: data.updated_at || Date.now(),
+      sync_status: data.sync_status || 'pending'
     };
     db._save();
     return collection[index];
@@ -694,6 +705,7 @@ module.exports = {
   initDatabase,
   getDatabase,
   getCollection,
+  saveDatabase,
   insert,
   update,
   findOne,

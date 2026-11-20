@@ -160,4 +160,16 @@
       </view>
     </view>
   </view>
+
+  <!-- 训练悬浮窗 -->
+  <view wx:if="{{trainingFloat}}" class="training-float" bindtap="onTapTrainingFloat">
+    <view class="training-float-content">
+      <text class="training-float-icon">💪</text>
+      <view class="training-float-info">
+        <text class="training-float-name">{{trainingFloat.exerciseName}}</text>
+        <text class="training-float-set">第 {{trainingFloat.currentSet}}/{{trainingFloat.totalSets}} 组</text>
+      </view>
+      <text class="training-float-arrow">›</text>
+    </view>
+  </view>
 </view>

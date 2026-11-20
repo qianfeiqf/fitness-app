@@ -1,4 +1,3 @@
-<wxs module="wxs">
 /**
  * 格式化时间显示 (MM:SS)
  */
@@ -14,4 +13,3 @@ function formatTime(seconds) {
 module.exports = {
   formatTime: formatTime
 };
-</wxs>

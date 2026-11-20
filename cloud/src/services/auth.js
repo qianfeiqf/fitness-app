@@ -6,6 +6,12 @@
 const { v4: uuidv4 } = require('uuid');
 const { generateToken } = require('../middleware/auth');
 const storage = require('./storage');
+const {
+  TOKEN_EXPIRES_SECONDS,
+  PHONE_CODE_EXPIRE_MS,
+  PHONE_CODE_RATE_LIMIT_MS,
+  PHONE_CODE_MAX_ATTEMPTS
+} = require('../constants');
 
 const USERS_STORE = 'users';
 
@@ -39,9 +45,11 @@ async function wxLogin(code) {
       console.error('微信API调用失败:', err.message);
       throw new Error('微信登录失败，请稍后重试');
     }
+  } else if (process.env.NODE_ENV === 'production') {
+    throw new Error('生产环境未配置 WX_APPID 或 WX_SECRET，无法完成微信登录');
   } else {
-    // 未配置微信凭证时，降级为本地mock（仅供开发测试）
-    console.warn('警告: 未配置 WX_APPID/WX_SECRET，使用模拟openid');
+    // 非生产环境未配置微信凭证时，降级为本地mock（仅供开发测试）
+    console.warn('警告: 未配置 WX_APPID/WX_SECRET，使用模拟openid（仅限开发环境）');
     openId = 'mock_openid_' + code;
   }
 
@@ -99,9 +107,10 @@ async function wxLogin(code) {
     accessToken,
     user: {
       id: user.id,
+      openId: user.openId || user.openid || openId,
       isNewUser
     },
-    expiresIn: 604800
+    expiresIn: TOKEN_EXPIRES_SECONDS
   };
 }
 
@@ -215,10 +224,9 @@ async function findUserByPhone(phone) {
  * 2. 短信验证码模式（通过 SMS 服务发送）
  */
 async function verifyPhoneCode(phone, code) {
-  // 微信 getPhoneNumber 模式：code 以 "wx_phone_" 为前缀
-  if (code.startsWith('wx_phone_')) {
-    console.warn('[Auth] 微信手机号验证码模式，生产环境需对接cloudID解密');
-    return true;
+  // 封堵未对接解密时的 wx_phone_ 前缀绕过风险
+  if (typeof code === 'string' && code.startsWith('wx_phone_')) {
+    throw new Error('暂未启用微信手机号一键登录，请使用微信登录或短信验证码');
   }
 
   // 短信验证码模式：从存储中校验
@@ -227,9 +235,9 @@ async function verifyPhoneCode(phone, code) {
     return false;
   }
 
-  // 检查是否过期（5分钟有效期）
+  // 检查是否过期
   const now = Date.now();
-  if (now - verification.createdAt > 5 * 60 * 1000) {
+  if (now - verification.createdAt > PHONE_CODE_EXPIRE_MS) {
     phoneCodeStore.delete(phone);
     return false;
   }
@@ -237,7 +245,7 @@ async function verifyPhoneCode(phone, code) {
   // 校验验证码
   if (verification.code !== code) {
     verification.attempts = (verification.attempts || 0) + 1;
-    if (verification.attempts >= 5) {
+    if (verification.attempts >= PHONE_CODE_MAX_ATTEMPTS) {
       phoneCodeStore.delete(phone);
     }
     return false;
@@ -264,7 +272,9 @@ async function sendPhoneCode(phone) {
   phoneCodeStore.set(phone, { code, createdAt: Date.now(), attempts: 0 });
 
   // TODO: 对接短信服务发送验证码
-  console.log(`[Auth] 验证码已生成: ${phone} -> ${code}（生产环境需对接短信服务）`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`[Auth] 验证码已生成: ${phone} -> ${code}（开发环境调试日志）`);
+  }
 
   return { success: true, message: '验证码已发送' };
 }
@@ -279,5 +289,4 @@ module.exports = {
   phoneLogin,
   refreshToken,
   sendPhoneCode
-};
 };

@@ -1,3 +1,5 @@
+<wxs src="./training.wxs" module="wxs" />
+
 <!-- 训练中页面 - 沉浸式极简风格 -->
 
 <view class="page-training" style="padding-top: {{navHeight}}px;">
@@ -10,7 +12,10 @@
         <text class="counter-sep">/</text>
         <text class="counter-total">{{exercises.length}}</text>
       </view>
-      <text class="exercise-name">{{currentExercise.name}}</text>
+      <view class="progress-right">
+        <text class="training-duration">{{wxs.formatTime(trainingDuration)}}</text>
+        <text class="exercise-name">{{currentExercise.name}}</text>
+      </view>
     </view>
     <view class="progress-bar-track">
       <view class="progress-bar-fill" style="width: {{(currentExercise.currentSetNumber / currentExercise.target_sets) * 100}}%;"></view>
@@ -51,28 +56,8 @@
     </view>
   </view>
 
-  <!-- 底部浮动休息计时器 -->
-  <view wx:if="{{isResting}}" class="rest-float-bar">
-    <view class="rest-float-content">
-      <view class="rest-float-info">
-        <text class="rest-float-label">组间休息</text>
-        <text class="rest-float-time">{{formatTime(restTimeLeft)}}</text>
-      </view>
-      <view class="rest-float-progress-wrap">
-        <view class="rest-float-progress-track">
-          <view class="rest-float-progress-fill" style="width: {{(restTimeLeft / restTimeTotal) * 100}}%;"></view>
-        </view>
-      </view>
-      <view class="rest-float-actions">
-        <view class="rest-float-btn" bindtap="onReduceRestTime">-30s</view>
-        <view class="rest-float-btn primary" bindtap="onReadyToGo">我准备好了</view>
-        <view class="rest-float-btn" bindtap="onAddRestTime">+30s</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 热身区域 -->
-  <view wx:elif="{{showWarmup}}" class="warmup-main">
+  <!-- 热身区域 — 用 hidden 避免销毁/重建 DOM -->
+  <view hidden="{{!showWarmup}}" class="warmup-main">
     <view class="warmup-header">
       <view class="tag tag-warning">热身阶段</view>
       <view class="warmup-title">
@@ -124,9 +109,9 @@
     </view>
   </view>
 
-  <!-- 主训练区域 -->
-  <view wx:else class="training-main">
-    <!-- 动作标签 -->
+  <!-- 主训练区域 — 用 hidden 避免销毁/重建 DOM；休息时不隐藏，由遮罩层覆盖 -->
+  <view hidden="{{showWarmup}}" class="training-main">
+    <!-- 动作标签 + 组数进度 -->
     <view class="exercise-header">
       <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
       <view class="set-indicator">
@@ -146,6 +131,10 @@
         <text class="target-sep">×</text>
         <text class="target-reps">{{currentExercise.target_reps}}</text>
         <text class="target-unit">次</text>
+      </view>
+      <view wx:if="{{plateHint}}" class="plate-hint-bar" bindtap="onToggleBarWeight">
+        <text class="plate-hint-text">🏋️ {{plateHint}}</text>
+        <text class="plate-hint-switch">切换杆重</text>
       </view>
     </view>
 
@@ -218,20 +207,27 @@
       </view>
     </view>
 
-    <!-- 超大完成按钮 -->
+    <!-- 完成按钮 -->
     <view class="complete-action">
-      <view class="btn btn-primary btn-lg btn-block" bindtap="onCompleteSet">
+      <view class="btn btn-primary btn-md btn-block" bindtap="onCompleteSet">
         <text class="btn-complete-icon">✓</text>
         <text>完成一组</text>
+      </view>
+      <view wx:if="{{completedSets.length > 0}}" class="undo-last-btn" bindtap="onUndoLastSet">
+        <text>↩ 撤回上一组</text>
       </view>
     </view>
   </view>
 
   <!-- 底部操作栏 -->
   <view class="bottom-bar">
-    <view class="bottom-btn" bindtap="onPauseTraining">
-      <text class="bottom-icon">⏸</text>
-      <text class="bottom-label">暂停</text>
+    <view class="bottom-btn" bindtap="onCollapseTraining">
+      <text class="bottom-icon">⬇</text>
+      <text class="bottom-label">收起</text>
+    </view>
+    <view class="bottom-btn" bindtap="{{isPaused ? 'onResumeTraining' : 'onPauseTraining'}}">
+      <text class="bottom-icon">{{isPaused ? '▶' : '⏸'}}</text>
+      <text class="bottom-label">{{isPaused ? '继续' : '暂停'}}</text>
     </view>
     <view class="bottom-btn danger" bindtap="onAbandonTraining">
       <text class="bottom-icon">✕</text>
@@ -327,4 +323,49 @@
       </view>
     </view>
   </modal-sheet>
+</view>
+
+<!-- 组间休息遮罩层（放在 page-training 外部，避免被 overflow:hidden 截断；用 hidden 避免销毁/重建 DOM） -->
+<view hidden="{{!isResting || restMinimized}}" class="rest-overlay">
+  <view class="rest-overlay-backdrop" bindtap="onMinimizeRest"></view>
+  <view class="rest-overlay-content">
+    <view class="rest-overlay-header">
+      <text class="rest-overlay-label">组间休息</text>
+    </view>
+
+    <!-- 大号倒计时 -->
+    <view class="rest-countdown">
+      <text class="rest-countdown-time">{{wxs.formatTime(restTimeLeft)}}</text>
+      <text class="rest-countdown-total">/ {{wxs.formatTime(restTimeTotal)}}</text>
+    </view>
+
+    <view class="rest-overlay-progress">
+      <view class="rest-overlay-progress-track">
+        <view class="rest-overlay-progress-fill" style="width: {{((restTimeTotal - restTimeLeft) / restTimeTotal) * 100}}%;"></view>
+      </view>
+    </view>
+
+    <view class="rest-overlay-body">
+      <text class="rest-overlay-icon">💪</text>
+      <text class="rest-overlay-title">休息一下</text>
+      <text class="rest-overlay-desc">让肌肉充分恢复，下一组表现更好</text>
+    </view>
+    <view class="rest-overlay-actions">
+      <view class="rest-overlay-btn" bindtap="onReduceRestTime">-30s</view>
+      <view class="rest-overlay-btn primary" bindtap="onReadyToGo">我准备好了</view>
+      <view class="rest-overlay-btn" bindtap="onAddRestTime">+30s</view>
+    </view>
+    <view wx:if="{{completedSets.length > 0}}" class="rest-undo-link" bindtap="onUndoLastSet">
+      <text>手滑点错了？撤回上一组</text>
+    </view>
+  </view>
+</view>
+
+<!-- 休息悬浮倒计时（点击弹窗外区域后显示） -->
+<view hidden="{{!isResting || !restMinimized}}" class="rest-float" bindtap="onExpandRest">
+  <view class="rest-float-content">
+    <text class="rest-float-icon">⏱</text>
+    <text class="rest-float-time">{{wxs.formatTime(restTimeLeft)}}</text>
+    <text class="rest-float-label">组间休息</text>
+  </view>
 </view>

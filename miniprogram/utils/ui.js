@@ -95,14 +95,26 @@ function showDeleteConfirm() {
  * 震动反馈
  */
 function vibrate() {
+  try {
+    const sys = wx.getSystemInfoSync();
+    if (sys.platform === 'devtools') return;
+  } catch (e) {}
   wx.vibrateShort({ type: 'heavy' });
 }
 
 function vibrateSuccess() {
+  try {
+    const sys = wx.getSystemInfoSync();
+    if (sys.platform === 'devtools') return;
+  } catch (e) {}
   wx.vibrateShort({ type: 'medium' });
 }
 
 function vibrateWarning() {
+  try {
+    const sys = wx.getSystemInfoSync();
+    if (sys.platform === 'devtools') return;
+  } catch (e) {}
   wx.vibrateShort({ type: 'light' });
 }
 

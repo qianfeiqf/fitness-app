@@ -34,6 +34,33 @@
     </view>
   </view>
 
+  <!-- 演进预览 -->
+  <view wx:if="{{showProgressions}}" class="progression-section">
+    <text class="section-title">下次训练重量</text>
+    <view class="progression-list">
+      <view 
+        wx:for="{{progressions}}" 
+        wx:key="exerciseId"
+        class="progression-item"
+      >
+        <view class="progression-info">
+          <text class="progression-name">{{item.exerciseName}}</text>
+          <text class="progression-reason">{{item.reason}}</text>
+        </view>
+        <view class="progression-change">
+          <text class="weight-current">{{item.currentWeight}}kg</text>
+          <text class="weight-arrow">→</text>
+          <text class="weight-next {{item.type === 'progression' ? 'up' : item.type === 'deload' ? 'down' : ''}}">{{item.nextWeight}}kg</text>
+          <view class="progression-badge {{item.type}}">
+            <text wx:if="{{item.type === 'progression'}}">↑</text>
+            <text wx:elif="{{item.type === 'deload'}}">↓</text>
+            <text wx:else>→</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 完成动作列表 -->
   <view class="completed-list">
     <text class="section-title">完成动作</text>

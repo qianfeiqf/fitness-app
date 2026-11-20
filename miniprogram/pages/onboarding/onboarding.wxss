@@ -1,23 +1,519 @@
-/* 新用户引导页面样式 */
+/* =====================
+   Onboarding 引导页
+   ===================== */
 
-.page-onboarding {
-  min-height: 100vh;
-  background: #FFFFFF;
+page {
+  background: #F5F5F5;
+}
+
+.onboarding-container {
   display: flex;
   flex-direction: column;
-  padding: 40rpx;
-  padding-top: 40rpx;
+  height: 100vh;
   box-sizing: border-box;
 }
 
-.redirect-hint {
+/* =====================
+   顶部进度条
+   ===================== */
+.onboarding-header {
+  padding: 32rpx 40rpx;
+  background: #FFFFFF;
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.progress-track {
+  flex: 1;
+  height: 6rpx;
+  background: #E5E5E5;
+  border-radius: 3rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #1A1A1A;
+  border-radius: 3rpx;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 24rpx;
+  color: #999999;
+  font-weight: 500;
+}
+
+.step-header {
+  margin-top: 16rpx;
+}
+
+.step-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 12rpx;
+  line-height: 1.3;
+}
+
+.step-subtitle {
+  font-size: 28rpx;
+  color: #666666;
+  display: block;
+  line-height: 1.4;
+}
+
+/* =====================
+   步骤内容区
+   ===================== */
+.step-content {
+  flex: 1;
+  padding: 24rpx 40rpx;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* =====================
+   步骤1：健身目标
+   ===================== */
+.goal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+}
+
+.goal-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 24rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 2rpx solid #E5E5E5;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.goal-card.selected {
+  border-color: #1A1A1A;
+  background: #F8F8F8;
+}
+
+.goal-card:active {
+  transform: scale(0.98);
+}
+
+.goal-icon {
+  font-size: 56rpx;
+  margin-bottom: 20rpx;
+}
+
+.goal-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 8rpx;
+}
+
+.goal-desc {
+  font-size: 22rpx;
+  color: #999999;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.goal-check {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: #1A1A1A;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.check-icon {
+  color: #FFFFFF;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+/* =====================
+   步骤2：训练天数
+   ===================== */
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+}
+
+.day-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 0;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 2rpx solid #E5E5E5;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.day-card.selected {
+  border-color: #1A1A1A;
+  background: #F8F8F8;
+}
+
+.day-card:active {
+  transform: scale(0.98);
+}
+
+.day-num {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1;
+}
+
+.day-label {
+  font-size: 24rpx;
+  color: #666666;
+  margin-top: 8rpx;
+}
+
+.day-desc {
+  font-size: 20rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+.day-check {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  background: #1A1A1A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =====================
+   步骤3：训练经验
+   ===================== */
+.exp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.exp-card {
+  padding: 36rpx 32rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 2rpx solid #E5E5E5;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.exp-card.selected {
+  border-color: #1A1A1A;
+  background: #F8F8F8;
+}
+
+.exp-card:active {
+  transform: scale(0.98);
+}
+
+.exp-header {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 12rpx;
+}
+
+.exp-icon {
+  font-size: 48rpx;
+}
+
+.exp-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.exp-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.exp-tag {
+  font-size: 22rpx;
+  color: #1A1A1A;
+  background: #F0F0F0;
+  padding: 4rpx 16rpx;
+  border-radius: 9999rpx;
+  margin-top: 4rpx;
+  align-self: flex-start;
+}
+
+.exp-desc {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.5;
+  padding-left: 68rpx;
+}
+
+.exp-check {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: #1A1A1A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =====================
+   步骤4：推荐计划
+   ===================== */
+.recommend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.recommend-card {
+  padding: 32rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  border: 2rpx solid #E5E5E5;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.recommend-card.selected {
+  border-color: #1A1A1A;
+  background: #F8F8F8;
+}
+
+.recommend-card:active {
+  transform: scale(0.98);
+}
+
+.recommend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12rpx;
+}
+
+.recommend-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
   flex: 1;
 }
 
-.redirect-text {
+.recommend-tags {
+  display: flex;
+  gap: 8rpx;
+  flex-shrink: 0;
+}
+
+.tag {
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 9999rpx;
+  background: #F0F0F0;
+  color: #666666;
+}
+
+.tag-beginner {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.tag-intermediate {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.tag-advanced {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.recommend-desc {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.5;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.recommend-features {
+  display: flex;
+  gap: 8rpx;
+  flex-wrap: wrap;
+}
+
+.feature-tag {
+  font-size: 20rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 9999rpx;
+  background: #F5F5F5;
+  color: #666666;
+}
+
+.recommend-check {
+  margin-top: 16rpx;
+  text-align: right;
+}
+
+.check-text {
+  font-size: 26rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+}
+
+/* 空推荐 */
+.empty-recommend {
+  text-align: center;
+  padding: 120rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 64rpx;
+  margin-bottom: 24rpx;
+  display: block;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 48rpx;
+}
+
+.empty-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 16rpx 32rpx;
+  background: #1A1A1A;
+  border-radius: 9999rpx;
+}
+
+.empty-action-text {
   font-size: 28rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.empty-action-arrow {
+  font-size: 28rpx;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* =====================
+   底部按钮区
+   ===================== */
+.onboarding-footer {
+  padding: 24rpx 40rpx calc(48rpx + env(safe-area-inset-bottom));
+  background: #FFFFFF;
+  border-top: 1rpx solid #E5E5E5;
+  flex-shrink: 0;
+}
+
+.footer-buttons {
+  display: flex;
+  gap: 20rpx;
+}
+
+.btn-prev {
+  flex-shrink: 0;
+  padding: 28rpx 40rpx;
+  background: #F5F5F5;
+  color: #1A1A1A;
+  border-radius: 9999rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: none;
+  line-height: 1;
+}
+
+.btn-next {
+  flex: 1;
+  padding: 28rpx 0;
+  background: #1A1A1A;
+  color: #FFFFFF;
+  border-radius: 9999rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: none;
+  line-height: 1;
+}
+
+.btn-next.disabled {
+  opacity: 0.4;
+}
+
+.btn-next::after {
+  border: none;
+}
+
+.btn-prev::after {
+  border: none;
+}
+
+.skip-text {
+  display: block;
+  text-align: center;
+  margin-top: 24rpx;
+  font-size: 26rpx;
   color: #999999;
+  padding: 12rpx;
+}
+
+/* =====================
+   动画
+   ===================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-content {
+  animation: fadeIn 0.3s ease;
 }

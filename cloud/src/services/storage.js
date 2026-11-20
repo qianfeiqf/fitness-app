@@ -7,7 +7,7 @@ let db = null;
 try { db = require('../db/mysql'); } catch (e) {}
 
 function isMySQL() {
-  return !!(db && db.getPool);
+  return !!(db && typeof db.getPool === 'function' && db.getPool());
 }
 
 /**

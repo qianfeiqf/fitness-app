@@ -2,7 +2,8 @@
  * 训练完成页面
  */
 
-const { findOne } = require('../../../localdb/db.js');
+const { findOne, getCollection } = require('../../../localdb/db.js');
+const { getNextWeightSuggestion } = require('../../../services/progression.js');
 const UI = require('../../../utils/ui.js');
 
 Page({
@@ -13,18 +14,22 @@ Page({
     totalVolume: 0,
     duration: '',
     prCount: 0,
-    showConfetti: false
+    showConfetti: false,
+    // 演进预览数据
+    progressions: [],
+    showProgressions: false
   },
 
   onLoad(options) {
     if (!options.sessionId) {
       UI.showToast('缺少会话信息', this);
-      setTimeout(() => wx.redirectTo({ url: '/pages/home/home' }), 1500);
+      setTimeout(() => wx.switchTab({ url: '/pages/home/home' }), 1500);
       return;
     }
 
     this.setData({ sessionId: options.sessionId });
     this.loadSession(options.sessionId);
+    this.loadProgressions(options.sessionId);
 
     // 显示庆祝动画
     setTimeout(() => {
@@ -33,13 +38,71 @@ Page({
     }, 300);
   },
 
+  /**
+   * 加载演进预览数据
+   */
+  loadProgressions(sessionId) {
+    try {
+      // 获取本次训练的所有动作
+      const sessionSets = getCollection('session_sets').filter(s => s.session_id === sessionId);
+      const exerciseIds = [...new Set(sessionSets.map(s => s.exercise_id))];
+      
+      const progressions = [];
+      
+      exerciseIds.forEach(exerciseId => {
+        const suggestion = getNextWeightSuggestion(exerciseId);
+        if (suggestion) {
+          // 获取动作信息
+          const exercise = findOne('exercises', { id: exerciseId });
+          const set = sessionSets.find(s => s.exercise_id === exerciseId);
+          
+          progressions.push({
+            exerciseId,
+            exerciseName: exercise ? exercise.name : (set ? set.exercise_name : '未知动作'),
+            currentWeight: set ? set.actual_weight : 0,
+            nextWeight: suggestion.suggested_weight,
+            type: suggestion.progression_type,
+            reason: suggestion.reason
+          });
+        }
+      });
+      
+      // 按重量变化排序（增重优先）
+      progressions.sort((a, b) => {
+        const typeOrder = { progression: 0, stall: 1, deload: 2, initial: 3 };
+        return typeOrder[a.type] - typeOrder[b.type];
+      });
+      
+      this.setData({
+        progressions,
+        showProgressions: progressions.length > 0
+      });
+      
+    } catch (err) {
+      console.error('加载演进预览失败:', err);
+    }
+  },
+
+  /**
+   * 获取演进类型的显示文本
+   */
+  getProgressionTypeText(type) {
+    const typeMap = {
+      progression: { text: '进阶', icon: '↑', color: '#07C160' },
+      stall: { text: '保持', icon: '→', color: '#999999' },
+      deload: { text: '减载', icon: '↓', color: '#FF6B6B' },
+      initial: { text: '初始', icon: '•', color: '#666666' }
+    };
+    return typeMap[type] || { text: '保持', icon: '→', color: '#999999' };
+  },
+
   loadSession(sessionId) {
     const session = findOne('sessions', { id: sessionId });
 
     if (!session) {
       console.error('会话不存在:', sessionId);
       UI.showToast('会话数据丢失', this);
-      setTimeout(() => wx.redirectTo({ url: '/pages/home/home' }), 1500);
+      setTimeout(() => wx.switchTab({ url: '/pages/home/home' }), 1500);
       return;
     }
 
@@ -73,7 +136,7 @@ Page({
   },
 
   onBackHome() {
-    wx.redirectTo({
+    wx.switchTab({
       url: '/pages/home/home'
     });
   },

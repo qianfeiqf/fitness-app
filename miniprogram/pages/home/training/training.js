@@ -2,7 +2,7 @@
  * 训练中页面 - 核心跟练交互
  */
 
-const { findOne, update, getCollection, insert } = require('../../../localdb/db.js');
+const { findOne, update, getCollection, insert, remove } = require('../../../localdb/db.js');
 const { calculate1RM, calculateAndSave1RM, checkMilestone } = require('../../../services/rm.js');
 const { calculateProgression } = require('../../../services/progression.js');
 const UI = require('../../../utils/ui.js');
@@ -50,6 +50,7 @@ Page({
 
     // 休息计时器状态
     restCompleting: false,
+    restMinimized: false,
 
     // 热身组
     showWarmup: false,
@@ -71,7 +72,15 @@ Page({
 
     // 刻度拨盘数据
     weightOptions: [],
-    repOptions: []
+    repOptions: [],
+
+    // 训练总时长
+    trainingDuration: 0,
+    isPaused: false,
+
+    // 杠铃配重片换算
+    barWeight: 20,
+    plateHint: ''
   },
 
   onLoad(options) {
@@ -80,11 +89,69 @@ Page({
 
     if (options.sessionId) {
       this.setData({ sessionId: options.sessionId });
-      this.loadSession(options.sessionId);
+      
+      // 检查是否需要填写身体档案（首次训练）
+      this.checkAndPromptProfile().then(() => {
+        this.loadSession(options.sessionId);
+      });
     }
 
     // 监听App隐藏事件
     wx.eventCenter.on('appHidden', this.onAppHidden, this);
+  },
+
+  /**
+   * 检查并提示填写身体档案
+   * 首次训练前需要填写体重，用于1RM计算和演进算法
+   */
+  async checkAndPromptProfile() {
+    const { findOne } = require('../../../localdb/db.js');
+    const profile = findOne('profiles', {});
+    
+    // 如果没有档案或没有体重，显示提示
+    if (!profile || !profile.weight) {
+      return new Promise((resolve) => {
+        wx.showModal({
+          title: '完善身体档案',
+          content: '为了更准确地计算1RM和训练演进，请先填写您的体重（其他信息可选）',
+          confirmText: '去填写',
+          cancelText: '跳过',
+          success: (res) => {
+            if (res.confirm) {
+              // 跳转到个人中心页面填写档案（tabBar页面需用switchTab），并记住当前会话 ID 以便一键返回
+              const app = getApp();
+              app.globalData.profileFrom = 'training';
+              app.globalData.profilePrompt = 'profile';
+              app.globalData.profileReturnSessionId = this.data.sessionId;
+              wx.switchTab({
+                url: '/pages/profile/profile',
+                complete: () => {
+                  resolve();
+                }
+              });
+            } else {
+              // 用户选择跳过，使用默认值继续
+              resolve();
+            }
+          }
+        });
+      });
+    }
+    
+    return Promise.resolve();
+  },
+
+  onShow() {
+    if (this.data.isResting && this.restEndTime && !this.data.restCompleting) {
+      const remaining = Math.ceil((this.restEndTime - Date.now()) / 1000);
+      if (remaining <= 0) {
+        this.setData({ restCompleting: true, restTimeLeft: 0 });
+        this.onRestComplete();
+      } else {
+        this.setData({ restTimeLeft: remaining });
+        this._startRestInterval();
+      }
+    }
   },
 
   onHide() {
@@ -94,13 +161,55 @@ Page({
 
   onUnload() {
     this.clearRestTimer();
+    this.stopDurationTimer();
     wx.eventCenter.off('appHidden', this.onAppHidden);
+  },
+
+  _startRestInterval() {
+    this.clearRestTimer();
+    this.restTimer = setInterval(() => {
+      if (this.data.restCompleting) return;
+      const remaining = this.restEndTime
+        ? Math.ceil((this.restEndTime - Date.now()) / 1000)
+        : this.data.restTimeLeft - 1;
+      if (remaining <= 0) {
+        this.setData({ restCompleting: true, restTimeLeft: 0 });
+        this.onRestComplete();
+      } else {
+        this.setData({ restTimeLeft: remaining });
+        this.playRestBeep();
+      }
+    }, 1000);
   },
 
   clearRestTimer() {
     if (this.restTimer) {
       clearInterval(this.restTimer);
       this.restTimer = null;
+    }
+  },
+
+  /**
+   * 启动训练总时长计时器
+   */
+  startDurationTimer() {
+    if (this.durationTimer) return;
+    this.durationTimer = setInterval(() => {
+      if (!this.data.isPaused) {
+        this.setData({
+          trainingDuration: this.data.trainingDuration + 1
+        });
+      }
+    }, 1000);
+  },
+
+  /**
+   * 停止训练总时长计时器
+   */
+  stopDurationTimer() {
+    if (this.durationTimer) {
+      clearInterval(this.durationTimer);
+      this.durationTimer = null;
     }
   },
 
@@ -144,6 +253,9 @@ Page({
     this.calculateOverallProgress();
 
     UI.hideLoading();
+
+    // 启动训练总时长计时器
+    this.startDurationTimer();
 
     // 设置当前动作
     if (exercises.length > 0) {
@@ -201,7 +313,8 @@ Page({
       setNote: '', // 每组备注初始为空
       showWarmup: false,
       weightOptions: this._buildWeightOptions(defaultWeight),
-      repOptions: this._buildRepOptions(defaultReps)
+      repOptions: this._buildRepOptions(defaultReps),
+      plateHint: this._calcBarbellPlates(defaultWeight, this.data.barWeight)
     });
 
     // 更新整体进度
@@ -331,12 +444,46 @@ Page({
       updated_at: Date.now()
     });
 
+    // 查找该动作最近一次的训练记录，作为默认值
+    const exercise = exercises[currentExerciseIndex];
+    const exerciseDetail = findOne('exercises', { id: exercise.exercise_id });
+    const lastRecord = this.getLastExerciseRecord(exercise.exercise_id);
+    const defaultWeight = lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0);
+    const defaultReps = lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 0);
+    const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2;
+
+    // 合并 calculateOverallProgress 数据，避免二次 setData
+    let completedCount = 0;
+    const statusList = exercises.map((ex, idx) => {
+      const isCompleted = ex.completed_sets >= ex.target_sets;
+      if (isCompleted) completedCount++;
+      return {
+        name: ex.exercise_name,
+        status: isCompleted ? 'completed' : (idx === currentExerciseIndex ? 'current' : 'pending')
+      };
+    });
+    const totalAngle = exercises.length > 0 ? (completedCount / exercises.length) * 360 : 0;
+
     this.setData({
       exercises,
-      showWarmup: false
+      showWarmup: false,
+      currentExercise: {
+        ...exercise,
+        ...exerciseDetail,
+        currentSetNumber: exercise.completed_sets + 1,
+        actual_weight: defaultWeight,
+        actual_reps: defaultReps
+      },
+      currentSetIndex: exercise.completed_sets || 0,
+      selectedRPE: defaultRPE,
+      setNote: '',
+      weightOptions: this._buildWeightOptions(defaultWeight),
+      repOptions: this._buildRepOptions(defaultReps),
+      plateHint: this._calcBarbellPlates(defaultWeight, this.data.barWeight),
+      completedExerciseCount: completedCount,
+      overallProgressAngle: totalAngle,
+      exerciseStatusList: statusList
     });
-
-    this.setCurrentExercise();
   },
 
   /**
@@ -372,7 +519,7 @@ Page({
    * 一键完成当前组
    */
   onCompleteSet() {
-    const { currentExercise, session, currentSetIndex } = this.data;
+    const { currentExercise, session, currentSetIndex, currentExerciseIndex, exercises, completedSets } = this.data;
 
     // 空值检查
     if (!currentExercise || !session) {
@@ -401,7 +548,7 @@ Page({
       target_reps: currentExercise.target_reps,
       actual_reps: actualReps,
       rpe: this.data.selectedRPE + 1,
-      note: this.data.setNote || '', // 组备注
+      note: this.data.setNote || '',
       status: 'completed',
       completed_at: Date.now(),
       created_at: Date.now()
@@ -410,21 +557,70 @@ Page({
     // 保存到本地
     insert('session_sets', setRecord);
 
-    // 更新session中的完成数组
-    const completedSets = [...this.data.completedSets, setRecord];
-    this.setData({ completedSets });
-
-    // 计算1RM
-    this.checkAndSave1RM(setRecord);
+    // 更新完成数组
+    const newCompletedSets = [...completedSets, setRecord];
 
     // 更新动作进度
-    this.updateExerciseProgress(currentExercise, currentSetIndex + 1);
+    const newExercises = [...exercises];
+    newExercises[currentExerciseIndex].completed_sets = currentSetIndex + 1;
+
+    let newExerciseIndex = currentExerciseIndex;
+    let newSetIndex = 0;
+    if (currentSetIndex + 1 >= currentExercise.target_sets) {
+      newExerciseIndex = currentExerciseIndex + 1;
+    } else {
+      newSetIndex = currentSetIndex + 1;
+    }
+
+    // 保存会话状态
+    update('sessions', session.id, {
+      pending_exercises: newExercises,
+      current_exercise_index: newExerciseIndex,
+      current_set_index: newSetIndex,
+      updated_at: Date.now()
+    });
+
+    // 合并 setData — 一次性更新所有状态，避免多次渲染导致闪动
+    const restSeconds = currentExercise.rest_seconds || 120;
+
+    // 合并 calculateOverallProgress 数据
+    let completedCount = 0;
+    const statusList = newExercises.map((ex, idx) => {
+      const isCompleted = ex.completed_sets >= ex.target_sets;
+      if (isCompleted) completedCount++;
+      return {
+        name: ex.exercise_name,
+        status: isCompleted ? 'completed' : (idx === newExerciseIndex ? 'current' : 'pending')
+      };
+    });
+    const totalAngle = newExercises.length > 0 ? (completedCount / newExercises.length) * 360 : 0;
+
+    this.setData({
+      completedSets: newCompletedSets,
+      exercises: newExercises,
+      currentExerciseIndex: newExerciseIndex,
+      currentSetIndex: newSetIndex,
+      isResting: true,
+      restTimeLeft: restSeconds,
+      restTimeTotal: restSeconds,
+      restCompleting: false,
+      completedExerciseCount: completedCount,
+      overallProgressAngle: totalAngle,
+      exerciseStatusList: statusList
+    });
+
+    // 保存快照
+    this.saveSnapshot();
+
+    // 基于截止时间戳启动倒计时
+    this.restEndTime = Date.now() + restSeconds * 1000;
+    this._startRestInterval();
+
+    // 计算1RM（异步，PR徽章单独更新）
+    this.checkAndSave1RM(setRecord);
 
     // 震动反馈
     UI.vibrateSuccess();
-
-    // 开始倒计时
-    this.startRestTimer(currentExercise.rest_seconds || 120);
   },
 
   /**
@@ -468,7 +664,114 @@ Page({
   onWeightChange(e) {
     const value = e.detail.value;
     this.setData({
-      'currentExercise.actual_weight': value
+      'currentExercise.actual_weight': value,
+      plateHint: this._calcBarbellPlates(value, this.data.barWeight)
+    });
+  },
+
+  /**
+   * 计算杠铃单边配重片组合
+   */
+  _calcBarbellPlates(totalWeight, barWeight = 20) {
+    const w = parseFloat(totalWeight) || 0;
+    if (w < barWeight) return '';
+    if (w === barWeight) return `空杆 (${barWeight}kg)`;
+    let perSide = Math.round(((w - barWeight) / 2) * 100) / 100;
+    const plates = [25, 20, 15, 10, 5, 2.5, 1.25];
+    const picked = [];
+    for (const p of plates) {
+      while (perSide + 0.001 >= p) {
+        picked.push(p);
+        perSide = Math.round((perSide - p) * 100) / 100;
+      }
+    }
+    if (picked.length === 0) return '';
+    const suffix = perSide > 0.01 ? ` (+${perSide})` : '';
+    return `单边: ${picked.join(' + ')}kg${suffix} (${barWeight}kg杆)`;
+  },
+
+  /**
+   * 切换标准杆(20kg) / 女子杆(15kg)
+   */
+  onToggleBarWeight() {
+    const nextBar = this.data.barWeight === 20 ? 15 : 20;
+    const currentWeight = this.data.currentExercise ? this.data.currentExercise.actual_weight : 0;
+    this.setData({
+      barWeight: nextBar,
+      plateHint: this._calcBarbellPlates(currentWeight, nextBar)
+    });
+  },
+
+  /**
+   * 撤回上一组已完成记录（防止健身房手滑误点）
+   */
+  onUndoLastSet() {
+    const { completedSets, exercises, session } = this.data;
+    if (!completedSets || completedSets.length === 0 || !session) {
+      wx.showToast({ title: '暂无可撤回的组记录', icon: 'none' });
+      return;
+    }
+    const lastSet = completedSets[completedSets.length - 1];
+    wx.showModal({
+      title: '撤回上一组',
+      content: `确定撤回「${lastSet.exercise_name}」第${lastSet.set_number}组 (${lastSet.actual_weight}kg × ${lastSet.actual_reps}次) 吗？`,
+      confirmText: '确认撤回',
+      cancelText: '取消',
+      success: (res) => {
+        if (!res.confirm) return;
+        this.clearRestTimer();
+        this.restEndTime = null;
+
+        remove('session_sets', lastSet.id);
+        const nextCompletedSets = completedSets.slice(0, -1);
+        const nextExercises = exercises.map(ex => ({ ...ex }));
+        let targetExIdx = nextExercises.findIndex(ex => ex.exercise_id === lastSet.exercise_id);
+        if (targetExIdx === -1) targetExIdx = Math.max(0, this.data.currentExerciseIndex - 1);
+
+        if (nextExercises[targetExIdx]) {
+          nextExercises[targetExIdx].completed_sets = Math.max(0, (nextExercises[targetExIdx].completed_sets || 1) - 1);
+        }
+        const targetSetIdx = nextExercises[targetExIdx] ? nextExercises[targetExIdx].completed_sets : 0;
+
+        update('sessions', session.id, {
+          pending_exercises: nextExercises,
+          current_exercise_index: targetExIdx,
+          current_set_index: targetSetIdx,
+          completed_sets: nextCompletedSets,
+          updated_at: Date.now()
+        });
+
+        const targetEx = nextExercises[targetExIdx];
+        const exerciseDetail = targetEx ? (findOne('exercises', { id: targetEx.exercise_id }) || {}) : {};
+        const restoredWeight = lastSet.actual_weight !== undefined ? lastSet.actual_weight : (targetEx ? targetEx.target_weight : 0);
+        const restoredReps = lastSet.actual_reps !== undefined ? lastSet.actual_reps : (targetEx ? targetEx.target_reps : 0);
+        const restoredRPE = lastSet.rpe ? Math.max(0, lastSet.rpe - 1) : 2;
+
+        this.setData({
+          isResting: false,
+          restTimeLeft: 0,
+          restMinimized: false,
+          restCompleting: false,
+          completedSets: nextCompletedSets,
+          exercises: nextExercises,
+          currentExerciseIndex: targetExIdx,
+          currentSetIndex: targetSetIdx,
+          currentExercise: targetEx ? {
+            ...targetEx,
+            ...exerciseDetail,
+            currentSetNumber: targetSetIdx + 1,
+            actual_weight: restoredWeight,
+            actual_reps: restoredReps
+          } : this.data.currentExercise,
+          selectedRPE: restoredRPE,
+          setNote: lastSet.note || '',
+          weightOptions: this._buildWeightOptions(restoredWeight),
+          repOptions: this._buildRepOptions(restoredReps),
+          plateHint: this._calcBarbellPlates(restoredWeight, this.data.barWeight)
+        });
+        this.calculateOverallProgress();
+        wx.showToast({ title: '已撤回上一组', icon: 'success' });
+      }
     });
   },
 
@@ -565,6 +868,7 @@ Page({
    * 开始休息倒计时
    */
   startRestTimer(seconds) {
+    this.restEndTime = Date.now() + seconds * 1000;
     // 重置完成标记
     this.setData({
       isResting: true,
@@ -576,21 +880,8 @@ Page({
     // 保存快照
     this.saveSnapshot();
 
-    // 开始倒计时
-    this.restTimer = setInterval(() => {
-      const { restTimeLeft, restCompleting } = this.data;
-
-      // 防止重复触发
-      if (restCompleting) return;
-
-      if (restTimeLeft <= 1) {
-        this.setData({ restCompleting: true });
-        this.onRestComplete();
-      } else {
-        this.setData({ restTimeLeft: restTimeLeft - 1 });
-        this.playRestBeep();
-      }
-    }, 1000);
+    // 启动倒计时
+    this._startRestInterval();
   },
 
   /**
@@ -598,22 +889,94 @@ Page({
    */
   onRestComplete() {
     this.clearRestTimer();
+    this.restEndTime = null;
 
-    // 播放完成提示音
     audio.playCompleteSound();
     UI.vibrate();
 
-    this.setData({
-      isResting: false,
-      restTimeLeft: 0
-    });
-
-    // 检查是否需要切换动作
     if (this.data.currentExerciseIndex >= this.data.exercises.length) {
+      this.setData({
+        isResting: false,
+        restTimeLeft: 0,
+        restMinimized: false
+      });
       this.onTrainingComplete();
     } else {
-      this.setCurrentExercise();
+      this._restoreFromRest();
     }
+  },
+
+  /**
+   * 休息结束恢复训练 — 合并 setData 避免闪动
+   */
+  _restoreFromRest() {
+    const { exercises, currentExerciseIndex } = this.data;
+    const exercise = exercises[currentExerciseIndex];
+
+    if (!exercise) {
+      this.setData({ isResting: false, restTimeLeft: 0, restMinimized: false });
+      this.onTrainingComplete();
+      return;
+    }
+
+    const exerciseDetail = findOne('exercises', { id: exercise.exercise_id });
+    if (!exerciseDetail) {
+      this.setData({ isResting: false, restTimeLeft: 0, restMinimized: false });
+      this.onSkipExercise();
+      return;
+    }
+
+    const needsWarmup = (exercise.target_weight || 0) >= 30 && !exercise.warmup_completed;
+
+    if (needsWarmup) {
+      this.setData({
+        isResting: false,
+        restTimeLeft: 0,
+        restMinimized: false
+      });
+      this.showWarmupPanel(exercise, exerciseDetail);
+      return;
+    }
+
+    const lastRecord = this.getLastExerciseRecord(exercise.exercise_id);
+    const defaultWeight = lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0);
+    const defaultReps = lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 0);
+    const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2;
+
+    // 合并 calculateOverallProgress 的数据，避免二次 setData
+    let completedCount = 0;
+    const statusList = exercises.map((ex, idx) => {
+      const isCompleted = ex.completed_sets >= ex.target_sets;
+      if (isCompleted) completedCount++;
+      return {
+        name: ex.exercise_name,
+        status: isCompleted ? 'completed' : (idx === currentExerciseIndex ? 'current' : 'pending')
+      };
+    });
+    const totalAngle = exercises.length > 0 ? (completedCount / exercises.length) * 360 : 0;
+
+    this.setData({
+      isResting: false,
+      restTimeLeft: 0,
+      restMinimized: false,
+      currentExercise: {
+        ...exercise,
+        ...exerciseDetail,
+        currentSetNumber: exercise.completed_sets + 1,
+        actual_weight: defaultWeight,
+        actual_reps: defaultReps
+      },
+      currentSetIndex: exercise.completed_sets || 0,
+      selectedRPE: defaultRPE,
+      setNote: '',
+      showWarmup: false,
+      weightOptions: this._buildWeightOptions(defaultWeight),
+      repOptions: this._buildRepOptions(defaultReps),
+      plateHint: this._calcBarbellPlates(defaultWeight, this.data.barWeight),
+      completedExerciseCount: completedCount,
+      overallProgressAngle: totalAngle,
+      exerciseStatusList: statusList
+    });
   },
 
   /**
@@ -629,15 +992,31 @@ Page({
    */
   onReadyToGo() {
     this.clearRestTimer();
+    this.setData({ restMinimized: false });
     this.onRestComplete();
+  },
+
+  /**
+   * 收起休息弹窗为悬浮倒计时
+   */
+  onMinimizeRest() {
+    this.setData({ restMinimized: true });
+  },
+
+  /**
+   * 展开悬浮倒计时为休息弹窗
+   */
+  onExpandRest() {
+    this.setData({ restMinimized: false });
   },
 
   /**
    * 增加休息时间
    */
   onAddRestTime() {
-    const { restTimeLeft, restTimeTotal } = this.data;
+    const { restTimeLeft } = this.data;
     const newTime = Math.min(restTimeLeft + 30, 300); // 最多5分钟
+    this.restEndTime = Date.now() + newTime * 1000;
     this.setData({ restTimeLeft: newTime, restTimeTotal: newTime });
   },
 
@@ -647,6 +1026,7 @@ Page({
   onReduceRestTime() {
     const { restTimeLeft } = this.data;
     const newTime = Math.max(restTimeLeft - 30, 30); // 最少30秒
+    this.restEndTime = Date.now() + newTime * 1000;
     this.setData({ restTimeLeft: newTime, restTimeTotal: newTime });
   },
 
@@ -1033,9 +1413,36 @@ Page({
   },
 
   /**
+   * 收起训练页面 — 返回上一页并显示悬浮窗
+   */
+  onCollapseTraining() {
+    const { session, currentExercise, currentSetIndex } = this.data;
+    if (!session) return;
+
+    // 保存当前训练状态到全局
+    const app = getApp();
+    app.globalData.trainingMinimized = true;
+    app.globalData.trainingMinimizedSessionId = session.id;
+    app.globalData.trainingSnapshot = {
+      sessionId: session.id,
+      exerciseName: currentExercise ? currentExercise.name : '',
+      currentSet: currentSetIndex + 1,
+      totalSets: currentExercise ? currentExercise.target_sets : 0
+    };
+
+    // 返回上一页（打开训练前的页面）
+    wx.navigateBack({
+      fail: () => {
+        // 如果没有上一页（直接打开训练页），则回到首页
+        wx.switchTab({ url: '/pages/home/home' });
+      }
+    });
+  },
+
+  /**
    * 暂停训练
    */
-  onPauseTraining() {
+  async onPauseTraining() {
     const { session } = this.data;
 
     // 空值检查
@@ -1044,17 +1451,48 @@ Page({
       return;
     }
 
+    // 暂停训练计时
+    this.setData({ isPaused: true });
+
     update('sessions', session.id, {
       status: 'paused',
       paused_at: Date.now(),
       updated_at: Date.now()
     });
 
-    UI.showDialog({
+    const result = await UI.showDialog({
       title: '训练已暂停',
       content: '可以稍后继续本次训练',
-      confirmText: '好的'
+      confirmText: '好的',
+      cancelText: '取消'
     });
+
+    // 只有点击"取消"才恢复训练，点击"好的"保持暂停状态
+    if (!result.confirm) {
+      this.setData({ isPaused: false });
+    }
+  },
+
+  /**
+   * 继续训练
+   */
+  async onResumeTraining() {
+    const { session } = this.data;
+
+    if (!session) {
+      UI.showError('数据异常', this);
+      return;
+    }
+
+    this.setData({ isPaused: false });
+
+    update('sessions', session.id, {
+      status: 'in_progress',
+      resumed_at: Date.now(),
+      updated_at: Date.now()
+    });
+
+    UI.showToast({ message: '继续训练', icon: 'none' });
   },
 
   /**

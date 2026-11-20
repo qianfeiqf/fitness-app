@@ -1,9 +1,8 @@
-/* 计划详情页面样式 — WeUI 扁平风格 */
+/* 计划详情页面样式 */
 
 .page-detail {
   min-height: 100vh;
-  background-color: #FFFFFF;
-  padding: 40rpx;
+  background-color: #F5F5F5;
   padding-top: calc(40rpx + env(safe-area-inset-top));
   padding-bottom: 200rpx;
 }
@@ -24,14 +23,18 @@
 
 /* 计划头部 */
 .plan-header {
-  margin-bottom: 40rpx;
+  margin: 0 32rpx 32rpx;
+  padding: 32rpx;
+  background-color: #FFFFFF;
+  border-radius: 24rpx;
 }
 
 .plan-title-row {
   display: flex;
   align-items: center;
   gap: 20rpx;
-  margin-bottom: 12rpx;
+  margin-bottom: 16rpx;
+  flex-wrap: wrap;
 }
 
 .plan-name {
@@ -43,6 +46,8 @@
 .plan-desc {
   font-size: 26rpx;
   color: #666666;
+  line-height: 1.6;
+  display: block;
 }
 
 /* 徽章 */
@@ -51,16 +56,16 @@
   align-items: center;
   justify-content: center;
   min-width: 32rpx;
-  height: 32rpx;
-  padding: 0 12rpx;
+  height: 40rpx;
+  padding: 0 16rpx;
   border-radius: 9999rpx;
   font-size: 22rpx;
   font-weight: 600;
 }
 
 .badge-success {
-  background-color: #F0F0F0;
-  color: #1A1A1A;
+  background-color: #E8F5E9;
+  color: #2E7D32;
 }
 
 .badge-secondary {
@@ -69,58 +74,192 @@
 }
 
 .badge-warning {
-  background-color: #F0F0F0;
+  background-color: #FFF3E0;
+  color: #E65100;
+}
+
+.badge-info {
+  background-color: #E3F2FD;
+  color: #1565C0;
+}
+
+/* 模板标签 */
+.template-tags {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 20rpx;
+  flex-wrap: wrap;
+}
+
+.template-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44rpx;
+  padding: 0 20rpx;
+  border-radius: 9999rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.tag-green {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.tag-yellow {
+  background-color: #FFF8E1;
+  color: #F57F17;
+}
+
+.tag-red {
+  background-color: #FFEBEE;
+  color: #C62828;
+}
+
+.tag-gray {
+  background-color: #F5F5F5;
   color: #666666;
+}
+
+/* 介绍展开区 */
+.intro-section {
+  margin-top: 24rpx;
+  border-top: 1rpx solid #EEEEEE;
+  padding-top: 20rpx;
+}
+
+.intro-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0;
+}
+
+.intro-toggle-text {
+  font-size: 26rpx;
+  color: #1565C0;
+  font-weight: 500;
+}
+
+.intro-toggle-icon {
+  font-size: 24rpx;
+  color: #1565C0;
+}
+
+.intro-content {
+  margin-top: 16rpx;
+}
+
+.intro-block {
+  margin-bottom: 24rpx;
+}
+
+.intro-block:last-child {
+  margin-bottom: 0;
+}
+
+.intro-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.intro-text {
+  font-size: 24rpx;
+  color: #666666;
+  line-height: 1.7;
+  display: block;
+}
+
+/* 周期安排标题 */
+.schedule-header {
+  margin: 0 32rpx 20rpx;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.schedule-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.schedule-subtitle {
+  font-size: 24rpx;
+  color: #999999;
 }
 
 /* 周计划 */
 .week-schedule {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 20rpx;
+  margin: 0 32rpx;
 }
 
 .day-section {
   background-color: #FFFFFF;
-  border-radius: 24rpx;
+  border-radius: 20rpx;
   overflow: hidden;
-  border: 1rpx solid #E5E5E5;
+}
+
+.day-section.rest-day {
+  opacity: 0.7;
 }
 
 .day-section.has-exercises {
-  /* 用阴影强度区分，不用红色边框 */
+  /* 有训练内容的日期 */
 }
 
 .day-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24rpx 30rpx;
-  background-color: #F5F5F5;
+  padding: 24rpx 28rpx;
+  background-color: #FAFAFA;
+}
+
+.day-label-group {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
 }
 
 .day-name {
-  font-size: 28rpx;
-  font-weight: 600;
+  font-size: 30rpx;
+  font-weight: 700;
   color: #1A1A1A;
 }
 
 .day-count {
-  font-size: 24rpx;
-  color: #1A1A1A;
-  font-weight: 600;
+  font-size: 22rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.rest-badge {
+  font-size: 22rpx;
+  color: #999999;
+  font-weight: 500;
+  padding: 4rpx 16rpx;
+  background-color: #F0F0F0;
+  border-radius: 9999rpx;
 }
 
 .day-exercises {
-  padding: 20rpx 30rpx;
+  padding: 8rpx 28rpx 16rpx;
 }
 
 .exercise-card {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 20rpx 0;
-  border-bottom: none;
+  border-bottom: 1rpx solid #F0F0F0;
 }
 
 .exercise-card:last-child {
@@ -129,49 +268,57 @@
 
 .exercise-main {
   flex: 1;
+  min-width: 0;
+}
+
+.exercise-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 4rpx;
 }
 
 .exercise-name {
-  font-size: 28rpx;
-  font-weight: 500;
+  font-size: 30rpx;
+  font-weight: 600;
   color: #1A1A1A;
+  flex: 1;
+}
+
+.exercise-muscle {
+  font-size: 22rpx;
+  color: #999999;
   display: block;
+  margin-bottom: 6rpx;
 }
 
 .exercise-sets {
   font-size: 24rpx;
   color: #666666;
-  margin-top: 4rpx;
   display: block;
 }
 
-.exercise-meta {
-  text-align: right;
+/* 视频按钮 */
+.video-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 6rpx 16rpx;
+  background-color: #E3F2FD;
+  border-radius: 9999rpx;
+  flex-shrink: 0;
 }
 
-.exercise-weight {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-  display: block;
-  font-family: 'DIN Alternate', system-ui, sans-serif;
+.video-icon {
+  font-size: 20rpx;
+  color: #1565C0;
 }
 
-.exercise-rest {
+.video-text {
   font-size: 22rpx;
-  color: #999999;
-  margin-top: 4rpx;
-  display: block;
-}
-
-.day-empty {
-  padding: 30rpx;
-  text-align: center;
-}
-
-.day-empty-text {
-  font-size: 26rpx;
-  color: #999999;
+  color: #1565C0;
+  font-weight: 500;
 }
 
 /* 操作按钮 */
@@ -180,13 +327,13 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 40rpx;
-  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  padding: 32rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
   background: #FFFFFF;
-  border-top: none;
+  border-top: 1rpx solid #EEEEEE;
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  gap: 16rpx;
 }
 
 .btn {
@@ -195,9 +342,9 @@
   justify-content: center;
   height: 88rpx;
   border-radius: 9999rpx;
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 600;
-  transition: box-shadow 0.15s ease;
+  border: none;
 }
 
 .btn-primary {
@@ -238,6 +385,7 @@
   justify-content: center;
   z-index: 100;
   border: 1rpx solid #E5E5E5;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
 }
 
 .back-icon {

@@ -163,6 +163,115 @@
   border-radius: 9999rpx;
 }
 
+/* 演进预览区域 */
+.progression-section {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 40rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.progression-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.progression-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.progression-item:last-child {
+  border-bottom: none;
+}
+
+.progression-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.progression-name {
+  font-size: 28rpx;
+  color: #1A1A1A;
+  font-weight: 500;
+}
+
+.progression-reason {
+  font-size: 22rpx;
+  color: #999999;
+  line-height: 1.4;
+}
+
+.progression-change {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.weight-current {
+  font-size: 26rpx;
+  color: #999999;
+  text-decoration: line-through;
+}
+
+.weight-arrow {
+  font-size: 24rpx;
+  color: #CCCCCC;
+}
+
+.weight-next {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.weight-next.up {
+  color: #07C160;
+}
+
+.weight-next.down {
+  color: #FF6B6B;
+}
+
+.progression-badge {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 700;
+  margin-left: 12rpx;
+}
+
+.progression-badge.progression {
+  background: #E8F5E9;
+  color: #07C160;
+}
+
+.progression-badge.stall {
+  background: #F5F5F5;
+  color: #999999;
+}
+
+.progression-badge.deload {
+  background: #FFEBEE;
+  color: #FF6B6B;
+}
+
+.progression-badge.initial {
+  background: #F5F5F5;
+  color: #666666;
+}
+
 /* 分享按钮 */
 .share-section {
   margin-bottom: 24rpx;

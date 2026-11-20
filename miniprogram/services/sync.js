@@ -1,24 +1,36 @@
 /**
- * 同步服务
- * 实现本地优先 + 云端同步的数据同步机制
+ * 同步服务（微信云开发 CloudBase NoSQL 版）
+ * 实现本地优先（localdb） + 微信云数据库（cloud1-1g20tdh446a011c5）双向同步
  *
- * 基于 CloudBase 最佳实践：
- * - 离线优先：本地数据始终可用
- * - 异步同步：不影响用户操作
- * - 冲突解决：Last-Write-Wins + 人工确认
- * - 指数退避：重试间隔递增
+ * - 离线优先：所有写操作先落本地 localdb，不阻塞 UI
+ * - 微信原生通道：通过 wx.cloud.database() 免鉴权读写，自动按 _openid 隔离用户数据
+ * - 分页拉取：突破小程序端单次查询 20 条限制
+ * - 指数退避：弱网失败自动重试
  */
 
-const { getCollection, update, insert, find, findOne, remove } = require('../localdb/db.js');
+const { getCollection, saveDatabase, update, insert, findOne, remove } = require('../localdb/db.js');
+const { CLOUD_ENV_ID, SYNC_COLLECTIONS } = require('../config/cloud.js');
 
-// 同步配置 - 指数退避配置
 const SYNC_CONFIG = {
   maxRetryCount: 5,
-  baseRetryInterval: 2000,  // 基础重试间隔 2秒
-  maxRetryInterval: 60000,  // 最大重试间隔 60秒
-  batchSize: 20,            // 批处理大小
-  conflictCooldown: 300000  // 冲突冷却时间 5分钟
+  baseRetryInterval: 2000,
+  maxRetryInterval: 60000,
+  batchSize: 20,
+  conflictCooldown: 300000
 };
+
+const LAST_PULL_TS_KEY = 'last_sync_pull_timestamp';
+const PAGE_SIZE = 20;
+
+/**
+ * 获取云数据库实例
+ */
+function getCloudDB() {
+  if (!wx.cloud) {
+    throw new Error('当前基础库不支持微信云开发');
+  }
+  return wx.cloud.database({ env: CLOUD_ENV_ID });
+}
 
 /**
  * 计算指数退避间隔
@@ -29,26 +41,42 @@ function getExponentialBackoff(retryCount) {
 }
 
 /**
+ * 清洗准备写入云数据库的文档（移除云端保留字段 _id / _openid / sync_status）
+ */
+function sanitizeForCloud(payload, entityId) {
+  const clean = {};
+  const source = payload || {};
+  Object.keys(source).forEach(key => {
+    if (key === '_id' || key === '_openid' || key === 'sync_status') return;
+    if (source[key] !== undefined) {
+      clean[key] = source[key];
+    }
+  });
+  clean.id = clean.id || entityId;
+  clean.updated_at = clean.updated_at || Date.now();
+  clean.created_at = clean.created_at || clean.updated_at;
+  return clean;
+}
+
+/**
  * 添加到同步队列
  */
 function addToSyncQueue(entityType, entityId, operation, payload) {
   const syncQueue = getCollection('sync_queue');
 
-  // 检查是否已有相同实体的待同步项
   const existing = syncQueue.find(item =>
-    item.entity_type === entityType && item.entity_id === entityId
+    item.entity_type === entityType && item.entity_id === entityId && item.status !== 'synced'
   );
 
   if (existing) {
-    // 更新已有项
     existing.operation = operation;
     existing.payload = payload;
     existing.updated_at = Date.now();
     existing.retry_count = 0;
     existing.status = 'pending';
     existing.last_error = null;
+    existing.next_retry_at = null;
   } else {
-    // 添加新项
     syncQueue.push({
       id: 'sync_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
       entity_type: entityType,
@@ -64,85 +92,149 @@ function addToSyncQueue(entityType, entityId, operation, payload) {
     });
   }
 
-  saveSyncQueue(syncQueue);
+  saveDatabase();
 }
 
 /**
- * 保存同步队列到本地存储
+ * 自动扫描业务集合中 sync_status === 'pending' 的记录并补入同步队列
  */
-function saveSyncQueue(syncQueue) {
-  wx.setStorageSync('sync_queue', syncQueue);
-}
-
-/**
- * 获取待同步队列（过滤掉还在冷却期的项）
- */
-function getPendingSyncItems() {
+function collectPendingChangesToQueue() {
   const syncQueue = getCollection('sync_queue');
-  const now = Date.now();
-  return syncQueue.filter(item =>
-    item.status === 'pending' &&
-    (!item.next_retry_at || item.next_retry_at <= now)
+  const activeKeySet = new Set(
+    syncQueue
+      .filter(item => item.status === 'pending' || item.status === 'conflict')
+      .map(item => `${item.entity_type}:${item.entity_id}`)
   );
-}
 
-/**
- * 处理同步
- */
-async function syncAll() {
-  console.log('=== 开始同步 ===');
-
-  const pendingItems = getPendingSyncItems();
-  console.log('待同步项数量:', pendingItems.length);
-
-  if (pendingItems.length === 0) {
-    console.log('没有待同步数据');
-    return { success: true, syncedCount: 0 };
-  }
-
-  let syncedCount = 0;
-  let failedCount = 0;
-
-  // 按批次处理
-  for (let i = 0; i < pendingItems.length; i += SYNC_CONFIG.batchSize) {
-    const batch = pendingItems.slice(i, i + SYNC_CONFIG.batchSize);
-
-    for (const item of batch) {
-      try {
-        await syncItem(item);
-        markAsSynced(item);
-        syncedCount++;
-      } catch (err) {
-        console.error('同步失败:', item.entity_id, err.message);
-        handleSyncError(item, err);
-        failedCount++;
+  let enqueued = 0;
+  for (const collectionName of SYNC_COLLECTIONS) {
+    const docs = getCollection(collectionName);
+    for (const doc of docs) {
+      if (doc && doc.id && doc.sync_status === 'pending') {
+        const key = `${collectionName}:${doc.id}`;
+        if (!activeKeySet.has(key)) {
+          syncQueue.push({
+            id: 'sync_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+            entity_type: collectionName,
+            entity_id: doc.id,
+            operation: 'upsert',
+            payload: doc,
+            created_at: Date.now(),
+            updated_at: Date.now(),
+            retry_count: 0,
+            status: 'pending',
+            last_error: null,
+            next_retry_at: null
+          });
+          activeKeySet.add(key);
+          enqueued++;
+        }
       }
     }
   }
 
-  console.log('同步完成: 成功', syncedCount, '失败', failedCount);
+  if (enqueued > 0) {
+    saveDatabase();
+  }
+}
+
+/**
+ * 获取待同步队列
+ */
+function getPendingSyncItems() {
+  const syncQueue = getCollection('sync_queue');
+  const now = Date.now();
+  const orderMap = {};
+  SYNC_COLLECTIONS.forEach((name, idx) => {
+    orderMap[name] = idx;
+  });
+
+  return syncQueue
+    .filter(item =>
+      item.status === 'pending' &&
+      SYNC_COLLECTIONS.includes(item.entity_type) &&
+      (!item.next_retry_at || item.next_retry_at <= now)
+    )
+    .sort((a, b) => {
+      const orderA = orderMap[a.entity_type] !== undefined ? orderMap[a.entity_type] : 99;
+      const orderB = orderMap[b.entity_type] !== undefined ? orderMap[b.entity_type] : 99;
+      if (orderA !== orderB) return orderA - orderB;
+      return (a.created_at || 0) - (b.created_at || 0);
+    });
+}
+
+/**
+ * 同步单条记录到云数据库
+ */
+async function syncItemToCloud(cloudDb, item) {
+  const col = cloudDb.collection(item.entity_type);
+  const docId = String(item.entity_id);
+
+  if (item.operation === 'delete') {
+    try {
+      await col.doc(docId).remove();
+    } catch (err) {
+      const msg = (err && (err.errMsg || err.message)) || '';
+      // 文档本就不存在时视为删除成功
+      if (!msg.includes('not exist') && !msg.includes('document with _id')) {
+        throw err;
+      }
+    }
+    return;
+  }
+
+  // Upsert：使用 doc(docId).set({ data }) 实现幂等写入，微信自动附带 _openid
+  const cleanData = sanitizeForCloud(item.payload, docId);
+  await col.doc(docId).set({ data: cleanData });
+}
+
+/**
+ * 处理双向同步：先推送本地变更，再增量拉取云端变更
+ */
+async function syncAll() {
+  console.log('=== [CloudBase] 开始双向同步 ===');
+  const cloudDb = getCloudDB();
+
+  collectPendingChangesToQueue();
+  const pendingItems = getPendingSyncItems();
+  console.log('[CloudBase] 待推送记录数:', pendingItems.length);
+
+  let syncedCount = 0;
+  let failedCount = 0;
+
+  for (const item of pendingItems) {
+    try {
+      await syncItemToCloud(cloudDb, item);
+      markAsSynced(item);
+      syncedCount++;
+    } catch (err) {
+      console.error('[CloudBase] 推送失败:', item.entity_type, item.entity_id, err.errMsg || err.message);
+      handleSyncError(item, err);
+      failedCount++;
+    }
+  }
+
+  cleanSyncedItems(100);
+
+  // 拉取云端增量更新
+  let pulledCount = 0;
+  try {
+    const lastPullTs = wx.getStorageSync(LAST_PULL_TS_KEY) || 0;
+    const pullResult = await pullFromCloud(lastPullTs);
+    pulledCount = pullResult.pulledCount;
+    wx.setStorageSync(LAST_PULL_TS_KEY, pullResult.syncTimestamp);
+  } catch (err) {
+    console.warn('[CloudBase] 拉取云端变更失败:', err.errMsg || err.message);
+  }
+
+  console.log('[CloudBase] 同步完成: 推送成功', syncedCount, '失败', failedCount, '拉取', pulledCount);
 
   return {
     success: failedCount === 0,
     syncedCount,
-    failedCount
+    failedCount,
+    pulledCount
   };
-}
-
-/**
- * 同步单个项目到云端
- */
-async function syncItem(item) {
-  const cloudAPI = getCloudAPI();
-
-  switch (item.operation) {
-    case 'upsert':
-      return await cloudAPI.upsert(item.entity_type, item.entity_id, item.payload);
-    case 'delete':
-      return await cloudAPI.delete(item.entity_type, item.entity_id);
-    default:
-      throw new Error('未知操作: ' + item.operation);
-  }
 }
 
 /**
@@ -157,19 +249,25 @@ function markAsSynced(item) {
     syncQueue[index].synced_at = Date.now();
     syncQueue[index].last_error = null;
     syncQueue[index].next_retry_at = null;
-    saveSyncQueue(syncQueue);
   }
 
-  // 同时更新本地实体的同步状态
   try {
-    update(item.entity_type, item.entity_id, { sync_status: 'synced' });
+    const existing = findOne(item.entity_type, { id: item.entity_id });
+    if (existing) {
+      update(item.entity_type, item.entity_id, {
+        sync_status: 'synced',
+        updated_at: existing.updated_at || Date.now()
+      });
+    } else {
+      saveDatabase();
+    }
   } catch (err) {
-    // 可能实体已被删除，忽略
+    saveDatabase();
   }
 }
 
 /**
- * 处理同步错误 - 使用指数退避
+ * 处理同步错误 - 指数退避
  */
 function handleSyncError(item, err) {
   const syncQueue = getCollection('sync_queue');
@@ -178,176 +276,113 @@ function handleSyncError(item, err) {
   if (index !== -1) {
     const retryCount = syncQueue[index].retry_count + 1;
     syncQueue[index].retry_count = retryCount;
-    syncQueue[index].last_error = err.message;
+    syncQueue[index].last_error = (err && (err.errMsg || err.message)) || '同步失败';
 
     if (retryCount >= SYNC_CONFIG.maxRetryCount) {
-      // 超过最大重试次数，标记为冲突需要人工处理
       syncQueue[index].status = 'conflict';
       syncQueue[index].next_retry_at = Date.now() + SYNC_CONFIG.conflictCooldown;
-      console.warn('[Sync] 同步项进入冲突状态:', item.entity_id);
     } else {
-      // 计算下一次重试时间（指数退避）
-      const backoffInterval = getExponentialBackoff(retryCount);
-      syncQueue[index].next_retry_at = Date.now() + backoffInterval;
-      console.log('[Sync] 下次重试在', backoffInterval / 1000, '秒后:', item.entity_id);
+      syncQueue[index].next_retry_at = Date.now() + getExponentialBackoff(retryCount);
     }
 
-    saveSyncQueue(syncQueue);
+    saveDatabase();
   }
 }
 
 /**
- * 从云端拉取数据
+ * 从云数据库分页拉取增量变更（自动按当前用户的 _openid 隔离）
  */
-async function pullFromCloud(since) {
-  console.log('从云端拉取数据，自', since);
+async function pullFromCloud(since = 0) {
+  const cloudDb = getCloudDB();
+  const _ = cloudDb.command;
+  const syncTimestamp = Date.now();
+  let pulledCount = 0;
 
-  const cloudAPI = getCloudAPI();
-  const changes = await cloudAPI.getChanges(since);
-
-  // 处理变更
-  for (const change of changes) {
-    await applyCloudChange(change);
-  }
-
-  return changes;
-}
-
-/**
- * 应用云端变更
- */
-async function applyCloudChange(change) {
-  const { entity_type, entity_id, operation, payload, server_updated_at } = change;
-
-  const localEntity = findOne(entity_type, { id: entity_id });
-
-  if (operation === 'upsert') {
-    if (!localEntity) {
-      // 本地不存在，直接插入
-      insert(entity_type, { ...payload, sync_status: 'synced' });
-      console.log('[Sync] 插入云端新数据:', entity_type, entity_id);
-    } else if (server_updated_at > localEntity.updated_at) {
-      // 服务端更新，使用服务端数据
-      update(entity_type, entity_id, { ...payload, sync_status: 'synced' });
-      console.log('[Sync] 采纳云端更新:', entity_type, entity_id);
-    } else if (localEntity.sync_status !== 'synced') {
-      // 本地有未同步的变更，存在冲突
-      // 根据冲突策略处理（这里使用 Last-Write-Wins + 标记冲突）
-      if (localEntity.updated_at > server_updated_at) {
-        // 本地优先，重新加入同步队列
-        addToSyncQueue(entity_type, entity_id, 'upsert', localEntity);
-        console.log('[Sync] 本地优先，重新同步:', entity_type, entity_id);
-      } else {
-        update(entity_type, entity_id, { ...payload, sync_status: 'synced' });
-        console.log('[Sync] 采纳云端更新(时间戳更早):', entity_type, entity_id);
-      }
-    }
-  } else if (operation === 'delete') {
-    // 删除操作
-    remove(entity_type, entity_id);
-    console.log('[Sync] 删除本地数据:', entity_type, entity_id);
-  }
-}
-
-/**
- * 云托管 API 地址
- */
-const { CLOUD_API_BASE } = require('../config/cloud.js');
-
-/**
- * 获取请求 header
- */
-function getAuthHeader() {
-  const app = getApp();
-  const token = app ? app.globalData.accessToken : null;
-  return token ? { 'Authorization': 'Bearer ' + token } : {};
-}
-
-/**
- * 云端 API 请求封装 - 带超时和错误处理
- */
-async function cloudRequest(url, method = 'GET', data = null, timeout = 15000) {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(new Error('请求超时'));
-    }, timeout);
-
-    wx.request({
-      url: CLOUD_API_BASE + url,
-      method,
-      data,
-      header: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader()
-      },
-      success: (res) => {
-        clearTimeout(timer);
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data);
-        } else if (res.statusCode === 401) {
-          // Token 过期
-          const app = getApp();
-          if (app) {
-            app.globalData.isLoggedIn = false;
-            app.globalData.accessToken = null;
-            wx.removeStorageSync('accessToken');
-          }
-          reject(new Error('认证已过期，请重新登录'));
-        } else {
-          reject(new Error(res.data?.error || `请求失败(${res.statusCode})`));
+  for (const collectionName of SYNC_COLLECTIONS) {
+    let skip = 0;
+    while (true) {
+      let rows = [];
+      try {
+        let query = cloudDb.collection(collectionName);
+        if (since > 0) {
+          query = query.where({ updated_at: _.gt(since) });
         }
-      },
-      fail: (err) => {
-        clearTimeout(timer);
-        reject(new Error(err.errMsg || '网络请求失败'));
+        const res = await query.skip(skip).limit(PAGE_SIZE).get();
+        rows = (res && res.data) || [];
+      } catch (err) {
+        const msg = (err && (err.errMsg || err.message)) || '';
+        // 集合尚未创建时跳过该集合，不中断其他集合同步
+        if (msg.includes('-502005') || msg.includes('collection not exists')) {
+          console.warn(`[CloudBase] 集合 ${collectionName} 尚未创建，跳过拉取`);
+          break;
+        }
+        throw err;
       }
-    });
-  });
+
+      for (const row of rows) {
+        applyCloudDoc(collectionName, row);
+        pulledCount++;
+      }
+
+      if (rows.length < PAGE_SIZE) {
+        break;
+      }
+      skip += PAGE_SIZE;
+    }
+  }
+
+  return { pulledCount, syncTimestamp };
 }
 
 /**
- * 获取云端API实例
+ * 将云端文档合并到本地 localdb（Last-Write-Wins）
  */
-function getCloudAPI() {
-  return {
-    async upsert(entityType, entityId, payload) {
-      console.log('[Cloud API] upsert', entityType, entityId);
+function applyCloudDoc(collectionName, cloudDoc) {
+  const entityId = cloudDoc.id || cloudDoc._id;
+  if (!entityId) return;
+
+  const cloudUpdatedAt = cloudDoc.updated_at || cloudDoc.created_at || Date.now();
+  const localEntity = findOne(collectionName, { id: entityId });
+
+  const normalized = { ...cloudDoc, id: entityId, sync_status: 'synced', updated_at: cloudUpdatedAt };
+  delete normalized._openid;
+
+  if (!localEntity) {
+    insert(collectionName, normalized);
+  } else if (cloudUpdatedAt > (localEntity.updated_at || 0)) {
+    update(collectionName, entityId, normalized);
+  } else if (localEntity.sync_status !== 'synced' && (localEntity.updated_at || 0) > cloudUpdatedAt) {
+    addToSyncQueue(collectionName, entityId, 'upsert', localEntity);
+  }
+}
+
+/**
+ * 永久清除当前用户在云数据库中的全部数据（供账号注销调用）
+ */
+async function clearCloudUserData() {
+  const cloudDb = getCloudDB();
+
+  for (const collectionName of SYNC_COLLECTIONS) {
+    while (true) {
+      let rows = [];
       try {
-        const result = await cloudRequest('/api/v1/sync/push', 'POST', {
-          changes: [{ entity_type: entityType, entity_id: entityId, operation: 'upsert', payload }]
-        });
-        return result;
+        const res = await cloudDb.collection(collectionName).limit(PAGE_SIZE).get();
+        rows = (res && res.data) || [];
       } catch (err) {
-        console.error('[Cloud API] upsert 失败:', err.message);
+        const msg = (err && (err.errMsg || err.message)) || '';
+        if (msg.includes('-502005') || msg.includes('collection not exists')) {
+          break;
+        }
         throw err;
       }
-    },
 
-    async delete(entityType, entityId) {
-      console.log('[Cloud API] delete', entityType, entityId);
-      try {
-        const result = await cloudRequest('/api/v1/sync/push', 'POST', {
-          changes: [{ entity_type: entityType, entity_id: entityId, operation: 'delete', payload: null }]
-        });
-        return result;
-      } catch (err) {
-        console.error('[Cloud API] delete 失败:', err.message);
-        throw err;
-      }
-    },
+      if (rows.length === 0) break;
 
-    async getChanges(since) {
-      console.log('[Cloud API] getChanges since', since);
-      try {
-        const result = await cloudRequest('/api/v1/sync/pull?since=' + (since || 0), 'GET');
-        return result.data?.changes || [];
-      } catch (err) {
-        console.error('[Cloud API] getChanges 失败:', err.message);
-        // 网络失败时记录警告，返回空变更
-        return [];
+      for (const row of rows) {
+        await cloudDb.collection(collectionName).doc(row._id).remove();
       }
     }
-  };
+  }
 }
 
 /**
@@ -356,8 +391,6 @@ function getCloudAPI() {
 function getSyncStatus() {
   const syncQueue = getCollection('sync_queue');
   const pending = syncQueue.filter(item => item.status === 'pending').length;
-  // 注意: 'failed' 状态在代码中从未设置，失败项会被标记为 'conflict'
-  // 此字段保留用于历史兼容性，始终为0
   const failed = syncQueue.filter(item => item.status === 'failed').length;
   const conflict = syncQueue.filter(item => item.status === 'conflict').length;
   const synced = syncQueue.filter(item => item.status === 'synced').length;
@@ -365,7 +398,7 @@ function getSyncStatus() {
   const app = getApp();
   return {
     pending,
-    failed,  // 始终为0，见上方注释
+    failed,
     conflict,
     synced,
     total: syncQueue.length,
@@ -386,13 +419,12 @@ async function retryFailedSync() {
     item.next_retry_at = null;
   }
 
-  saveSyncQueue(syncQueue);
-
+  saveDatabase();
   return await syncAll();
 }
 
 /**
- * 清理已同步项（保留一定数量的历史记录）
+ * 清理已同步项
  */
 function cleanSyncedItems(keepCount = 100) {
   const syncQueue = getCollection('sync_queue');
@@ -408,8 +440,7 @@ function cleanSyncedItems(keepCount = 100) {
         syncQueue.splice(index, 1);
       }
     });
-    saveSyncQueue(syncQueue);
-    console.log('[Sync] 清理了', toRemove.length, '条已同步记录');
+    saveDatabase();
   }
 }
 
@@ -417,6 +448,7 @@ module.exports = {
   addToSyncQueue,
   syncAll,
   pullFromCloud,
+  clearCloudUserData,
   getSyncStatus,
   retryFailedSync,
   cleanSyncedItems,

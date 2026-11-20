@@ -45,24 +45,24 @@
       <text>浏览计划库</text>
       <text class="btn-cta-arrow">→</text>
     </button>
-    <view class="free-workout-empty-btn" bindtap="onStartFreeWorkout">
-      <text class="free-workout-plus">+</text>
-      <text>开始自由训练</text>
+    <view class="free-workout-empty-btn {{activeFreeSession ? 'active' : ''}}" bindtap="onStartFreeWorkout">
+      <text class="free-workout-plus">{{activeFreeSession ? '▶' : '+'}}</text>
+      <text>{{activeFreeSession ? '继续进行中的自由训练' : '开始自由训练'}}</text>
     </view>
   </view>
 
   <!-- 今日训练 -->
   <view wx:else class="training-section">
-    <!-- 自由训练快捷入口 -->
-    <view class="free-workout-bar" bindtap="onStartFreeWorkout">
+    <!-- 自由训练快捷入口（有进行中会话时高亮提示直接续练） -->
+    <view class="free-workout-bar {{activeFreeSession ? 'active' : ''}}" bindtap="onStartFreeWorkout">
       <view class="free-workout-left">
-        <text class="free-workout-icon">⚡</text>
+        <text class="free-workout-icon">{{activeFreeSession ? '🔥' : '⚡'}}</text>
         <view class="free-workout-info">
-          <text class="free-workout-title">自由训练</text>
-          <text class="free-workout-desc">不按计划，直接进记录页边练边加动作</text>
+          <text class="free-workout-title">{{activeFreeSession ? '进行中的自由训练' : '自由训练'}}</text>
+          <text class="free-workout-desc">{{activeFreeSession ? activeFreeSummary : '不按计划，直接进记录页边练边加动作'}}</text>
         </view>
       </view>
-      <text class="free-workout-btn">开始 ›</text>
+      <text class="free-workout-btn">{{activeFreeSession ? '继续 ›' : '开始 ›'}}</text>
     </view>
     <!-- Deload 提醒横幅 -->
     <view wx:if="{{showDeloadReminder}}" class="deload-banner" bindtap="onDismissDeloadReminder">

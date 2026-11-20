@@ -50,7 +50,11 @@ Page({
     swiperHeight: 1000,
 
     // 训练悬浮窗
-    trainingFloat: null
+    trainingFloat: null,
+
+    // 进行中的自由训练会话
+    activeFreeSession: null,
+    activeFreeSummary: ''
   },
 
   // 空操作函数（用于阻止事件冒泡）
@@ -171,6 +175,9 @@ Page({
     this.setData({ loading: true });
 
     try {
+      // 同步检查是否有进行中的自由训练（无论有没有固定计划都展示）
+      const { session: activeFreeSession, summary: activeFreeSummary } = this._getActiveFreeSessionInfo();
+
       // 获取所有激活的计划（最新创建/更新的排在最前，确保新建计划立即可见）
       const allPlans = getCollection('plans');
       const activePlans = allPlans
@@ -182,6 +189,8 @@ Page({
           activePlans: [],
           planDataList: [],
           todayPlan: null,
+          activeFreeSession,
+          activeFreeSummary,
           loading: false,
           showDeloadReminder: false
         });
@@ -222,6 +231,8 @@ Page({
         streak,
         isRestDay: currentData.isRestDay,
         showDeloadReminder,
+        activeFreeSession,
+        activeFreeSummary,
         swiperHeight: this.calcSwiperHeight(currentData.exercises.length),
         loading: false
       });
@@ -686,12 +697,42 @@ Page({
   },
 
   /**
-   * 一键开始自由训练（零前置表单，直接进入训练记录页）
+   * 查找最近一条进行中或暂停中的自由训练会话
+   */
+  _getActiveFreeSessionInfo() {
+    const sessions = getCollection('sessions') || [];
+    const activeFree = sessions
+      .filter(s => s && s.is_free_workout && (s.status === 'in_progress' || s.status === 'paused' || s.status === 'active'))
+      .sort((a, b) => (b.updated_at || b.created_at || 0) - (a.updated_at || a.created_at || 0))[0] || null;
+
+    if (!activeFree) {
+      return { session: null, summary: '' };
+    }
+
+    const exCount = (activeFree.pending_exercises || []).length;
+    const doneSets = (activeFree.completed_sets || []).length;
+    const summary = exCount > 0
+      ? `已选 ${exCount} 个动作 · 已完成 ${doneSets} 组，点击继续`
+      : '尚未添加动作，点击继续自由训练';
+    return { session: activeFree, summary };
+  },
+
+  /**
+   * 一键开始或继续自由训练（存在进行中自由训练时直接续练，不丢失进度）
    */
   onStartFreeWorkout() {
     const app = getApp();
     if (!app.globalData.isLoggedIn) {
       this.onLogin();
+      return;
+    }
+
+    const { session: existingFree } = this._getActiveFreeSessionInfo();
+    if (existingFree) {
+      this.setData({ currentSession: existingFree, isTraining: true });
+      wx.navigateTo({
+        url: '/pages/home/training/training?sessionId=' + existingFree.id
+      });
       return;
     }
 

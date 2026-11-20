@@ -955,3 +955,27 @@
   font-size: 30rpx;
   font-weight: 600;
 }
+
+.free-workout-bar.active {
+  background: #1A1A1A;
+  border-color: #1A1A1A;
+}
+
+.free-workout-bar.active .free-workout-title {
+  color: #FFFFFF;
+}
+
+.free-workout-bar.active .free-workout-desc {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.free-workout-bar.active .free-workout-btn {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.free-workout-empty-btn.active {
+  background: #1A1A1A;
+  border-color: #1A1A1A;
+  color: #FFFFFF;
+}

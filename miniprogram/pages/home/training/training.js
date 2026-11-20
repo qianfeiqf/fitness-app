@@ -172,6 +172,12 @@ Page({
   onUnload() {
     this.clearRestTimer();
     this.stopDurationTimer();
+    if (this.data.session && !this.data.isCompleted) {
+      const latest = findOne('sessions', { id: this.data.session.id });
+      if (latest && latest.status !== 'completed' && latest.status !== 'aborted') {
+        this.saveSnapshot();
+      }
+    }
     wx.eventCenter.off('appHidden', this.onAppHidden);
   },
 

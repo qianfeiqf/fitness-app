@@ -1,6 +1,6 @@
 {
   "usingComponents": {
-    "mp-tabs": "weui-miniprogram/tabs/tabs"
+    "mp-tabs": "../../components/mp-tabs/mp-tabs"
   },
   "navigationBarTitleText": "训练统计",
   "navigationStyle": "custom"

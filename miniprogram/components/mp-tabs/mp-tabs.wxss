@@ -1,0 +1,33 @@
+.mp-tabs-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.mp-tabs-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 4rpx 0;
+}
+
+.mp-tab-item {
+  flex-shrink: 0;
+  padding: 10rpx 24rpx;
+  border-radius: 9999rpx;
+  background: #F3F4F6;
+  color: #666666;
+  font-size: 24rpx;
+  font-weight: 500;
+  line-height: 1.4;
+  transition: all 0.15s ease;
+}
+
+.mp-tab-item.active {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.mp-tab-text {
+  white-space: nowrap;
+}

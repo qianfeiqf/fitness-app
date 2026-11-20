@@ -91,7 +91,7 @@
   <!-- 经典计划详情弹窗 -->
   <modal-sheet
     visible="{{showTemplateDetailModal}}"
-    title="{{selectedTemplate.name}}"
+    title="{{selectedTemplate ? selectedTemplate.name : ''}}"
     confirmText="使用此计划"
     cancelText="关闭"
     bind:confirm="onShowCloneTemplateFromDetail"
@@ -131,7 +131,7 @@
   <!-- 经典计划详细介绍弹窗 -->
   <modal-sheet
     visible="{{showTemplateIntroModal}}"
-    title="{{selectedTemplate.name}}"
+    title="{{selectedTemplate ? selectedTemplate.name : ''}}"
     confirmText="使用此计划"
     cancelText="关闭"
     bind:confirm="onShowCloneTemplateFromIntro"

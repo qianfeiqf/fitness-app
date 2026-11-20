@@ -97,7 +97,7 @@
     <view class="volume-card">
       <view class="volume-chart">
         <view wx:for="{{volumeTrend}}"
-              wx:key="date"
+              wx:key="index"
               class="volume-bar-item">
           <view class="volume-bar-container">
             <view class="volume-bar-track">
@@ -143,7 +143,7 @@
 
     <view wx:else class="pr-list">
       <view wx:for="{{recentPRs}}"
-            wx:key="date"
+            wx:key="index"
             class="pr-item"
             hover-class="item-pressed">
         <view class="pr-icon-wrap">

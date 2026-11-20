@@ -2,6 +2,6 @@
   "usingComponents": {
     "modal-sheet": "../../components/modal-sheet/modal-sheet",
     "mp-searchbar": "weui-miniprogram/searchbar/searchbar",
-    "mp-tabs": "weui-miniprogram/tabs/tabs"
+    "mp-tabs": "../../components/mp-tabs/mp-tabs"
   }
 }

@@ -1,0 +1,13 @@
+<scroll-view class="mp-tabs-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
+  <view class="mp-tabs-list">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="index"
+      class="mp-tab-item {{activeTab === index ? 'active' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTapTab"
+    >
+      <text class="mp-tab-text">{{item.title || item}}</text>
+    </view>
+  </view>
+</scroll-view>

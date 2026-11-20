@@ -18,7 +18,7 @@
       </view>
     </view>
     <view class="progress-bar-track">
-      <view class="progress-bar-fill" style="width: {{currentExercise && currentExercise.target_sets ? (currentExercise.currentSetNumber / currentExercise.target_sets) * 100 : 0}}%;"></view>
+      <view class="progress-bar-fill" style="width: {{currentExercise && currentExercise.target_sets ? (currentExercise.completed_sets >= currentExercise.target_sets ? 100 : (currentExercise.completed_sets / currentExercise.target_sets) * 100) : 0}}%;"></view>
     </view>
   </view>
 

@@ -28,8 +28,10 @@ Page({
     }
 
     this.setData({ sessionId: options.sessionId });
-    this.loadSession(options.sessionId);
-    this.loadProgressions(options.sessionId);
+    const session = this.loadSession(options.sessionId);
+    if (session && !session.is_free_workout) {
+      this.loadProgressions(options.sessionId);
+    }
 
     // 显示庆祝动画
     setTimeout(() => {
@@ -133,6 +135,7 @@ Page({
       duration,
       prCount
     });
+    return session;
   },
 
   onBackHome() {
@@ -157,7 +160,7 @@ Page({
     wx.showLoading({ title: '生成中...' });
 
     this.drawShareCard({
-      planName: session.plan_name,
+      planName: session.plan_name || (session.is_free_workout ? '自由训练' : '今日训练'),
       totalVolume,
       duration,
       prCount,
@@ -213,7 +216,8 @@ Page({
           const ctx = canvas.getContext('2d');
 
           // 高清画布尺寸
-          const dpr = Math.min(wx.getSystemInfoSync().pixelRatio, 2);
+          const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+          const dpr = Math.min(windowInfo.pixelRatio, 2);
           const width = 750;
           const height = 1000;
           canvas.width = width * dpr;

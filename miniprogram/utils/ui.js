@@ -94,27 +94,27 @@ function showDeleteConfirm() {
 /**
  * 震动反馈
  */
-function vibrate() {
+function _isDevtools() {
   try {
-    const sys = wx.getSystemInfoSync();
-    if (sys.platform === 'devtools') return;
-  } catch (e) {}
+    const info = wx.getDeviceInfo ? wx.getDeviceInfo() : wx.getSystemInfoSync();
+    return info.platform === 'devtools';
+  } catch (e) {
+    return false;
+  }
+}
+
+function vibrate() {
+  if (_isDevtools()) return;
   wx.vibrateShort({ type: 'heavy' });
 }
 
 function vibrateSuccess() {
-  try {
-    const sys = wx.getSystemInfoSync();
-    if (sys.platform === 'devtools') return;
-  } catch (e) {}
+  if (_isDevtools()) return;
   wx.vibrateShort({ type: 'medium' });
 }
 
 function vibrateWarning() {
-  try {
-    const sys = wx.getSystemInfoSync();
-    if (sys.platform === 'devtools') return;
-  } catch (e) {}
+  if (_isDevtools()) return;
   wx.vibrateShort({ type: 'light' });
 }
 

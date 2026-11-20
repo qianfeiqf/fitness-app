@@ -64,8 +64,8 @@ Page({
 
   calcNavBarHeight() {
     const menuButton = wx.getMenuButtonBoundingClientRect();
-    const systemInfo = wx.getSystemInfoSync();
-    const navHeight = menuButton.top + menuButton.height + (menuButton.top - systemInfo.statusBarHeight);
+    const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const navHeight = menuButton.top + menuButton.height + (menuButton.top - windowInfo.statusBarHeight);
     this.setData({ navHeight });
   },
 
@@ -210,7 +210,7 @@ Page({
         if (!res[0]) return;
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
-        const dpr = wx.getSystemInfoSync().pixelRatio;
+        const dpr = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).pixelRatio;
         const width = res[0].width;
         const height = res[0].height;
 
@@ -473,7 +473,7 @@ Page({
         if (!res[0]) return;
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
-        const dpr = wx.getSystemInfoSync().pixelRatio;
+        const dpr = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).pixelRatio;
         const width = res[0].width;
         const height = res[0].height;
 

@@ -245,8 +245,8 @@ Page({
 
   calcNavBarHeight() {
     const menuButton = wx.getMenuButtonBoundingClientRect();
-    const systemInfo = wx.getSystemInfoSync();
-    const navHeight = menuButton.top + menuButton.height + (menuButton.top - systemInfo.statusBarHeight);
+    const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const navHeight = menuButton.top + menuButton.height + (menuButton.top - windowInfo.statusBarHeight);
     this.setData({ navHeight });
   },
 
@@ -1763,8 +1763,15 @@ Page({
       }
     }
 
-    // 异步同步到云端
+    // 清理全局收起浮窗状态，避免完成后首页/其他 Tab 残留浮窗
     const app = getApp();
+    if (app && app.globalData && app.globalData.trainingMinimizedSessionId === session.id) {
+      app.globalData.trainingMinimized = false;
+      app.globalData.trainingMinimizedSessionId = null;
+      app.globalData.trainingSnapshot = null;
+    }
+
+    // 异步同步到云端
     if (app && typeof app.startSync === 'function') {
       app.startSync();
     }

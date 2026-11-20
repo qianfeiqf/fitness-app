@@ -73,8 +73,8 @@ Page({
 
   calcNavBarHeight() {
     const menuButton = wx.getMenuButtonBoundingClientRect();
-    const systemInfo = wx.getSystemInfoSync();
-    const navHeight = menuButton.top + menuButton.height + (menuButton.top - systemInfo.statusBarHeight);
+    const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const navHeight = menuButton.top + menuButton.height + (menuButton.top - windowInfo.statusBarHeight);
     this.setData({ navHeight });
   },
 

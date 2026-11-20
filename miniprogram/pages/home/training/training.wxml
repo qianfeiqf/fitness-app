@@ -138,7 +138,7 @@
   </view>
 
   <!-- 主训练区域 — 用 hidden 避免销毁/重建 DOM；休息时不隐藏，由遮罩层覆盖 -->
-  <view hidden="{{showWarmup || !currentExercise}}" class="training-main">
+  <view hidden="{{showWarmup || !currentExercise || freeAllDone}}" class="training-main">
     <!-- 动作标签 + 组数进度 -->
     <view class="exercise-header">
       <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>

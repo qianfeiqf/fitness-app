@@ -335,6 +335,7 @@ Page({
       selectedRPE: defaultRPE,
       setNote: '', // 每组备注初始为空
       showWarmup: false,
+      freeAllDone: false,
       weightOptions: this._buildWeightOptions(defaultWeight),
       repOptions: this._buildRepOptions(defaultReps),
       plateHint: this._calcBarbellPlates(defaultWeight, this.data.barWeight)
@@ -590,7 +591,13 @@ Page({
     let newExerciseIndex = currentExerciseIndex;
     let newSetIndex = 0;
     if (currentSetIndex + 1 >= currentExercise.target_sets) {
-      newExerciseIndex = currentExerciseIndex + 1;
+      // 先找后面未完成的动作，若后面都完成了再找前面跳过去未完成的动作
+      let nextUndoneIdx = newExercises.findIndex((ex, idx) => idx > currentExerciseIndex && (ex.completed_sets || 0) < (ex.target_sets || 1));
+      if (nextUndoneIdx === -1) {
+        nextUndoneIdx = newExercises.findIndex((ex) => (ex.completed_sets || 0) < (ex.target_sets || 1));
+      }
+      newExerciseIndex = nextUndoneIdx !== -1 ? nextUndoneIdx : newExercises.length;
+      newSetIndex = nextUndoneIdx !== -1 ? (newExercises[nextUndoneIdx].completed_sets || 0) : 0;
     } else {
       newSetIndex = currentSetIndex + 1;
     }
@@ -1555,10 +1562,11 @@ Page({
       return;
     }
 
-    // 切换当前动作
+    // 切换当前动作并退出完成引导态
     this.setData({
       currentExerciseIndex: index,
       currentSetIndex: targetExercise.completed_sets || 0,
+      freeAllDone: false,
       showExercisePicker: false
     });
 
@@ -1604,10 +1612,11 @@ Page({
       return;
     }
 
-    // 切换当前动作
+    // 切换当前动作并退出完成引导态
     this.setData({
       currentExerciseIndex: index,
       currentSetIndex: targetExercise.completed_sets || 0,
+      freeAllDone: false,
       showExercisePicker: false
     });
 

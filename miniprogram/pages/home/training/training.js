@@ -1788,8 +1788,11 @@ Page({
    * 收起训练页面 — 返回上一页并显示悬浮窗
    */
   onCollapseTraining() {
-    const { session, currentExercise, currentSetIndex } = this.data;
+    const { session, currentExercise, currentSetIndex, isFreeWorkout } = this.data;
     if (!session) return;
+
+    // 先落盘最新快照，再返回上一页，避免首页 onShow 读到旧数据
+    this.saveSnapshot();
 
     // 保存当前训练状态到全局
     const app = getApp();
@@ -1797,7 +1800,7 @@ Page({
     app.globalData.trainingMinimizedSessionId = session.id;
     app.globalData.trainingSnapshot = {
       sessionId: session.id,
-      exerciseName: currentExercise ? currentExercise.name : '',
+      exerciseName: currentExercise ? currentExercise.name : (isFreeWorkout ? '自由训练' : '进行中的训练'),
       currentSet: currentSetIndex + 1,
       totalSets: currentExercise ? currentExercise.target_sets : 0
     };

@@ -134,10 +134,6 @@ Page({
 
   onHide() {
     console.log('=== 训练中心页面隐藏 ===');
-    // 保存快照
-    if (this.data.currentSession) {
-      this.saveSessionSnapshot();
-    }
   },
 
   onUnload() {
@@ -626,21 +622,7 @@ Page({
     return this._createSessionForPlan(pd || this.data.planDataList[0]);
   },
 
-  /**
-   * 保存会话快照
-   */
-  saveSessionSnapshot() {
-    if (!this.data.currentSession) return;
 
-    update('sessions', this.data.currentSession.id, {
-      status: this.data.currentSession.status,
-      pending_exercises: this.data.currentSession.pending_exercises,
-      current_exercise_index: this.data.currentSession.current_exercise_index,
-      current_set_index: this.data.currentSession.current_set_index,
-      updated_at: Date.now(),
-      snapshot: true
-    });
-  },
 
   /**
    * 同步完成回调

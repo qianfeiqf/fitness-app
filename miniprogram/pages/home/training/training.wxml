@@ -149,7 +149,10 @@
           <text class="set-total">{{currentExercise.target_sets}}</text>
           <text class="set-label">组</text>
         </view>
-        <view wx:if="{{isFreeWorkout}}" class="extra-set-btn" bindtap="onAddExtraSet">+ 加组</view>
+        <view wx:if="{{isFreeWorkout}}" class="extra-set-group">
+          <view class="extra-set-btn" bindtap="onReduceExtraSet">- 组</view>
+          <view class="extra-set-btn" bindtap="onAddExtraSet">+ 加组</view>
+        </view>
       </view>
     </view>
 
@@ -339,15 +342,51 @@
       <view
         wx:for="{{filteredExercises}}"
         wx:key="id"
-        class="alternative-item {{selectedAddMap[item.id] ? 'selected' : ''}}"
-        bindtap="onToggleAddExercise"
-        data-exercise-id="{{item.id}}"
+        class="add-exercise-card {{selectedAddMap[item.id] ? 'selected' : ''}}"
       >
-        <view class="alt-info">
-          <text class="alt-name">{{item.name}}</text>
-          <text class="alt-muscle">{{item.muscle_group}}</text>
+        <view
+          class="alternative-item add-card-head"
+          bindtap="onToggleAddExercise"
+          data-exercise-id="{{item.id}}"
+        >
+          <view class="alt-info">
+            <text class="alt-name">{{item.name}}</text>
+            <text class="alt-muscle">{{item.muscle_group}}</text>
+          </view>
+          <text class="add-check-circle {{selectedAddMap[item.id] ? 'checked' : ''}}">{{selectedAddMap[item.id] ? '✓' : ''}}</text>
         </view>
-        <text class="add-check-circle {{selectedAddMap[item.id] ? 'checked' : ''}}">{{selectedAddMap[item.id] ? '✓' : ''}}</text>
+        <view wx:if="{{selectedAddMap[item.id] && selectedAddConfigs[item.id]}}" class="add-config-bar" catchtap="noop">
+          <view class="add-cfg-item">
+            <text class="add-cfg-label">组数</text>
+            <view class="add-cfg-stepper">
+              <text class="cfg-step-btn" bindtap="onStepAddSets" data-exercise-id="{{item.id}}" data-delta="-1">-</text>
+              <text class="cfg-step-val">{{selectedAddConfigs[item.id].sets}}</text>
+              <text class="cfg-step-btn" bindtap="onStepAddSets" data-exercise-id="{{item.id}}" data-delta="1">+</text>
+            </view>
+          </view>
+          <view class="add-cfg-item">
+            <text class="add-cfg-label">重量(kg)</text>
+            <input
+              class="add-cfg-input"
+              type="digit"
+              value="{{selectedAddConfigs[item.id].weight}}"
+              data-exercise-id="{{item.id}}"
+              data-field="weight"
+              bindinput="onUpdateAddConfig"
+            />
+          </view>
+          <view class="add-cfg-item">
+            <text class="add-cfg-label">次数</text>
+            <input
+              class="add-cfg-input"
+              type="number"
+              value="{{selectedAddConfigs[item.id].reps}}"
+              data-exercise-id="{{item.id}}"
+              data-field="reps"
+              bindinput="onUpdateAddConfig"
+            />
+          </view>
+        </view>
       </view>
     </scroll-view>
   </modal-sheet>

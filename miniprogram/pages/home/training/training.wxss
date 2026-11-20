@@ -1281,3 +1281,90 @@
   background: #1A1A1A;
   border-color: #1A1A1A;
 }
+
+.extra-set-group {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.add-exercise-card {
+  margin-bottom: 12rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  border: 1rpx solid transparent;
+}
+
+.add-exercise-card.selected {
+  border-color: #1A1A1A;
+  background: #F7F8F7;
+}
+
+.add-card-head {
+  margin-bottom: 0 !important;
+  border: none !important;
+}
+
+.add-config-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  padding: 14rpx 20rpx 18rpx;
+  border-top: 1rpx solid #EAEAEA;
+  background: #FAFAFA;
+}
+
+.add-cfg-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.add-cfg-label {
+  font-size: 20rpx;
+  color: #888888;
+}
+
+.add-cfg-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E0E0E0;
+  border-radius: 10rpx;
+  padding: 0 6rpx;
+}
+
+.cfg-step-btn {
+  width: 44rpx;
+  height: 44rpx;
+  line-height: 44rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  background: #F2F2F2;
+  border-radius: 8rpx;
+}
+
+.cfg-step-val {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.add-cfg-input {
+  height: 56rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E0E0E0;
+  border-radius: 10rpx;
+  padding: 0 12rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-align: center;
+  box-sizing: border-box;
+}

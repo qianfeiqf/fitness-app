@@ -70,6 +70,7 @@ Page({
     filteredExercises: [],
     selectedAddIds: [],
     selectedAddMap: {},
+    selectedAddConfigs: {},
     canAddCustomExercise: false,
 
     // 自由训练模式
@@ -316,9 +317,10 @@ Page({
     // 查找该动作最近一次的训练记录，作为默认值
     const lastRecord = this.getLastExerciseRecord(exercise.exercise_id);
 
-    // 确定实际重量和次数的默认值：优先上次记录，其次目标值
-    const defaultWeight = lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0);
-    const defaultReps = lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 0);
+    // 确定实际重量和次数的默认值：自由训练/手动添加的动作第1组优先采用刚自定义的目标值
+    const preferTarget = (this.data.isFreeWorkout || exercise.is_added) && (exercise.completed_sets || 0) === 0;
+    const defaultWeight = preferTarget ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
+    const defaultReps = preferTarget ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 0));
     const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2; // rpeOptions索引：0=轻量,1=中等,2=吃力,3=力竭
 
     this.setData({
@@ -969,8 +971,9 @@ Page({
     }
 
     const lastRecord = this.getLastExerciseRecord(exercise.exercise_id);
-    const defaultWeight = lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0);
-    const defaultReps = lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 0);
+    const preferTarget = (this.data.isFreeWorkout || exercise.is_added) && (exercise.completed_sets || 0) === 0;
+    const defaultWeight = preferTarget ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
+    const defaultReps = preferTarget ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 0));
     const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2;
 
     // 合并 calculateOverallProgress 的数据，避免二次 setData
@@ -1219,6 +1222,7 @@ Page({
       selectedAddMuscle: '全部',
       selectedAddIds: [],
       selectedAddMap: {},
+      selectedAddConfigs: {},
       canAddCustomExercise: false,
       filteredExercises: allExercises
     });
@@ -1268,19 +1272,53 @@ Page({
   onToggleAddExercise(e) {
     const { exerciseId } = e.currentTarget.dataset;
     if (!exerciseId) return;
-    const { selectedAddIds, selectedAddMap } = this.data;
+    const { selectedAddIds, selectedAddMap, selectedAddConfigs } = this.data;
     const nextMap = { ...selectedAddMap };
+    const nextConfigs = { ...selectedAddConfigs };
     let nextIds;
     if (nextMap[exerciseId]) {
       delete nextMap[exerciseId];
+      delete nextConfigs[exerciseId];
       nextIds = selectedAddIds.filter(id => id !== exerciseId);
     } else {
       nextMap[exerciseId] = true;
       nextIds = [...selectedAddIds, exerciseId];
+      const lastRecord = this.getLastExerciseRecord(exerciseId);
+      nextConfigs[exerciseId] = {
+        sets: 3,
+        reps: lastRecord ? (lastRecord.actual_reps || 10) : 10,
+        weight: lastRecord ? (lastRecord.actual_weight || 20) : 20
+      };
     }
     this.setData({
       selectedAddIds: nextIds,
-      selectedAddMap: nextMap
+      selectedAddMap: nextMap,
+      selectedAddConfigs: nextConfigs
+    });
+  },
+
+  /**
+   * 调整单个待添加动作的组数（- / +）
+   */
+  onStepAddSets(e) {
+    const { exerciseId, delta } = e.currentTarget.dataset;
+    const cfg = this.data.selectedAddConfigs[exerciseId];
+    if (!cfg) return;
+    const nextSets = Math.min(20, Math.max(1, (parseInt(cfg.sets, 10) || 3) + parseInt(delta, 10)));
+    this.setData({
+      [`selectedAddConfigs.${exerciseId}.sets`]: nextSets
+    });
+  },
+
+  /**
+   * 自定义输入单个待添加动作的重量/次数/组数
+   */
+  onUpdateAddConfig(e) {
+    const { exerciseId, field } = e.currentTarget.dataset;
+    if (!exerciseId || !field) return;
+    const raw = e.detail.value;
+    this.setData({
+      [`selectedAddConfigs.${exerciseId}.${field}`]: raw
     });
   },
 
@@ -1320,22 +1358,26 @@ Page({
   },
 
   /**
-   * 将一个或多个动作加入当前训练会话
+   * 将一个或多个动作加入当前训练会话（应用各自自定义的组数/次数/重量）
    */
   _appendExercisesToSession(exerciseList) {
-    const { exercises, session, currentExerciseIndex, freeAllDone } = this.data;
+    const { exercises, session, currentExerciseIndex, freeAllDone, selectedAddConfigs } = this.data;
     const prevLen = exercises.length;
     const nextExercises = [...exercises];
 
     exerciseList.forEach(exercise => {
-      const lastRecord = this.getLastExerciseRecord(exercise.id);
+      const cfg = selectedAddConfigs[exercise.id];
+      const lastRecord = cfg ? null : this.getLastExerciseRecord(exercise.id);
+      const targetSets = cfg ? Math.min(20, Math.max(1, parseInt(cfg.sets, 10) || 3)) : 3;
+      const targetReps = cfg ? Math.max(1, parseInt(cfg.reps, 10) || 10) : (lastRecord ? (lastRecord.actual_reps || 10) : 10);
+      const targetWeight = cfg ? Math.max(0, parseFloat(cfg.weight) || 0) : (lastRecord ? (lastRecord.actual_weight || 20) : 20);
       nextExercises.push({
         exercise_id: exercise.id,
         exercise_name: exercise.name,
         name: exercise.name,
-        target_sets: 3,
-        target_reps: lastRecord ? (lastRecord.actual_reps || 10) : 10,
-        target_weight: lastRecord ? (lastRecord.actual_weight || 20) : 20,
+        target_sets: targetSets,
+        target_reps: targetReps,
+        target_weight: targetWeight,
         rest_seconds: 90,
         completed_sets: 0,
         warmup_completed: true,
@@ -1364,6 +1406,7 @@ Page({
       addExerciseSearch: '',
       selectedAddIds: [],
       selectedAddMap: {},
+      selectedAddConfigs: {},
       filteredExercises: []
     });
 
@@ -1390,7 +1433,7 @@ Page({
     if (!target) return;
 
     const nextExercises = exercises.map((ex, i) =>
-      i === targetIdx ? { ...ex, target_sets: (ex.target_sets || 3) + 1 } : ex
+      i === targetIdx ? { ...ex, target_sets: Math.min(20, (ex.target_sets || 3) + 1) } : ex
     );
 
     update('sessions', session.id, {
@@ -1408,6 +1451,34 @@ Page({
     });
     this.setCurrentExercise();
     wx.showToast({ title: '已增加 1 组', icon: 'none' });
+  },
+
+  /**
+   * 自由训练：减少当前动作的目标组数（最低保留当前正在进行的组）
+   */
+  onReduceExtraSet() {
+    const { exercises, currentExerciseIndex, session } = this.data;
+    if (!exercises || exercises.length === 0 || !session) return;
+    const target = exercises[currentExerciseIndex];
+    if (!target) return;
+    const minSets = Math.max(1, (target.completed_sets || 0) + 1);
+    if ((target.target_sets || 3) <= minSets) {
+      wx.showToast({ title: `最少保留 ${minSets} 组`, icon: 'none' });
+      return;
+    }
+
+    const nextExercises = exercises.map((ex, i) =>
+      i === currentExerciseIndex ? { ...ex, target_sets: (ex.target_sets || 3) - 1 } : ex
+    );
+    update('sessions', session.id, {
+      pending_exercises: nextExercises,
+      updated_at: Date.now()
+    });
+    this.setData({
+      exercises: nextExercises,
+      'currentExercise.target_sets': nextExercises[currentExerciseIndex].target_sets
+    });
+    wx.showToast({ title: '已减少 1 组', icon: 'none' });
   },
 
   /**

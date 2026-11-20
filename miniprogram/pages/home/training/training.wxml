@@ -8,17 +8,17 @@
   <view class="progress-header">
     <view class="progress-info">
       <view class="progress-counter">
-        <text class="counter-num">{{currentExerciseIndex + 1}}</text>
+        <text class="counter-num">{{exercises.length > 0 ? (currentExerciseIndex < exercises.length ? currentExerciseIndex + 1 : exercises.length) : 0}}</text>
         <text class="counter-sep">/</text>
         <text class="counter-total">{{exercises.length}}</text>
       </view>
       <view class="progress-right">
         <text class="training-duration">{{wxs.formatTime(trainingDuration)}}</text>
-        <text class="exercise-name">{{currentExercise.name}}</text>
+        <text class="exercise-name">{{currentExercise ? currentExercise.name : (isFreeWorkout ? '自由训练' : '')}}</text>
       </view>
     </view>
     <view class="progress-bar-track">
-      <view class="progress-bar-fill" style="width: {{(currentExercise.currentSetNumber / currentExercise.target_sets) * 100}}%;"></view>
+      <view class="progress-bar-fill" style="width: {{currentExercise && currentExercise.target_sets ? (currentExercise.currentSetNumber / currentExercise.target_sets) * 100 : 0}}%;"></view>
     </view>
   </view>
 
@@ -109,16 +109,50 @@
     </view>
   </view>
 
+  <!-- 自由训练：尚无动作时的空态引导 -->
+  <view wx:if="{{isFreeWorkout && exercises.length === 0}}" class="free-empty-state">
+    <text class="free-empty-icon">🏋️</text>
+    <text class="free-empty-title">自由训练已开始</text>
+    <text class="free-empty-desc">可以先一次性选好几个动作再逐个练，也可以练完一个再加下一个</text>
+    <view class="btn btn-primary btn-md free-empty-btn" bindtap="onAddExercise">
+      <text>+ 添加训练动作</text>
+    </view>
+  </view>
+
+  <!-- 自由训练：当前列表全部完成后的流转引导 -->
+  <view wx:elif="{{isFreeWorkout && freeAllDone}}" class="free-empty-state">
+    <text class="free-empty-icon">✅</text>
+    <text class="free-empty-title">已完成 {{completedSets.length}} 组训练</text>
+    <text class="free-empty-desc">想继续加练新动作、当前动作再加一组，还是现在结束并保存？</text>
+    <view class="free-done-actions">
+      <view class="btn btn-primary btn-md btn-block" bindtap="onAddExercise">
+        <text>+ 继续添加下一个动作</text>
+      </view>
+      <view class="btn btn-secondary btn-md btn-block" bindtap="onAddExtraSet">
+        <text>+ 上个动作再加一组</text>
+      </view>
+      <view class="btn btn-finish btn-md btn-block" bindtap="onFinishTraining">
+        <text>✓ 完成本次训练并保存</text>
+      </view>
+    </view>
+  </view>
+
   <!-- 主训练区域 — 用 hidden 避免销毁/重建 DOM；休息时不隐藏，由遮罩层覆盖 -->
-  <view hidden="{{showWarmup}}" class="training-main">
+  <view hidden="{{showWarmup || !currentExercise || freeAllDone}}" class="training-main">
     <!-- 动作标签 + 组数进度 -->
     <view class="exercise-header">
       <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
-      <view class="set-indicator">
-        <text class="set-current">{{currentExercise.currentSetNumber}}</text>
-        <text class="set-sep">/</text>
-        <text class="set-total">{{currentExercise.target_sets}}</text>
-        <text class="set-label">组</text>
+      <view class="set-indicator-wrap">
+        <view class="set-indicator">
+          <text class="set-current">{{currentExercise.currentSetNumber}}</text>
+          <text class="set-sep">/</text>
+          <text class="set-total">{{currentExercise.target_sets}}</text>
+          <text class="set-label">{{currentExercise.isDone ? '组 (已完成)' : '组'}}</text>
+        </view>
+        <view wx:if="{{isFreeWorkout || currentExercise.isDone}}" class="extra-set-group">
+          <view class="extra-set-btn" bindtap="onReduceExtraSet">- 组</view>
+          <view class="extra-set-btn" bindtap="onAddExtraSet">+ 加组</view>
+        </view>
       </view>
     </view>
 
@@ -207,9 +241,13 @@
       </view>
     </view>
 
-    <!-- 完成按钮 -->
+    <!-- 完成按钮（已完成动作直接变为「+ 加练一组」） -->
     <view class="complete-action">
-      <view class="btn btn-primary btn-md btn-block" bindtap="onCompleteSet">
+      <view wx:if="{{currentExercise.isDone}}" class="btn btn-primary btn-md btn-block" bindtap="onAddExtraSet">
+        <text class="btn-complete-icon">+</text>
+        <text>加练一组（第 {{currentExercise.target_sets + 1}} 组）</text>
+      </view>
+      <view wx:else class="btn btn-primary btn-md btn-block" bindtap="onCompleteSet">
         <text class="btn-complete-icon">✓</text>
         <text>完成一组</text>
       </view>
@@ -229,9 +267,13 @@
       <text class="bottom-icon">{{isPaused ? '▶' : '⏸'}}</text>
       <text class="bottom-label">{{isPaused ? '继续' : '暂停'}}</text>
     </view>
+    <view wx:if="{{isFreeWorkout || completedSets.length > 0}}" class="bottom-btn finish" bindtap="onFinishTraining">
+      <text class="bottom-icon">✓</text>
+      <text class="bottom-label">完成训练</text>
+    </view>
     <view class="bottom-btn danger" bindtap="onAbandonTraining">
       <text class="bottom-icon">✕</text>
-      <text class="bottom-label">结束训练</text>
+      <text class="bottom-label">放弃</text>
     </view>
   </view>
 
@@ -261,13 +303,15 @@
     </view>
   </modal-sheet>
 
-  <!-- 添加动作弹窗 -->
+  <!-- 添加动作弹窗（支持按肌群筛选、多选批量添加与自定义动作） -->
   <modal-sheet
     visible="{{showAddExerciseModal}}"
-    title="添加动作"
-    description="从动作库选择要添加的动作"
-    showConfirm="{{false}}"
+    title="添加训练动作"
+    description="可单选即刻开练，也可多选几个动作依次练"
+    confirmText="{{selectedAddIds.length > 0 ? '添加已选 (' + selectedAddIds.length + ')' : '确定添加'}}"
+    confirmDisabled="{{selectedAddIds.length === 0 && !canAddCustomExercise}}"
     cancelText="取消"
+    bind:confirm="onConfirmAddExercises"
     bind:cancel="onCancelAddExercise"
     bind:close="onCancelAddExercise"
   >
@@ -275,24 +319,78 @@
       <input
         class="add-search-input"
         type="text"
-        placeholder="搜索动作..."
+        placeholder="搜索动作库，或输入自定义动作名..."
         value="{{addExerciseSearch}}"
         bindinput="onAddExerciseSearch"
       />
     </view>
+    <scroll-view scroll-x class="add-muscle-scroll">
+      <view class="add-muscle-list">
+        <view
+          wx:for="{{addMuscleGroups}}"
+          wx:key="*this"
+          class="add-muscle-chip {{selectedAddMuscle === item ? 'active' : ''}}"
+          bindtap="onSelectAddMuscle"
+          data-muscle="{{item}}"
+        >{{item}}</view>
+      </view>
+    </scroll-view>
     <scroll-view scroll-y class="add-exercise-list">
+      <view wx:if="{{canAddCustomExercise}}" class="alternative-item custom-add-row" bindtap="onAddCustomExercise">
+        <view class="alt-info">
+          <text class="alt-name">+ 添加自定义动作「{{addExerciseSearch}}」</text>
+          <text class="alt-muscle">直接加入本次训练</text>
+        </view>
+        <text class="alt-arrow">+</text>
+      </view>
       <view
         wx:for="{{filteredExercises}}"
         wx:key="id"
-        class="alternative-item"
-        bindtap="onSelectAddExercise"
-        data-exercise-id="{{item.id}}"
+        class="add-exercise-card {{selectedAddMap[item.id] ? 'selected' : ''}}"
       >
-        <view class="alt-info">
-          <text class="alt-name">{{item.name}}</text>
-          <text class="alt-muscle">{{item.muscle_group}}</text>
+        <view
+          class="alternative-item add-card-head"
+          bindtap="onToggleAddExercise"
+          data-exercise-id="{{item.id}}"
+        >
+          <view class="alt-info">
+            <text class="alt-name">{{item.name}}</text>
+            <text class="alt-muscle">{{item.muscle_group}}</text>
+          </view>
+          <text class="add-check-circle {{selectedAddMap[item.id] ? 'checked' : ''}}">{{selectedAddMap[item.id] ? '✓' : ''}}</text>
         </view>
-        <text class="alt-arrow">›</text>
+        <view wx:if="{{selectedAddMap[item.id] && selectedAddConfigs[item.id]}}" class="add-config-bar" catchtap="noop">
+          <view class="add-cfg-item">
+            <text class="add-cfg-label">组数</text>
+            <view class="add-cfg-stepper">
+              <text class="cfg-step-btn" bindtap="onStepAddSets" data-exercise-id="{{item.id}}" data-delta="-1">-</text>
+              <text class="cfg-step-val">{{selectedAddConfigs[item.id].sets}}</text>
+              <text class="cfg-step-btn" bindtap="onStepAddSets" data-exercise-id="{{item.id}}" data-delta="1">+</text>
+            </view>
+          </view>
+          <view class="add-cfg-item">
+            <text class="add-cfg-label">重量(kg)</text>
+            <input
+              class="add-cfg-input"
+              type="digit"
+              value="{{selectedAddConfigs[item.id].weight}}"
+              data-exercise-id="{{item.id}}"
+              data-field="weight"
+              bindinput="onUpdateAddConfig"
+            />
+          </view>
+          <view class="add-cfg-item">
+            <text class="add-cfg-label">次数</text>
+            <input
+              class="add-cfg-input"
+              type="number"
+              value="{{selectedAddConfigs[item.id].reps}}"
+              data-exercise-id="{{item.id}}"
+              data-field="reps"
+              bindinput="onUpdateAddConfig"
+            />
+          </view>
+        </view>
       </view>
     </scroll-view>
   </modal-sheet>

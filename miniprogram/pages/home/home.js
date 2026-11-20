@@ -683,5 +683,42 @@ Page({
     wx.switchTab({
       url: '/pages/plans/plans'
     });
+  },
+
+  /**
+   * 一键开始自由训练（零前置表单，直接进入训练记录页）
+   */
+  onStartFreeWorkout() {
+    const app = getApp();
+    if (!app.globalData.isLoggedIn) {
+      this.onLogin();
+      return;
+    }
+
+    const now = Date.now();
+    const todayStr = this.formatDate(new Date(now));
+    const session = {
+      id: 'sess_' + now + '_' + Math.random().toString(36).substr(2, 6),
+      plan_id: null,
+      plan_name: '自由训练',
+      is_free_workout: true,
+      scheduled_date: todayStr,
+      status: 'in_progress',
+      started_at: now,
+      completed_sets: [],
+      pending_exercises: [],
+      current_exercise_index: 0,
+      current_set_index: 0,
+      created_at: now,
+      updated_at: now,
+      sync_status: 'pending'
+    };
+
+    insert('sessions', session);
+    this.setData({ currentSession: session, isTraining: true });
+
+    wx.navigateTo({
+      url: '/pages/home/training/training?sessionId=' + session.id
+    });
   }
 });

@@ -1152,3 +1152,219 @@
   color: rgba(255, 255, 255, 0.72);
   text-decoration: underline;
 }
+
+/* =====================
+   自由训练模式与多选动作抽屉
+   ===================== */
+.free-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120rpx 48rpx 80rpx;
+}
+
+.free-empty-icon {
+  font-size: 84rpx;
+  margin-bottom: 24rpx;
+}
+
+.free-empty-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-bottom: 12rpx;
+}
+
+.free-empty-desc {
+  font-size: 26rpx;
+  color: #888888;
+  line-height: 1.6;
+  margin-bottom: 44rpx;
+  max-width: 540rpx;
+}
+
+.free-empty-btn {
+  padding: 0 56rpx;
+}
+
+.free-done-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.btn-finish {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.set-indicator-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.extra-set-btn {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  background: #F2F2F2;
+  padding: 8rpx 18rpx;
+  border-radius: 9999rpx;
+}
+
+.extra-set-btn:active {
+  background: #E5E5E5;
+}
+
+.bottom-btn.finish .bottom-icon,
+.bottom-btn.finish .bottom-label {
+  color: #07C160;
+  font-weight: 600;
+}
+
+.add-muscle-scroll {
+  white-space: nowrap;
+  margin-bottom: 16rpx;
+}
+
+.add-muscle-list {
+  display: inline-flex;
+  gap: 12rpx;
+  padding: 4rpx 0;
+}
+
+.add-muscle-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 10rpx 22rpx;
+  border-radius: 9999rpx;
+  background: #F3F3F3;
+  font-size: 24rpx;
+  color: #555555;
+}
+
+.add-muscle-chip.active {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.alternative-item.selected {
+  background: #F4F6F5;
+  border-color: #1A1A1A;
+}
+
+.alternative-item.custom-add-row {
+  border: 1rpx dashed #1A1A1A;
+  background: #FAFAFA;
+}
+
+.add-check-circle {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid #CCCCCC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.add-check-circle.checked {
+  background: #1A1A1A;
+  border-color: #1A1A1A;
+}
+
+.extra-set-group {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.add-exercise-card {
+  margin-bottom: 12rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  border: 1rpx solid transparent;
+}
+
+.add-exercise-card.selected {
+  border-color: #1A1A1A;
+  background: #F7F8F7;
+}
+
+.add-card-head {
+  margin-bottom: 0 !important;
+  border: none !important;
+}
+
+.add-config-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  padding: 14rpx 20rpx 18rpx;
+  border-top: 1rpx solid #EAEAEA;
+  background: #FAFAFA;
+}
+
+.add-cfg-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.add-cfg-label {
+  font-size: 20rpx;
+  color: #888888;
+}
+
+.add-cfg-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E0E0E0;
+  border-radius: 10rpx;
+  padding: 0 6rpx;
+}
+
+.cfg-step-btn {
+  width: 44rpx;
+  height: 44rpx;
+  line-height: 44rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  background: #F2F2F2;
+  border-radius: 8rpx;
+}
+
+.cfg-step-val {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.add-cfg-input {
+  height: 56rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E0E0E0;
+  border-radius: 10rpx;
+  padding: 0 12rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-align: center;
+  box-sizing: border-box;
+}

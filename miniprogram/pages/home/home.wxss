@@ -871,3 +871,87 @@
   opacity: 0.85;
   transform: scale(0.98);
 }
+
+/* =====================
+   自由训练快捷入口
+   ===================== */
+.free-workout-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 24rpx;
+  background: #F7F7F7;
+  border: 1rpx solid #EAEAEA;
+  border-radius: 20rpx;
+}
+
+.free-workout-bar:active {
+  background: #EFEFEF;
+}
+
+.free-workout-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.free-workout-icon {
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.free-workout-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.free-workout-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.free-workout-desc {
+  display: block;
+  font-size: 22rpx;
+  color: #888888;
+  margin-top: 2rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.free-workout-btn {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: #1A1A1A;
+  padding: 10rpx 24rpx;
+  border-radius: 9999rpx;
+}
+
+.free-workout-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  margin-top: 24rpx;
+  padding: 18rpx 40rpx;
+  border-radius: 9999rpx;
+  border: 1rpx solid #DCDCDC;
+  background: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.free-workout-plus {
+  font-size: 30rpx;
+  font-weight: 600;
+}

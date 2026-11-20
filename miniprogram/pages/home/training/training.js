@@ -99,56 +99,11 @@ Page({
 
     if (options.sessionId) {
       this.setData({ sessionId: options.sessionId });
-      
-      // 检查是否需要填写身体档案（首次训练）
-      this.checkAndPromptProfile().then(() => {
-        this.loadSession(options.sessionId);
-      });
+      this.loadSession(options.sessionId);
     }
 
     // 监听App隐藏事件
     wx.eventCenter.on('appHidden', this.onAppHidden, this);
-  },
-
-  /**
-   * 检查并提示填写身体档案
-   * 首次训练前需要填写体重，用于1RM计算和演进算法
-   */
-  async checkAndPromptProfile() {
-    const { findOne } = require('../../../localdb/db.js');
-    const profile = findOne('profiles', {});
-    
-    // 如果没有档案或没有体重，显示提示
-    if (!profile || !profile.weight) {
-      return new Promise((resolve) => {
-        wx.showModal({
-          title: '完善身体档案',
-          content: '为了更准确地计算1RM和训练演进，请先填写您的体重（其他信息可选）',
-          confirmText: '去填写',
-          cancelText: '跳过',
-          success: (res) => {
-            if (res.confirm) {
-              // 跳转到个人中心页面填写档案（tabBar页面需用switchTab），并记住当前会话 ID 以便一键返回
-              const app = getApp();
-              app.globalData.profileFrom = 'training';
-              app.globalData.profilePrompt = 'profile';
-              app.globalData.profileReturnSessionId = this.data.sessionId;
-              wx.switchTab({
-                url: '/pages/profile/profile',
-                complete: () => {
-                  resolve();
-                }
-              });
-            } else {
-              // 用户选择跳过，使用默认值继续
-              resolve();
-            }
-          }
-        });
-      });
-    }
-    
-    return Promise.resolve();
   },
 
   onShow() {

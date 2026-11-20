@@ -83,6 +83,9 @@ Page({
     if (app.globalData.unfinishedSession) {
       this.onUnfinishedSessionFound(app.globalData.unfinishedSession);
       delete app.globalData.unfinishedSession;
+    } else if (!app.globalData.needsOnboarding) {
+      // 仅首次打开小程序时提示一次完善身体档案
+      this.checkFirstLaunchProfilePrompt();
     }
   },
 
@@ -129,6 +132,36 @@ Page({
       wx.redirectTo({
         url: '/pages/onboarding/onboarding'
       });
+    }
+  },
+
+  /**
+   * 首次打开小程序时弹出一次完善身体档案提示（后续不再重复弹出）
+   */
+  checkFirstLaunchProfilePrompt() {
+    try {
+      if (wx.getStorageSync('has_prompted_profile')) return;
+      const profile = findOne('profiles', {});
+      if (profile && profile.weight) {
+        wx.setStorageSync('has_prompted_profile', true);
+        return;
+      }
+      wx.setStorageSync('has_prompted_profile', true);
+      wx.showModal({
+        title: '完善身体档案',
+        content: '为了更准确地计算1RM和训练演进，建议填写您的体重（其他信息可选）',
+        confirmText: '去填写',
+        cancelText: '暂不填写',
+        success: (res) => {
+          if (res.confirm) {
+            const app = getApp();
+            app.globalData.profilePrompt = 'profile';
+            wx.switchTab({ url: '/pages/profile/profile' });
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('首次身体档案提示检查失败:', e);
     }
   },
 

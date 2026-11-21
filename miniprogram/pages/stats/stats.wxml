@@ -13,6 +13,87 @@
     </view>
   </view>
 
+  <!-- 月度训练日历 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">训练日历</text>
+      <text class="calendar-summary">本月已练 {{calendarTrainedDays}} 天</text>
+    </view>
+
+    <view class="calendar-card">
+      <!-- 月份切换栏 -->
+      <view class="calendar-nav">
+        <view class="calendar-nav-btn" bindtap="onPrevMonth">
+          <text>‹</text>
+        </view>
+        <view class="calendar-nav-center">
+          <text class="calendar-month-label">{{calendarYear}}年{{calendarMonth}}月</text>
+          <text wx:if="{{!calendarIsCurrentMonth}}" class="calendar-today-btn" bindtap="onBackToCurrentMonth">回到本月</text>
+        </view>
+        <view class="calendar-nav-btn" bindtap="onNextMonth">
+          <text>›</text>
+        </view>
+      </view>
+
+      <!-- 星期表头 -->
+      <view class="calendar-weekdays">
+        <text wx:for="{{calendarWeekdays}}" wx:key="*this" class="calendar-weekday">{{item}}</text>
+      </view>
+
+      <!-- 日期网格 -->
+      <view class="calendar-grid">
+        <view
+          wx:for="{{calendarDays}}"
+          wx:key="index"
+          class="calendar-cell {{item.isEmpty ? 'empty' : ''}} {{item.hasWorkout ? 'trained' : ''}} {{item.isToday ? 'today' : ''}} {{selectedDateKey === item.dateKey ? 'selected' : ''}}"
+          data-date-key="{{item.dateKey}}"
+          bindtap="{{item.isEmpty ? '' : 'onSelectCalendarDay'}}"
+        >
+          <block wx:if="{{!item.isEmpty}}">
+            <view class="calendar-day-top">
+              <text class="calendar-day-num">{{item.day}}</text>
+              <text wx:if="{{item.sessionCount > 1}}" class="calendar-multi-badge">+{{item.sessionCount - 1}}</text>
+            </view>
+            <view wx:if="{{item.hasWorkout}}" class="calendar-plan-tag">
+              <text class="calendar-plan-text">{{item.planTag}}</text>
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <!-- 选中日期的训练详情列表 -->
+      <view wx:if="{{selectedDateKey}}" class="calendar-detail">
+        <view class="calendar-detail-header">
+          <text class="calendar-detail-date">{{selectedDateKey}}</text>
+          <text class="calendar-detail-count">{{selectedDaySessions.length > 0 ? selectedDaySessions.length + ' 次训练' : '当日休息'}}</text>
+        </view>
+
+        <view wx:if="{{selectedDaySessions.length === 0}}" class="calendar-detail-empty">
+          <text>这一天没有已完成的训练记录</text>
+        </view>
+
+        <view wx:else class="calendar-session-list">
+          <view
+            wx:for="{{selectedDaySessions}}"
+            wx:key="id"
+            class="calendar-session-item"
+            data-session-id="{{item.id}}"
+            bindtap="onViewSessionDetail"
+          >
+            <view class="calendar-session-main">
+              <view class="calendar-session-title-row">
+                <text class="calendar-session-name">{{item.planName}}</text>
+                <text class="calendar-session-time">{{item.timeStr}}</text>
+              </view>
+              <text class="calendar-session-meta">{{item.setCount}} 组 · {{item.volume}} kg · {{item.duration}}</text>
+            </view>
+            <text class="calendar-session-arrow">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 1RM 趋势折线图 -->
   <view class="section">
     <view class="section-header">

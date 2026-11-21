@@ -50,6 +50,16 @@ Page({
     // 肌群建议
     muscleAdvice: '',
 
+    // 月度训练日历
+    calendarYear: new Date().getFullYear(),
+    calendarMonth: new Date().getMonth() + 1,
+    calendarWeekdays: ['一', '二', '三', '四', '五', '六', '日'],
+    calendarDays: [],
+    calendarTrainedDays: 0,
+    calendarIsCurrentMonth: true,
+    selectedDateKey: '',
+    selectedDaySessions: [],
+
     // 加载状态
     loading: true,
 
@@ -133,6 +143,9 @@ Page({
       muscleAdvice,
       loading: false
     });
+
+    // 构建月度训练日历
+    this.buildCalendar(this.data.calendarYear, this.data.calendarMonth);
 
     // 延迟绘制图表，等待 DOM 更新
     setTimeout(() => {
@@ -647,5 +660,159 @@ Page({
   formatDateKey(timestamp) {
     const d = new Date(timestamp);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  },
+
+  /**
+   * 构建指定年月的训练日历数据
+   */
+  buildCalendar(year, month) {
+    const now = new Date();
+    const todayKey = this.formatDateKey(now.getTime());
+    const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
+
+    const allSessions = (getCollection('sessions') || []).filter(s => s && s.status === 'completed');
+    const allSets = getCollection('session_sets') || [];
+    const setsBySession = {};
+    allSets.forEach(set => {
+      if (set && set.status === 'completed' && set.session_id) {
+        if (!setsBySession[set.session_id]) setsBySession[set.session_id] = [];
+        setsBySession[set.session_id].push(set);
+      }
+    });
+
+    const dayMap = {};
+    allSessions.forEach(s => {
+      const ts = s.completed_at || s.updated_at || s.started_at;
+      if (!ts) return;
+      const d = new Date(ts);
+      if (d.getFullYear() !== year || d.getMonth() + 1 !== month) return;
+
+      const dateKey = this.formatDateKey(ts);
+      const sets = setsBySession[s.id] || s.completed_sets || [];
+      let volume = 0;
+      sets.forEach(set => {
+        volume += (Number(set.actual_weight) || 0) * (Number(set.actual_reps) || 0);
+      });
+
+      const durationMins = s.total_duration_seconds
+        ? Math.max(1, Math.floor(s.total_duration_seconds / 60))
+        : (s.started_at && s.completed_at ? Math.max(1, Math.floor((s.completed_at - s.started_at) / 60000)) : 0);
+
+      const planName = s.plan_name || (s.is_free_workout ? '自由训练' : '计划训练');
+      const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+      if (!dayMap[dateKey]) dayMap[dateKey] = [];
+      dayMap[dateKey].push({
+        id: s.id,
+        planName,
+        isFreeWorkout: !!s.is_free_workout,
+        setCount: sets.length,
+        volume: Math.round(volume),
+        duration: durationMins > 0 ? `${durationMins}分钟` : '--',
+        timeStr,
+        completedAt: ts
+      });
+    });
+
+    Object.keys(dayMap).forEach(k => {
+      dayMap[k].sort((a, b) => b.completedAt - a.completedAt);
+    });
+
+    const firstDayOfWeek = (new Date(year, month - 1, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const calendarDays = [];
+
+    for (let i = 0; i < firstDayOfWeek; i++) {
+      calendarDays.push({ isEmpty: true });
+    }
+
+    let trainedDays = 0;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const sessions = dayMap[dateKey] || [];
+      const hasWorkout = sessions.length > 0;
+      if (hasWorkout) trainedDays++;
+
+      calendarDays.push({
+        isEmpty: false,
+        day,
+        dateKey,
+        isToday: dateKey === todayKey,
+        hasWorkout,
+        planTag: hasWorkout ? sessions[0].planName : '',
+        sessionCount: sessions.length,
+        sessions
+      });
+    }
+
+    const monthPrefix = `${year}-${String(month).padStart(2, '0')}-`;
+    const selectedDateKey = this.data.selectedDateKey && this.data.selectedDateKey.startsWith(monthPrefix)
+      ? this.data.selectedDateKey
+      : (isCurrentMonth && dayMap[todayKey] ? todayKey : '');
+    const selectedDaySessions = selectedDateKey ? (dayMap[selectedDateKey] || []) : [];
+
+    this.setData({
+      calendarYear: year,
+      calendarMonth: month,
+      calendarDays,
+      calendarTrainedDays: trainedDays,
+      calendarIsCurrentMonth: isCurrentMonth,
+      selectedDateKey,
+      selectedDaySessions
+    });
+  },
+
+  onPrevMonth() {
+    let { calendarYear, calendarMonth } = this.data;
+    if (calendarMonth === 1) {
+      calendarYear -= 1;
+      calendarMonth = 12;
+    } else {
+      calendarMonth -= 1;
+    }
+    this.setData({ selectedDateKey: '', selectedDaySessions: [] });
+    this.buildCalendar(calendarYear, calendarMonth);
+  },
+
+  onNextMonth() {
+    let { calendarYear, calendarMonth } = this.data;
+    if (calendarMonth === 12) {
+      calendarYear += 1;
+      calendarMonth = 1;
+    } else {
+      calendarMonth += 1;
+    }
+    this.setData({ selectedDateKey: '', selectedDaySessions: [] });
+    this.buildCalendar(calendarYear, calendarMonth);
+  },
+
+  onBackToCurrentMonth() {
+    const now = new Date();
+    this.setData({ selectedDateKey: '', selectedDaySessions: [] });
+    this.buildCalendar(now.getFullYear(), now.getMonth() + 1);
+  },
+
+  onSelectCalendarDay(e) {
+    const { dateKey } = e.currentTarget.dataset;
+    if (!dateKey) return;
+
+    if (this.data.selectedDateKey === dateKey) {
+      this.setData({ selectedDateKey: '', selectedDaySessions: [] });
+      return;
+    }
+
+    const dayObj = this.data.calendarDays.find(d => !d.isEmpty && d.dateKey === dateKey);
+    this.setData({
+      selectedDateKey: dateKey,
+      selectedDaySessions: dayObj ? dayObj.sessions : []
+    });
+  },
+
+  onViewSessionDetail(e) {
+    const { sessionId } = e.currentTarget.dataset;
+    if (!sessionId) return;
+    wx.navigateTo({
+      url: '/pages/history/detail/detail?sessionId=' + sessionId
+    });
   }
 });

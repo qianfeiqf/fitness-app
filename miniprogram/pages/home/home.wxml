@@ -131,21 +131,12 @@
         <view class="training-card">
           <view class="card-accent"></view>
 
-          <!-- 休息日提示（明确展示所属计划名） -->
-          <view wx:if="{{pd.isRestDay}}" class="rest-day-card-body">
-            <view class="rest-day-plan-header">
-              <view class="rest-day-plan-meta">
-                <text class="card-label">当前计划</text>
-                <text class="rest-day-plan-name">{{pd.plan.name}}</text>
-              </view>
-              <text class="rest-day-pill">今日休息</text>
-            </view>
-            <view class="rest-day-inline">
-              <text class="rest-day-inline-icon">☕</text>
-              <view class="rest-day-inline-content">
-                <text class="rest-day-inline-title">今日是休息日</text>
-                <text class="rest-day-inline-desc">适当放松，让身体恢复，明天继续加油</text>
-              </view>
+          <!-- 休息日提示（单计划时轻量带出计划名，多计划时由顶部页签承载避免重复） -->
+          <view wx:if="{{pd.isRestDay}}" class="rest-day-inline">
+            <text class="rest-day-inline-icon">☕</text>
+            <view class="rest-day-inline-content">
+              <text class="rest-day-inline-title">今日是休息日</text>
+              <text class="rest-day-inline-desc">{{planDataList.length === 1 ? pd.plan.name + ' · ' : ''}}适当放松，让身体恢复，明天继续加油</text>
             </view>
           </view>
 

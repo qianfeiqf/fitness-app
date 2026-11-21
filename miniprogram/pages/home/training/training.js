@@ -296,10 +296,10 @@ Page({
     // 查找该动作最近一次的训练记录，作为默认值
     const lastRecord = this.getLastExerciseRecord(exercise.exercise_id);
 
-    // 确定实际重量和次数的默认值：自由训练/手动添加的动作第1组优先采用刚自定义的目标值
-    const preferTarget = (this.data.isFreeWorkout || exercise.is_added) && (exercise.completed_sets || 0) === 0;
-    const defaultWeight = preferTarget ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
-    const defaultReps = preferTarget ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 0));
+    // 确定实际重量和次数的默认值：每个动作第 1 组统一取目标重量和目标次数；后续组沿用上一组实际值
+    const isFirstSet = (exercise.completed_sets || 0) === 0;
+    const defaultWeight = isFirstSet ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
+    const defaultReps = isFirstSet ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 10));
     const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2; // rpeOptions索引：0=轻量,1=中等,2=吃力,3=力竭
 
     const isDone = (exercise.completed_sets || 0) >= (exercise.target_sets || 1);
@@ -453,8 +453,9 @@ Page({
     const exercise = exercises[currentExerciseIndex];
     const exerciseDetail = findOne('exercises', { id: exercise.exercise_id });
     const lastRecord = this.getLastExerciseRecord(exercise.exercise_id);
-    const defaultWeight = lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0);
-    const defaultReps = lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 0);
+    const isFirstSet = (exercise.completed_sets || 0) === 0;
+    const defaultWeight = isFirstSet ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
+    const defaultReps = isFirstSet ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 10));
     const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2;
 
     // 合并 calculateOverallProgress 数据，避免二次 setData
@@ -959,9 +960,9 @@ Page({
     }
 
     const lastRecord = this.getLastExerciseRecord(exercise.exercise_id);
-    const preferTarget = (this.data.isFreeWorkout || exercise.is_added) && (exercise.completed_sets || 0) === 0;
-    const defaultWeight = preferTarget ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
-    const defaultReps = preferTarget ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 0));
+    const isFirstSet = (exercise.completed_sets || 0) === 0;
+    const defaultWeight = isFirstSet ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
+    const defaultReps = isFirstSet ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 10));
     const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2;
 
     // 合并 calculateOverallProgress 的数据，避免二次 setData

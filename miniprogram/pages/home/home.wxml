@@ -74,16 +74,27 @@
       <text class="deload-dismiss">✕</text>
     </view>
 
-    <!-- 多计划切换指示器 -->
-    <view wx:if="{{activePlans.length > 1}}" class="plan-switcher">
-      <view class="plan-dots">
-        <view
-          wx:for="{{activePlans}}"
-          wx:key="id"
-          class="plan-dot {{index === currentPlanIndex ? 'active' : ''}}"
-        />
+    <!-- 多计划切换栏：直接显示计划名，支持点击和左右滑动切换 -->
+    <view wx:if="{{planDataList.length > 1}}" class="plan-tabs-section">
+      <view class="plan-tabs-header">
+        <text class="plan-tabs-label">进行中的计划 ({{planDataList.length}})</text>
+        <text class="plan-tabs-hint">点击或左右滑动切换</text>
       </view>
-      <text class="plan-count">{{currentPlanIndex + 1}} / {{activePlans.length}}</text>
+      <scroll-view class="plan-tabs-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
+        <view class="plan-tabs-list">
+          <view
+            wx:for="{{planDataList}}"
+            wx:key="id"
+            class="plan-tab-pill {{index === currentPlanIndex ? 'active' : ''}}"
+            data-index="{{index}}"
+            bindtap="onSelectPlanTab"
+          >
+            <view class="plan-tab-status {{item.isRestDay ? 'rest' : 'train'}}"></view>
+            <text class="plan-tab-name">{{item.plan.name}}</text>
+            <text class="plan-tab-tag">{{item.isRestDay ? '休' : '练'}}</text>
+          </view>
+        </view>
+      </scroll-view>
     </view>
 
     <!-- 主内容 — 左右滑动切换计划 -->
@@ -120,12 +131,21 @@
         <view class="training-card">
           <view class="card-accent"></view>
 
-          <!-- 休息日提示 -->
-          <view wx:if="{{pd.isRestDay}}" class="rest-day-inline">
-            <text class="rest-day-inline-icon">☕</text>
-            <view class="rest-day-inline-content">
-              <text class="rest-day-inline-title">今日是休息日</text>
-              <text class="rest-day-inline-desc">适当放松，让身体恢复，明天继续加油</text>
+          <!-- 休息日提示（明确展示所属计划名） -->
+          <view wx:if="{{pd.isRestDay}}" class="rest-day-card-body">
+            <view class="rest-day-plan-header">
+              <view class="rest-day-plan-meta">
+                <text class="card-label">当前计划</text>
+                <text class="rest-day-plan-name">{{pd.plan.name}}</text>
+              </view>
+              <text class="rest-day-pill">今日休息</text>
+            </view>
+            <view class="rest-day-inline">
+              <text class="rest-day-inline-icon">☕</text>
+              <view class="rest-day-inline-content">
+                <text class="rest-day-inline-title">今日是休息日</text>
+                <text class="rest-day-inline-desc">适当放松，让身体恢复，明天继续加油</text>
+              </view>
             </view>
           </view>
 

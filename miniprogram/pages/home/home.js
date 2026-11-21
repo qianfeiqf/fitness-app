@@ -354,6 +354,15 @@ Page({
   },
 
   /**
+   * 点击顶部计划标签切换计划
+   */
+  onSelectPlanTab(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(index) || index === this.data.currentPlanIndex) return;
+    this.switchToPlan(index);
+  },
+
+  /**
    * 切换到指定计划
    */
   switchToPlan(index) {

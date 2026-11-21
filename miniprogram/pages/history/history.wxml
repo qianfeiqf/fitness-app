@@ -15,7 +15,9 @@
   </view>
 
   <!-- 时间筛选 -->
-  <mp-tabs tabs="{{periodTabs}}" active-tab="{{periodTabIndex}}" bind:change="onPeriodTabChange" />
+  <view class="period-tabs-wrap">
+    <mp-tabs tabs="{{periodTabs}}" active-tab="{{periodTabIndex}}" bind:change="onPeriodTabChange" />
+  </view>
 
   <!-- 加载中 -->
   <view wx:if="{{loading}}" class="loading-wrap">

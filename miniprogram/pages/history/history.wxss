@@ -44,10 +44,10 @@
   background: rgba(0, 0, 0, 0.08);
 }
 
-/* WeUI 组件样式覆盖 */
-mp-tabs {
+/* 时间筛选栏 — 与卡片左右 30rpx 对齐 */
+.period-tabs-wrap {
   padding: 0 30rpx;
-  margin-bottom: 8rpx;
+  margin-bottom: 16rpx;
 }
 
 /* 骨架屏 */

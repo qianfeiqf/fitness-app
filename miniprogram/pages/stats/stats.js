@@ -421,7 +421,8 @@ Page({
     return rawData.map(item => ({
       date: item.date,
       volume: item.volume,
-      barHeight: item.volume > 0 ? Math.round((item.volume / referenceVolume) * 80) : 0
+      barHeight: item.volume > 0 ? Math.round((item.volume / referenceVolume) * 80) : 0,
+      barStyle: `height: ${item.volume > 0 ? Math.round((item.volume / referenceVolume) * 80) : 0}%;`
     }));
   },
 

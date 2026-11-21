@@ -45,7 +45,6 @@
   <view class="section">
     <view class="section-header">
       <text class="section-title">经典计划</text>
-      <text class="section-hint">点击查看详情，使用此计划</text>
     </view>
 
     <!-- 难度筛选 -->

@@ -303,7 +303,7 @@
   <modal-sheet
     visible="{{showAddExerciseModal}}"
     title="添加训练动作"
-    description="可单选即刻开练，也可多选几个动作依次练"
+    description="支持多选或自定义"
     confirmText="{{selectedAddIds.length > 0 ? '添加已选 (' + selectedAddIds.length + ')' : '确定添加'}}"
     confirmDisabled="{{selectedAddIds.length === 0 && !canAddCustomExercise}}"
     cancelText="取消"
@@ -442,7 +442,7 @@
     <view class="rest-overlay-body">
       <text class="rest-overlay-icon">💪</text>
       <text class="rest-overlay-title">休息一下</text>
-      <text class="rest-overlay-desc">让肌肉充分恢复，下一组表现更好</text>
+
     </view>
     <view class="rest-overlay-actions">
       <view class="rest-overlay-btn" bindtap="onReduceRestTime">-30s</view>

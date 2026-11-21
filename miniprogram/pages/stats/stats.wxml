@@ -5,7 +5,6 @@
   <view class="page-header">
     <view class="page-header-left">
       <text class="page-title">训练统计</text>
-      <text class="page-subtitle">追踪你的进步</text>
     </view>
     <view class="history-entry" bindtap="onViewHistory">
       <text class="history-entry-text">训练历史</text>
@@ -183,7 +182,7 @@
           <view class="volume-bar-container">
             <view class="volume-bar-track">
               <view class="volume-bar {{item.volume > 0 ? 'active' : ''}}"
-                    style="height: {{item.volume > 0 ? item.barHeight : 0}}%">
+                    style="{{item.barStyle}}">
               </view>
             </view>
           </view>

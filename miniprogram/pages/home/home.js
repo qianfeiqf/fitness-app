@@ -177,7 +177,7 @@ Page({
   /**
    * 检查登录状态并加载数据
    */
-  async checkLoginAndLoadData() {
+  async checkLoginAndLoadData(options = {}) {
     const app = getApp();
 
     if (!app.globalData.isLoggedIn) {
@@ -189,19 +189,24 @@ Page({
       return;
     }
 
-    this.setData({
-      isLoggedIn: true,
-      userInfo: { openId: app.globalData.openId }
-    });
+    if (!this.data.isLoggedIn || !this.data.userInfo || this.data.userInfo.openId !== app.globalData.openId) {
+      this.setData({
+        isLoggedIn: true,
+        userInfo: { openId: app.globalData.openId }
+      });
+    }
 
-    await this.loadTodayTraining();
+    await this.loadTodayTraining(options);
   },
 
   /**
    * 加载今日训练 — 支持多计划
    */
-  async loadTodayTraining() {
-    this.setData({ loading: true });
+  async loadTodayTraining(options = {}) {
+    if (!options.silent && !this._hasLoadedOnce) {
+      this.setData({ loading: true });
+    }
+    this._hasLoadedOnce = true;
 
     try {
       // 同步检查是否有进行中的自由训练（无论有没有固定计划都展示）
@@ -669,9 +674,13 @@ Page({
   /**
    * 同步完成回调
    */
-  onSyncCompleted() {
-    console.log('同步完成，刷新数据');
-    this.checkLoginAndLoadData();
+  onSyncCompleted(result) {
+    // 无新增云端拉取数据时不触发重绘，避免进首页约 1 秒后闪屏刷新
+    if (result && typeof result.pulled === 'number' && result.pulled === 0) {
+      return;
+    }
+    console.log('同步拉取到新数据，静默刷新首页');
+    this.checkLoginAndLoadData({ silent: true });
   },
 
   /**

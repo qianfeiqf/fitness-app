@@ -30,7 +30,7 @@ Page({
     // RPE选择
     showRPEPicker: false,
     rpeOptions: ['轻量', '中等', '吃力', '力竭'],
-    selectedRPE: 2,
+    selectedRPE: 1,
 
     // UI状态
     isCompleted: false,
@@ -319,7 +319,7 @@ Page({
     const isFirstSet = (exercise.completed_sets || 0) === 0;
     const defaultWeight = isFirstSet ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
     const defaultReps = isFirstSet ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 10));
-    const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2; // rpeOptions索引：0=轻量,1=中等,2=吃力,3=力竭
+    const defaultRPE = isFirstSet ? 1 : (lastRecord && lastRecord.rpe ? (lastRecord.rpe - 1) : 1); // rpeOptions索引：0=轻量,1=中等,2=吃力,3=力竭
 
     const isDone = (exercise.completed_sets || 0) >= (exercise.target_sets || 1);
     this.setData({
@@ -410,25 +410,95 @@ Page({
   },
 
   /**
+   * 计算下一个未完成的热身组索引
+   */
+  _findNextWarmupIndex(sets) {
+    const idx = sets.findIndex(s => !s.completed);
+    return idx >= 0 ? idx : sets.length;
+  },
+
+  /**
+   * 编辑热身组重量
+   */
+  onWarmupWeightInput(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(idx) || !this.data.warmupSets[idx]) return;
+    this.setData({ [`warmupSets[${idx}].weight`]: e.detail.value });
+  },
+
+  /**
+   * 编辑热身组次数
+   */
+  onWarmupRepsInput(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(idx) || !this.data.warmupSets[idx]) return;
+    this.setData({ [`warmupSets[${idx}].reps`]: e.detail.value });
+  },
+
+  /**
+   * 热身输入框失焦时规范化数值
+   */
+  onWarmupInputBlur(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    const sets = this.data.warmupSets;
+    if (Number.isNaN(idx) || !sets[idx]) return;
+    const rawW = parseFloat(sets[idx].weight);
+    const rawR = parseInt(sets[idx].reps, 10);
+    this.setData({
+      [`warmupSets[${idx}].weight`]: Number.isNaN(rawW) || rawW < 0 ? 0 : rawW,
+      [`warmupSets[${idx}].reps`]: Number.isNaN(rawR) || rawR < 1 ? 1 : rawR
+    });
+  },
+
+  /**
+   * 添加一组热身
+   */
+  onAddWarmupSet() {
+    const warmupSets = [...this.data.warmupSets];
+    const last = warmupSets[warmupSets.length - 1];
+    warmupSets.push({
+      weight: last ? (parseFloat(last.weight) || 20) : 20,
+      reps: last ? (parseInt(last.reps, 10) || 5) : 5,
+      label: '自定义热身',
+      completed: false
+    });
+    this.setData({
+      warmupSets,
+      currentWarmupIndex: this._findNextWarmupIndex(warmupSets)
+    });
+  },
+
+  /**
+   * 删除指定热身组（至少保留 1 组）
+   */
+  onDeleteWarmupSet(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    const warmupSets = [...this.data.warmupSets];
+    if (warmupSets.length <= 1 || Number.isNaN(idx)) return;
+    warmupSets.splice(idx, 1);
+    this.setData({
+      warmupSets,
+      currentWarmupIndex: this._findNextWarmupIndex(warmupSets)
+    });
+  },
+
+  /**
    * 完成一组热身
    */
   onCompleteWarmupSet() {
-    const { warmupSets, currentWarmupIndex, exercises, currentExerciseIndex } = this.data;
+    const { warmupSets, currentWarmupIndex } = this.data;
+    if (!warmupSets[currentWarmupIndex]) return;
 
-    // 标记当前热身组完成
     warmupSets[currentWarmupIndex].completed = true;
-
-    const nextIndex = currentWarmupIndex + 1;
+    const nextIndex = this._findNextWarmupIndex(warmupSets);
 
     this.setData({
       warmupSets,
       currentWarmupIndex: nextIndex
     });
 
-    // 震动反馈
     UI.vibrateSuccess();
 
-    // 如果所有热身组都完成了，自动提示
     if (nextIndex >= warmupSets.length) {
       UI.showToast({
         message: '热身完成！',
@@ -475,7 +545,7 @@ Page({
     const isFirstSet = (exercise.completed_sets || 0) === 0;
     const defaultWeight = isFirstSet ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
     const defaultReps = isFirstSet ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 10));
-    const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2;
+    const defaultRPE = isFirstSet ? 1 : (lastRecord && lastRecord.rpe ? (lastRecord.rpe - 1) : 1);
 
     // 合并 calculateOverallProgress 数据，避免二次 setData
     let completedCount = 0;
@@ -982,7 +1052,7 @@ Page({
     const isFirstSet = (exercise.completed_sets || 0) === 0;
     const defaultWeight = isFirstSet ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
     const defaultReps = isFirstSet ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 10));
-    const defaultRPE = lastRecord ? (lastRecord.rpe - 1) : 2;
+    const defaultRPE = isFirstSet ? 1 : (lastRecord && lastRecord.rpe ? (lastRecord.rpe - 1) : 1);
 
     // 合并 calculateOverallProgress 的数据，避免二次 setData
     let completedCount = 0;

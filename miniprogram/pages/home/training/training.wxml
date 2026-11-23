@@ -73,10 +73,6 @@
       </view>
     </view>
 
-    <view class="warmup-desc">
-      <text class="warmup-desc-text">热身可以降低受伤风险，提升训练表现。请按顺序完成以下热身组：</text>
-    </view>
-
     <view class="warmup-list">
       <view
         wx:for="{{warmupSets}}"
@@ -88,12 +84,39 @@
           <text wx:else class="warmup-check-num">{{index + 1}}</text>
         </view>
         <view class="warmup-info">
-          <text class="warmup-weight">{{item.weight}}kg</text>
+          <input
+            type="digit"
+            class="warmup-input"
+            value="{{item.weight}}"
+            data-index="{{index}}"
+            bindinput="onWarmupWeightInput"
+            bindblur="onWarmupInputBlur"
+          />
+          <text class="warmup-unit">kg</text>
           <text class="warmup-sep">×</text>
-          <text class="warmup-reps">{{item.reps}}次</text>
+          <input
+            type="number"
+            class="warmup-input warmup-input-sm"
+            value="{{item.reps}}"
+            data-index="{{index}}"
+            bindinput="onWarmupRepsInput"
+            bindblur="onWarmupInputBlur"
+          />
+          <text class="warmup-unit">次</text>
         </view>
-        <text class="warmup-label">{{item.label}}</text>
+        <view
+          wx:if="{{warmupSets.length > 1}}"
+          class="warmup-delete-btn"
+          data-index="{{index}}"
+          bindtap="onDeleteWarmupSet"
+        >
+          <text>×</text>
+        </view>
       </view>
+    </view>
+
+    <view class="warmup-add-btn" bindtap="onAddWarmupSet">
+      <text>+ 添加热身组</text>
     </view>
 
     <view class="warmup-actions">

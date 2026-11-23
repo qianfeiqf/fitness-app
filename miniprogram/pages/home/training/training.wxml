@@ -3,6 +3,13 @@
 <!-- 训练中页面 - 沉浸式极简风格 -->
 
 <view class="page-training" style="padding-top: {{navHeight}}px;">
+  <!-- 顶部自定义返回栏（与右侧微信胶囊垂直对齐） -->
+  <view class="training-custom-nav" style="top: {{navTop}}px; height: {{navMenuHeight}}px;">
+    <view class="training-back-btn" bindtap="onBackFromTraining">
+      <text class="training-back-arrow">‹</text>
+      <text class="training-back-text">返回</text>
+    </view>
+  </view>
 
   <!-- 顶部进度条 -->
   <view class="progress-header">

@@ -95,6 +95,18 @@ Page({
     this.checkTrainingFloat();
   },
 
+  async onPullDownRefresh() {
+    try {
+      const app = getApp();
+      if (app && typeof app.startSync === 'function') {
+        await app.startSync();
+      }
+      await this.checkLoginAndLoadData({ silent: true });
+    } finally {
+      wx.stopPullDownRefresh();
+    }
+  },
+
   /**
    * 检查是否有最小化的训练悬浮窗
    */

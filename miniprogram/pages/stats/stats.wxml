@@ -219,6 +219,7 @@
       </view>
       <text class="empty-title">暂无PR记录</text>
       <text class="empty-desc">完成训练后记录会自动保存</text>
+      <view class="empty-action-btn" bindtap="onGoToHome">去开始训练</view>
     </view>
 
     <view wx:else class="pr-list">

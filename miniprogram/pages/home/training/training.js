@@ -202,7 +202,26 @@ Page({
     const menuButton = wx.getMenuButtonBoundingClientRect();
     const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
     const navHeight = menuButton.top + menuButton.height + (menuButton.top - windowInfo.statusBarHeight);
-    this.setData({ navHeight });
+    this.setData({
+      navHeight,
+      navTop: menuButton.top,
+      navMenuHeight: menuButton.height
+    });
+  },
+
+  /**
+   * 顶部自定义返回按钮（保存进度快照后返回）
+   */
+  onBackFromTraining() {
+    const { session } = this.data;
+    if (session && session.status !== 'completed' && session.status !== 'aborted') {
+      this.saveSnapshot();
+    }
+    wx.navigateBack({
+      fail: () => {
+        wx.switchTab({ url: '/pages/home/home' });
+      }
+    });
   },
 
   /**

@@ -4,5 +4,6 @@
     "privacy-popup": "../../components/privacy-popup/privacy-popup"
   },
   "navigationBarTitleText": "训练中心",
-  "navigationStyle": "custom"
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true
 }

@@ -456,6 +456,12 @@ Page({
     });
   },
 
+  onGoToHome() {
+    wx.switchTab({
+      url: '/pages/home/home'
+    });
+  },
+
   /**
    * 切换容量周期 Tab
    */

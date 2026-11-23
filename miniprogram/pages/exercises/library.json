@@ -1,4 +1,5 @@
 {
+  "navigationBarTitleText": "动作库",
   "usingComponents": {
     "modal-sheet": "../../components/modal-sheet/modal-sheet",
     "mp-searchbar": "weui-miniprogram/searchbar/searchbar",

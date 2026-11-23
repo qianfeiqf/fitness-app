@@ -1,4 +1,5 @@
 {
+  "navigationBarTitleText": "计划详情",
   "usingComponents": {
     "mp-loading": "weui-miniprogram/loading/loading"
   }

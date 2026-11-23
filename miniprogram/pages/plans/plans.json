@@ -3,5 +3,6 @@
     "modal-sheet": "../../components/modal-sheet/modal-sheet",
     "mp-tabs": "../../components/mp-tabs/mp-tabs"
   },
-  "navigationBarTitleText": "训练计划"
+  "navigationBarTitleText": "训练计划",
+  "navigationStyle": "custom"
 }

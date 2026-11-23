@@ -714,9 +714,9 @@
   opacity: 0.85;
 }
 
-/* 继续训练 — 灰色底 */
+/* 继续训练 — 统一使用绿色训练执行语义 */
 .btn-resume {
-  background: #666666;
+  background: #07C160;
   color: #FFFFFF;
 }
 

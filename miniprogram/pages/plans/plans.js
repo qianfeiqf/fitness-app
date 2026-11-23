@@ -65,12 +65,21 @@ Page({
     wizardSelectedPlan: null,
 
     // 训练悬浮窗
-    trainingFloat: null
+    trainingFloat: null,
+    navHeight: 0
   },
 
   onLoad() {
+    this.calcNavBarHeight();
     this.loadPlans();
     this.loadTemplates();
+  },
+
+  calcNavBarHeight() {
+    const menuButton = wx.getMenuButtonBoundingClientRect();
+    const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const navHeight = menuButton.top + menuButton.height + (menuButton.top - windowInfo.statusBarHeight);
+    this.setData({ navHeight });
   },
 
   onShow() {

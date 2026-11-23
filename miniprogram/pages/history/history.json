@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "训练历史",
+  "enablePullDownRefresh": true,
   "usingComponents": {
     "mp-tabs": "../../components/mp-tabs/mp-tabs"
   }

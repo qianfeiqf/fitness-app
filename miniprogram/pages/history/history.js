@@ -144,5 +144,17 @@ Page({
     wx.navigateTo({
       url: '/pages/history/detail/detail?sessionId=' + sessionId
     });
+  },
+
+  async onPullDownRefresh() {
+    try {
+      const app = getApp();
+      if (app && typeof app.startSync === 'function') {
+        await app.startSync();
+      }
+      this.loadHistory();
+    } finally {
+      wx.stopPullDownRefresh();
+    }
   }
 });

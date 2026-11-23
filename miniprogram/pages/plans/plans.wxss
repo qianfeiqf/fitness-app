@@ -5,9 +5,19 @@
 .page-plans {
   min-height: 100vh;
   background-color: #FFFFFF;
-  padding: 40rpx;
-  padding-top: calc(40rpx + env(safe-area-inset-top));
-  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  padding: 0 40rpx calc(120rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.page-header {
+  padding: 20rpx 0 28rpx;
+}
+
+.page-title {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  letter-spacing: -1rpx;
 }
 
 /* =====================

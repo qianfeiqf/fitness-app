@@ -11,6 +11,42 @@
   overflow: hidden;
 }
 
+.training-custom-nav {
+  position: fixed;
+  left: 24rpx;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+}
+
+.training-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4rpx;
+  height: 100%;
+  padding: 0 20rpx 0 12rpx;
+  border-radius: 9999rpx;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1rpx solid #EAEAEA;
+}
+
+.training-back-btn:active {
+  background: #F2F2F2;
+}
+
+.training-back-arrow {
+  font-size: 38rpx;
+  line-height: 1;
+  color: #1A1A1A;
+  margin-top: -2rpx;
+}
+
+.training-back-text {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+
 /* =====================
    进度条（原生替代 t-progress）
    ===================== */
@@ -170,7 +206,7 @@
 }
 
 .chip-sets {
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: #999999;
 }
 
@@ -184,7 +220,7 @@
 }
 
 .chip-check.skip {
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: #666666;
   background: #F0F0F0;
   padding: 2rpx 8rpx;

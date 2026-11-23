@@ -495,13 +495,45 @@
    热身区域
    ===================== */
 .warmup-main {
-  padding: 40rpx;
+  flex: 1;
+  min-height: 0;
+  padding: 28rpx 40rpx 16rpx;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 .warmup-header {
-  margin-bottom: 24rpx;
+  flex-shrink: 0;
+  margin-bottom: 20rpx;
+}
+
+.warmup-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.warmup-stage-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 18rpx;
+  border-radius: 9999rpx;
+  background: #FFF7ED;
+  border: 1rpx solid #FDBA74;
+  color: #D97706;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.warmup-stage-note {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.warmup-scroll {
+  flex: 1;
+  min-height: 0;
 }
 
 .warmup-title {
@@ -553,7 +585,8 @@
 }
 
 .warmup-item.current {
-  background-color: #F8F8F8;
+  background-color: #FFFBF5;
+  border-color: #FDBA74;
 }
 
 .warmup-item.completed {
@@ -561,30 +594,43 @@
 }
 
 .warmup-check {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 50%;
-  background: #F0F0F0;
+  min-width: 64rpx;
+  height: 52rpx;
+  padding: 0 10rpx;
+  border-radius: 9999rpx;
+  background: #FFF7ED;
+  border: 1rpx solid #FED7AA;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.warmup-item.current .warmup-check {
+  background: #D97706;
+  border-color: #D97706;
+}
+
+.warmup-item.current .warmup-check-num {
+  color: #FFFFFF;
 }
 
 .warmup-item.completed .warmup-check {
   background: #07C160;
+  border-color: #07C160;
 }
 
 .warmup-check-icon {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #FFFFFF;
   font-weight: 600;
 }
 
 .warmup-check-num {
-  font-size: 26rpx;
-  color: #666666;
-  font-weight: 600;
+  font-size: 22rpx;
+  color: #D97706;
+  font-weight: 700;
 }
 
 .warmup-info {
@@ -680,22 +726,45 @@
 }
 
 .warmup-actions {
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12rpx;
-  margin-top: 40rpx;
-  padding: 0 40rpx;
+  gap: 10rpx;
+  margin-top: 16rpx;
+  padding: 12rpx 0 4rpx;
+  border-top: 1rpx solid #F2F2F2;
+  background: #FFFFFF;
 }
 
-.warmup-actions .btn-primary {
+.warmup-actions .btn-primary,
+.warmup-actions .btn-warmup-primary {
+  width: 100%;
   height: 88rpx;
   font-size: 30rpx;
+  box-sizing: border-box;
+}
+
+.btn-warmup-primary {
+  background: #D97706;
+  color: #FFFFFF;
+  border-radius: 9999rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.btn-warmup-primary:active {
+  opacity: 0.88;
 }
 
 .warmup-actions .btn-text {
   height: auto;
-  padding: 12rpx 24rpx;
+  padding: 10rpx 24rpx;
   font-size: 26rpx;
 }
 
@@ -716,6 +785,24 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24rpx;
+}
+
+.exercise-tags {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.formal-stage-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 16rpx;
+  border-radius: 9999rpx;
+  background: #E8F8EE;
+  border: 1rpx solid #A7E3BE;
+  color: #07C160;
+  font-size: 22rpx;
+  font-weight: 700;
 }
 
 .set-indicator {

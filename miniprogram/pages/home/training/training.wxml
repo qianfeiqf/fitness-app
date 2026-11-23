@@ -66,63 +66,68 @@
   <!-- 热身区域 — 用 hidden 避免销毁/重建 DOM -->
   <view hidden="{{!showWarmup}}" class="warmup-main">
     <view class="warmup-header">
-      <view class="tag tag-warning">热身阶段</view>
+      <view class="warmup-badge-row">
+        <view class="warmup-stage-badge">热身组</view>
+        <text class="warmup-stage-note">不计入正式组数</text>
+      </view>
       <view class="warmup-title">
         <text class="warmup-exercise-name">{{currentExercise.exercise_name}}</text>
         <text class="warmup-target">目标重量 {{currentExercise.target_weight}}kg</text>
       </view>
     </view>
 
-    <view class="warmup-list">
-      <view
-        wx:for="{{warmupSets}}"
-        wx:key="index"
-        class="warmup-item {{item.completed ? 'completed' : ''}} {{index === currentWarmupIndex ? 'current' : ''}}"
-      >
-        <view class="warmup-check">
-          <text wx:if="{{item.completed}}" class="warmup-check-icon">✓</text>
-          <text wx:else class="warmup-check-num">{{index + 1}}</text>
-        </view>
-        <view class="warmup-info">
-          <input
-            type="digit"
-            class="warmup-input"
-            value="{{item.weight}}"
-            data-index="{{index}}"
-            bindinput="onWarmupWeightInput"
-            bindblur="onWarmupInputBlur"
-          />
-          <text class="warmup-unit">kg</text>
-          <text class="warmup-sep">×</text>
-          <input
-            type="number"
-            class="warmup-input warmup-input-sm"
-            value="{{item.reps}}"
-            data-index="{{index}}"
-            bindinput="onWarmupRepsInput"
-            bindblur="onWarmupInputBlur"
-          />
-          <text class="warmup-unit">次</text>
-        </view>
+    <scroll-view scroll-y class="warmup-scroll" show-scrollbar="{{false}}">
+      <view class="warmup-list">
         <view
-          wx:if="{{warmupSets.length > 1}}"
-          class="warmup-delete-btn"
-          data-index="{{index}}"
-          bindtap="onDeleteWarmupSet"
+          wx:for="{{warmupSets}}"
+          wx:key="index"
+          class="warmup-item {{item.completed ? 'completed' : ''}} {{index === currentWarmupIndex ? 'current' : ''}}"
         >
-          <text>×</text>
+          <view class="warmup-check">
+            <text wx:if="{{item.completed}}" class="warmup-check-icon">✓</text>
+            <text wx:else class="warmup-check-num">热{{index + 1}}</text>
+          </view>
+          <view class="warmup-info">
+            <input
+              type="digit"
+              class="warmup-input"
+              value="{{item.weight}}"
+              data-index="{{index}}"
+              bindinput="onWarmupWeightInput"
+              bindblur="onWarmupInputBlur"
+            />
+            <text class="warmup-unit">kg</text>
+            <text class="warmup-sep">×</text>
+            <input
+              type="number"
+              class="warmup-input warmup-input-sm"
+              value="{{item.reps}}"
+              data-index="{{index}}"
+              bindinput="onWarmupRepsInput"
+              bindblur="onWarmupInputBlur"
+            />
+            <text class="warmup-unit">次</text>
+          </view>
+          <view
+            wx:if="{{warmupSets.length > 1}}"
+            class="warmup-delete-btn"
+            data-index="{{index}}"
+            bindtap="onDeleteWarmupSet"
+          >
+            <text>×</text>
+          </view>
         </view>
       </view>
-    </view>
 
-    <view class="warmup-add-btn" bindtap="onAddWarmupSet">
-      <text>+ 添加热身组</text>
-    </view>
+      <view class="warmup-add-btn" bindtap="onAddWarmupSet">
+        <text>+ 添加热身组</text>
+      </view>
+    </scroll-view>
 
     <view class="warmup-actions">
       <view
         wx:if="{{currentWarmupIndex < warmupSets.length}}"
-        class="btn btn-primary btn-block"
+        class="btn btn-warmup-primary btn-block"
         bindtap="onCompleteWarmupSet"
       >
         <text class="btn-complete-icon">✓</text>
@@ -171,7 +176,10 @@
   <view hidden="{{showWarmup || !currentExercise || freeAllDone}}" class="training-main">
     <!-- 动作标签 + 组数进度 -->
     <view class="exercise-header">
-      <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
+      <view class="exercise-tags">
+        <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
+        <view class="formal-stage-badge">正式组</view>
+      </view>
       <view class="set-indicator-wrap">
         <view class="set-indicator">
           <text class="set-current">{{currentExercise.currentSetNumber}}</text>

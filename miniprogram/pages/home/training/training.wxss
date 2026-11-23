@@ -527,7 +527,7 @@
 }
 
 .warmup-stage-note {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #999999;
 }
 
@@ -665,12 +665,12 @@
 }
 
 .warmup-delete-btn {
-  width: 52rpx;
-  height: 52rpx;
+  width: 68rpx;
+  height: 68rpx;
   border-radius: 50%;
   background: #F5F5F5;
   color: #999999;
-  font-size: 32rpx;
+  font-size: 34rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1161,7 +1161,7 @@
 }
 
 .bottom-label {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #666666;
 }
 

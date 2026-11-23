@@ -10,7 +10,7 @@
   <view wx:if="{{!isLoggedIn}}" class="login-section">
     <view class="login-card">
       <view class="login-avatar">
-        <text class="login-avatar-icon">👤</text>
+        <mp-icon icon="me" color="#666666" size="{{36}}" />
       </view>
       <text class="login-title">登录后查看完整数据</text>
       <text class="login-desc">同步训练记录，追踪你的进步</text>
@@ -107,50 +107,50 @@
       </view>
     </view>
 
-    <!-- 功能列表 -->
+    <!-- 功能列表（采用官方 WeUI 矢量图标） -->
     <view class="menu-section">
       <view class="menu-item" bindtap="onExportData">
         <view class="menu-icon-wrap">
-          <text class="menu-icon">📤</text>
+          <mp-icon icon="download" color="#1A1A1A" size="{{22}}" />
         </view>
         <view class="menu-content">
           <text class="menu-title">数据导出</text>
           <text class="menu-desc">导出 Markdown 报告或 JSON 备份</text>
         </view>
-        <text class="menu-arrow">›</text>
+        <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
 
       <view class="menu-item" bindtap="onSyncData">
         <view class="menu-icon-wrap">
-          <text class="menu-icon">🔄</text>
+          <mp-icon icon="refresh" color="#1A1A1A" size="{{22}}" />
         </view>
         <view class="menu-content">
           <text class="menu-title">同步数据</text>
           <text class="menu-desc">将本地数据同步到云端</text>
         </view>
-        <text class="menu-arrow">›</text>
+        <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
 
       <view class="menu-item" bindtap="onOpenPrivacyPolicy">
         <view class="menu-icon-wrap">
-          <text class="menu-icon">🛡️</text>
+          <mp-icon icon="lock" color="#1A1A1A" size="{{22}}" />
         </view>
         <view class="menu-content">
           <text class="menu-title">隐私保护指引</text>
           <text class="menu-desc">了解我们如何保护你的个人信息</text>
         </view>
-        <text class="menu-arrow">›</text>
+        <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
 
       <view class="menu-item" bindtap="onOpenUserAgreement">
         <view class="menu-icon-wrap">
-          <text class="menu-icon">📄</text>
+          <mp-icon icon="note" color="#1A1A1A" size="{{22}}" />
         </view>
         <view class="menu-content">
           <text class="menu-title">用户服务协议</text>
           <text class="menu-desc">查看使用条款与免责声明</text>
         </view>
-        <text class="menu-arrow">›</text>
+        <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
     </view>
 
@@ -158,7 +158,7 @@
     <view class="menu-section">
       <view class="menu-item danger" bindtap="onLogout">
         <view class="menu-icon-wrap">
-          <text class="menu-icon">🚪</text>
+          <mp-icon icon="back2" color="#FA5151" size="{{22}}" />
         </view>
         <view class="menu-content">
           <text class="menu-title logout">退出登录</text>
@@ -167,7 +167,7 @@
 
       <view class="menu-item danger" bindtap="onDeleteAccount">
         <view class="menu-icon-wrap">
-          <text class="menu-icon">🗑️</text>
+          <mp-icon icon="delete" color="#FA5151" size="{{22}}" />
         </view>
         <view class="menu-content">
           <text class="menu-title logout">注销账号</text>

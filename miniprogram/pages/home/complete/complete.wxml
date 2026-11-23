@@ -3,8 +3,8 @@
 <view class="page-complete">
   <!-- 完成标志 -->
   <view class="complete-header">
-    <view class="complete-icon-wrap">
-      <text class="complete-icon">✓</text>
+    <view class="complete-icon-native">
+      <icon type="success" size="56" color="#07C160" />
     </view>
     <text class="complete-title">训练完成</text>
     <text class="complete-subtitle">{{session ? session.plan_name : ''}}</text>

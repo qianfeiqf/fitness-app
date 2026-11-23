@@ -6,7 +6,7 @@
   <!-- 顶部自定义返回栏（与右侧微信胶囊垂直对齐） -->
   <view class="training-custom-nav" style="top: {{navTop}}px; height: {{navMenuHeight}}px;">
     <view class="training-back-btn" bindtap="onBackFromTraining">
-      <text class="training-back-arrow">‹</text>
+      <mp-icon icon="back" color="#1A1A1A" size="{{12}}" />
       <text class="training-back-text">返回</text>
     </view>
   </view>
@@ -156,18 +156,17 @@
 
   <!-- 自由训练：当前列表全部完成后的流转引导 -->
   <view wx:elif="{{isFreeWorkout && freeAllDone}}" class="free-empty-state">
-    <text class="free-empty-icon">✅</text>
+    <icon type="success" size="48" color="#07C160" />
     <text class="free-empty-title">已完成 {{completedSets.length}} 组训练</text>
-    <text class="free-empty-desc">想继续加练新动作、当前动作再加一组，还是现在结束并保存？</text>
     <view class="free-done-actions">
-      <view class="btn btn-primary btn-md btn-block" bindtap="onAddExercise">
+      <view class="btn btn-finish btn-md btn-block" bindtap="onFinishTraining">
+        <text>完成本次训练并保存</text>
+      </view>
+      <view class="btn btn-secondary btn-md btn-block" bindtap="onAddExercise">
         <text>+ 继续添加下一个动作</text>
       </view>
       <view class="btn btn-secondary btn-md btn-block" bindtap="onAddExtraSet">
         <text>+ 上个动作再加一组</text>
-      </view>
-      <view class="btn btn-finish btn-md btn-block" bindtap="onFinishTraining">
-        <text>✓ 完成本次训练并保存</text>
       </view>
     </view>
   </view>
@@ -308,7 +307,7 @@
       <text class="bottom-label">{{isPaused ? '继续' : '暂停'}}</text>
     </view>
     <view class="bottom-btn finish" bindtap="onFinishTraining">
-      <text class="bottom-icon">✓</text>
+      <mp-icon icon="done" color="#07C160" size="{{20}}" />
       <text class="bottom-label">完成训练</text>
     </view>
   </view>

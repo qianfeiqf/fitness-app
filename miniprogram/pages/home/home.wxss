@@ -1038,3 +1038,48 @@
   border-color: #1A1A1A;
   color: #FFFFFF;
 }
+
+/* 顶部非阻塞轻提示条（身体档案 / 同步重试） */
+.home-tip-banner {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 20rpx;
+  border-radius: 16rpx;
+  background: #F4FBF7;
+  border: 1rpx solid #CBEFD9;
+}
+
+.home-tip-banner.warn {
+  background: #FFFBF2;
+  border-color: #FDE6B8;
+}
+
+.home-tip-text {
+  flex: 1;
+  font-size: 24rpx;
+  color: #333333;
+  line-height: 1.4;
+}
+
+.home-tip-action {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #07C160;
+  padding: 12rpx 16rpx;
+  flex-shrink: 0;
+}
+
+.home-tip-banner.warn .home-tip-action {
+  color: #D97706;
+}
+
+.home-tip-close {
+  padding: 16rpx;
+  margin: -12rpx -8rpx -12rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

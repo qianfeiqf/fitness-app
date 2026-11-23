@@ -53,10 +53,31 @@
 
   <!-- 今日训练 -->
   <view wx:else class="training-section">
+    <!-- 云端同步失败重试条 -->
+    <view wx:if="{{syncFailed}}" class="home-tip-banner warn">
+      <icon type="warn" size="18" color="#D97706" />
+      <text class="home-tip-text">云端同步失败，请检查网络</text>
+      <text class="home-tip-action" bindtap="onRetrySync">重试</text>
+    </view>
+
+    <!-- 首次完善身体档案轻提示条（非阻塞） -->
+    <view wx:if="{{showProfileBanner}}" class="home-tip-banner">
+      <icon type="info" size="18" color="#07C160" />
+      <text class="home-tip-text">填写体重，1RM 与重量推荐更准确</text>
+      <text class="home-tip-action" bindtap="onGoToProfileBanner">去填写</text>
+      <view class="home-tip-close" bindtap="onDismissProfileBanner">
+        <mp-icon icon="close" color="#999999" size="{{14}}" />
+      </view>
+    </view>
+
     <!-- 自由训练快捷入口（有进行中会话时高亮提示直接续练） -->
     <view class="free-workout-bar {{activeFreeSession ? 'active' : ''}}" bindtap="onStartFreeWorkout">
       <view class="free-workout-left">
-        <text class="free-workout-icon">{{activeFreeSession ? '🔥' : '⚡'}}</text>
+        <mp-icon
+          icon="{{activeFreeSession ? 'play2' : 'add2'}}"
+          color="{{activeFreeSession ? '#07C160' : '#1A1A1A'}}"
+          size="{{24}}"
+        />
         <view class="free-workout-info">
           <text class="free-workout-title">{{activeFreeSession ? '进行中的自由训练' : '自由训练'}}</text>
           <text class="free-workout-desc">{{activeFreeSession ? activeFreeSummary : '随练随记，不按计划'}}</text>
@@ -66,12 +87,12 @@
     </view>
     <!-- Deload 提醒横幅 -->
     <view wx:if="{{showDeloadReminder}}" class="deload-banner" bindtap="onDismissDeloadReminder">
-      <text class="deload-icon">⚠</text>
+      <icon type="warn" size="20" color="#D97706" />
       <view class="deload-content">
         <text class="deload-title">建议安排减载周</text>
         <text class="deload-desc">你已持续高强度训练 6 周，建议本周降低重量 10-20% 进行恢复</text>
       </view>
-      <text class="deload-dismiss">✕</text>
+      <mp-icon icon="close" color="#999999" size="{{14}}" />
     </view>
 
     <!-- 多计划切换栏 -->

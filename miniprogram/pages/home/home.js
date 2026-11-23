@@ -54,7 +54,13 @@ Page({
 
     // 进行中的自由训练会话
     activeFreeSession: null,
-    activeFreeSummary: ''
+    activeFreeSummary: '',
+
+    // 首次完善身体档案轻提示条（非阻塞）
+    showProfileBanner: false,
+
+    // 云端同步失败重试提示
+    syncFailed: false
   },
 
   // 空操作函数（用于阻止事件冒泡）
@@ -77,6 +83,7 @@ Page({
     // 监听事件（热启动恢复使用事件，冷启动恢复使用 globalData）
     wx.eventCenter.on('unfinishedSessionFound', this.onUnfinishedSessionFound, this);
     wx.eventCenter.on('syncCompleted', this.onSyncCompleted, this);
+    wx.eventCenter.on('syncFailed', this.onSyncFailed, this);
 
     // 检查冷启动时 onLaunch 已检测到的未完成会话
     const app = getApp();
@@ -148,7 +155,7 @@ Page({
   },
 
   /**
-   * 首次打开小程序时弹出一次完善身体档案提示（后续不再重复弹出）
+   * 首次打开小程序时展示非阻塞的身体档案轻提示条（替代冷启动弹窗）
    */
   checkFirstLaunchProfilePrompt() {
     try {
@@ -158,22 +165,45 @@ Page({
         wx.setStorageSync('has_prompted_profile', true);
         return;
       }
-      wx.setStorageSync('has_prompted_profile', true);
-      wx.showModal({
-        title: '完善身体档案',
-        content: '为了更准确地计算1RM和训练演进，建议填写您的体重（其他信息可选）',
-        confirmText: '去填写',
-        cancelText: '暂不填写',
-        success: (res) => {
-          if (res.confirm) {
-            const app = getApp();
-            app.globalData.profilePrompt = 'profile';
-            wx.switchTab({ url: '/pages/profile/profile' });
-          }
-        }
-      });
+      this.setData({ showProfileBanner: true });
     } catch (e) {
       console.warn('首次身体档案提示检查失败:', e);
+    }
+  },
+
+  onGoToProfileBanner() {
+    wx.setStorageSync('has_prompted_profile', true);
+    this.setData({ showProfileBanner: false });
+    const app = getApp();
+    app.globalData.profilePrompt = 'profile';
+    wx.switchTab({ url: '/pages/profile/profile' });
+  },
+
+  onDismissProfileBanner() {
+    wx.setStorageSync('has_prompted_profile', true);
+    this.setData({ showProfileBanner: false });
+  },
+
+  onSyncFailed() {
+    this.setData({ syncFailed: true });
+  },
+
+  async onRetrySync() {
+    const app = getApp();
+    if (app && typeof app.startSync === 'function') {
+      wx.showLoading({ title: '同步中...' });
+      try {
+        const res = await app.startSync();
+        if (res && res.success) {
+          this.setData({ syncFailed: false });
+          await this.checkLoginAndLoadData({ silent: true });
+          wx.showToast({ title: '同步成功', icon: 'success' });
+        } else {
+          wx.showToast({ title: '同步失败，请稍后重试', icon: 'none' });
+        }
+      } finally {
+        wx.hideLoading();
+      }
     }
   },
 
@@ -184,6 +214,7 @@ Page({
   onUnload() {
     wx.eventCenter.off('unfinishedSessionFound', this.onUnfinishedSessionFound);
     wx.eventCenter.off('syncCompleted', this.onSyncCompleted);
+    wx.eventCenter.off('syncFailed', this.onSyncFailed);
   },
 
   /**
@@ -687,6 +718,9 @@ Page({
    * 同步完成回调
    */
   onSyncCompleted(result) {
+    if (this.data.syncFailed) {
+      this.setData({ syncFailed: false });
+    }
     // 无新增云端拉取数据时不触发重绘，避免进首页约 1 秒后闪屏刷新
     if (result && typeof result.pulled === 'number' && result.pulled === 0) {
       return;

@@ -1,7 +1,8 @@
 {
   "usingComponents": {
     "modal-sheet": "../../components/modal-sheet/modal-sheet",
-    "privacy-popup": "../../components/privacy-popup/privacy-popup"
+    "privacy-popup": "../../components/privacy-popup/privacy-popup",
+    "mp-icon": "weui-miniprogram/icon/icon"
   },
   "navigationBarTitleText": "训练中心",
   "navigationStyle": "custom",

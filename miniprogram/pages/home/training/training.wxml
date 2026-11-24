@@ -285,7 +285,6 @@
           class="btn btn-warmup-primary btn-md btn-block"
           bindtap="onCompleteWarmupSet"
         >
-          <text class="btn-complete-icon">✓</text>
           <text>完成 {{currentWarmupIndex + 1}}/{{warmupSets.length}} 组热身</text>
         </view>
         <view
@@ -298,33 +297,33 @@
       </block>
       <block wx:else>
         <view wx:if="{{currentExercise.isDone}}" class="btn btn-primary btn-md btn-block" bindtap="onAddExtraSet">
-          <text class="btn-complete-icon">+</text>
-          <text>加练一组（第 {{currentExercise.target_sets + 1}} 组）</text>
+          <text>+ 加练一组（第 {{currentExercise.target_sets + 1}} 组）</text>
         </view>
         <view wx:else class="btn btn-primary btn-md btn-block" bindtap="onCompleteSet">
-          <text class="btn-complete-icon">✓</text>
           <text>完成 {{currentExercise.currentSetNumber}}/{{currentExercise.target_sets}} 组</text>
         </view>
         <view wx:if="{{completedSets.length > 0}}" class="undo-last-btn" bindtap="onUndoLastSet">
-          <text>↩ 撤回上一组</text>
+          <text>撤回上一组</text>
         </view>
       </block>
     </view>
   </view>
 
-  <!-- 底部操作栏 -->
+  <!-- 底部操作栏（单行紧凑图文 + 微信官方 WeUI 矢量图标） -->
   <view class="bottom-bar">
     <view class="bottom-btn" bindtap="onCollapseTraining">
-      <text class="bottom-icon">⬇</text>
+      <view class="bottom-collapse-icon">
+        <mp-icon icon="arrow" color="#666666" size="{{12}}" />
+      </view>
       <text class="bottom-label">收起</text>
     </view>
     <view class="bottom-btn" bindtap="{{isPaused ? 'onResumeTraining' : 'onPauseTraining'}}">
-      <text class="bottom-icon">{{isPaused ? '▶' : '⏸'}}</text>
+      <mp-icon icon="{{isPaused ? 'play2' : 'pause'}}" color="#666666" size="{{18}}" />
       <text class="bottom-label">{{isPaused ? '继续' : '暂停'}}</text>
     </view>
     <view class="bottom-btn finish" bindtap="onFinishTraining">
-      <mp-icon icon="done" color="#07C160" size="{{20}}" />
-      <text class="bottom-label">完成训练</text>
+      <mp-icon icon="done" color="#07C160" size="{{18}}" />
+      <text class="bottom-label">完成</text>
     </view>
   </view>
 

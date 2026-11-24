@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   padding-top: 100rpx; /* JS 动态覆盖 */
-  padding-bottom: calc(168rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(104rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -1248,11 +1248,12 @@
    ===================== */
 .bottom-bar {
   display: flex;
+  align-items: center;
   justify-content: space-around;
-  padding: 24rpx 40rpx;
-  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  padding: 12rpx 32rpx;
+  padding-bottom: calc(12rpx + env(safe-area-inset-bottom));
   background: #FFFFFF;
-  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.06);
+  border-top: 1rpx solid #F0F0F0;
   position: fixed;
   left: 0;
   right: 0;
@@ -1262,26 +1263,31 @@
 
 .bottom-btn {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 6rpx;
-  padding: 12rpx 40rpx;
-  border-radius: 16rpx;
+  justify-content: center;
+  gap: 10rpx;
+  height: 72rpx;
+  padding: 0 28rpx;
+  border-radius: 9999rpx;
   background: transparent;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease;
 }
 
 .bottom-btn:active {
   background: #F5F5F5;
 }
 
-.bottom-icon {
-  font-size: 36rpx;
-  color: #666666;
+.bottom-collapse-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(90deg);
 }
 
 .bottom-label {
-  font-size: 24rpx;
+  font-size: 26rpx;
+  font-weight: 500;
   color: #666666;
 }
 

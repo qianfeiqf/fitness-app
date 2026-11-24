@@ -63,87 +63,6 @@
     </view>
   </view>
 
-  <!-- 热身区域 — 用 hidden 避免销毁/重建 DOM -->
-  <view hidden="{{!showWarmup}}" class="warmup-main">
-    <view class="warmup-header">
-      <view class="warmup-badge-row">
-        <view class="warmup-stage-badge">热身组</view>
-        <text class="warmup-stage-note">不计入正式组数</text>
-      </view>
-      <view class="warmup-title">
-        <text class="warmup-exercise-name">{{currentExercise.exercise_name}}</text>
-        <text class="warmup-target">目标重量 {{currentExercise.target_weight}}kg</text>
-      </view>
-    </view>
-
-    <scroll-view scroll-y class="warmup-scroll" show-scrollbar="{{false}}">
-      <view class="warmup-list">
-        <view
-          wx:for="{{warmupSets}}"
-          wx:key="index"
-          class="warmup-item {{item.completed ? 'completed' : ''}} {{index === currentWarmupIndex ? 'current' : ''}}"
-        >
-          <view class="warmup-check">
-            <text wx:if="{{item.completed}}" class="warmup-check-icon">✓</text>
-            <text wx:else class="warmup-check-num">{{index + 1}}</text>
-          </view>
-          <view class="warmup-info">
-            <input
-              type="digit"
-              class="warmup-input"
-              value="{{item.weight}}"
-              data-index="{{index}}"
-              bindinput="onWarmupWeightInput"
-              bindblur="onWarmupInputBlur"
-            />
-            <text class="warmup-unit">kg</text>
-            <text class="warmup-sep">×</text>
-            <input
-              type="number"
-              class="warmup-input warmup-input-sm"
-              value="{{item.reps}}"
-              data-index="{{index}}"
-              bindinput="onWarmupRepsInput"
-              bindblur="onWarmupInputBlur"
-            />
-            <text class="warmup-unit">次</text>
-          </view>
-          <view
-            wx:if="{{warmupSets.length > 1}}"
-            class="warmup-delete-btn"
-            data-index="{{index}}"
-            bindtap="onDeleteWarmupSet"
-          >
-            <text>×</text>
-          </view>
-        </view>
-      </view>
-
-      <view class="warmup-add-btn" bindtap="onAddWarmupSet">
-        <text>+ 添加热身组</text>
-      </view>
-    </scroll-view>
-
-    <view class="warmup-actions">
-      <view
-        wx:if="{{currentWarmupIndex < warmupSets.length}}"
-        class="btn btn-warmup-primary btn-block"
-        bindtap="onCompleteWarmupSet"
-      >
-        <text class="btn-complete-icon">✓</text>
-        <text>完成第 {{currentWarmupIndex + 1}} 组热身</text>
-      </view>
-      <view
-        wx:else
-        class="btn btn-primary btn-block"
-        bindtap="onFinishWarmup"
-      >
-        <text>热身完成，开始正式训练</text>
-      </view>
-      <view class="btn btn-text" bindtap="onSkipWarmup">跳过热身</view>
-    </view>
-  </view>
-
   <!-- 自由训练：尚无动作时的空态引导 -->
   <view wx:if="{{isFreeWorkout && exercises.length === 0}}" class="free-empty-state">
     <text class="free-empty-icon">🏋️</text>
@@ -171,18 +90,21 @@
     </view>
   </view>
 
-  <!-- 主训练区域 — 用 hidden 避免销毁/重建 DOM；休息时不隐藏，由遮罩层覆盖 -->
-  <view hidden="{{showWarmup || !currentExercise || freeAllDone}}" class="training-main">
-    <scroll-view scroll-y class="training-scroll" show-scrollbar="{{false}}">
-    <!-- 动作标签 + 组数进度 -->
+  <!-- 主训练区域：热身组与正式组双 Tab 平级切换 -->
+  <view hidden="{{!currentExercise || freeAllDone}}" class="training-main">
+    <!-- 动作肌群标签 + 当前阶段进度 -->
     <view class="exercise-header">
       <view class="exercise-tags">
         <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
-        <view class="formal-stage-badge">正式组</view>
-        <view wx:if="{{!currentExercise.isDone}}" class="warmup-entry-btn" bindtap="onOpenWarmup">热身</view>
       </view>
       <view class="set-indicator-wrap">
-        <view class="set-indicator">
+        <view wx:if="{{activeStage === 'warmup'}}" class="set-indicator set-indicator-warmup">
+          <text class="set-current">{{warmupCompletedCount}}</text>
+          <text class="set-sep">/</text>
+          <text class="set-total">{{warmupSets.length}}</text>
+          <text class="set-label">热身</text>
+        </view>
+        <view wx:else class="set-indicator">
           <text class="set-current">{{currentExercise.currentSetNumber}}</text>
           <text class="set-sep">/</text>
           <text class="set-total">{{currentExercise.target_sets}}</text>
@@ -191,111 +113,202 @@
       </view>
     </view>
 
-    <!-- 正式组平铺列表（支持行内编辑重量/次数、点圆圈勾选/取消、增减组） -->
-    <view class="formal-list">
+    <!-- 热身组 / 正式组 分段切换 Tab -->
+    <view class="stage-tabs">
       <view
-        wx:for="{{formalSets}}"
-        wx:key="index"
-        class="formal-item {{item.completed ? 'completed' : ''}} {{index === currentSetIndex ? 'current' : ''}}"
+        class="stage-tab {{activeStage === 'warmup' ? 'active' : ''}}"
+        data-stage="warmup"
+        bindtap="onSwitchStage"
       >
-        <view class="formal-check" data-index="{{index}}" bindtap="onToggleFormalSet">
-          <text wx:if="{{item.completed}}" class="formal-check-icon">✓</text>
-          <text wx:else class="formal-check-num">{{index + 1}}</text>
-        </view>
-        <view class="warmup-info">
-          <input
-            type="digit"
-            class="warmup-input"
-            value="{{item.weight}}"
-            data-index="{{index}}"
-            bindinput="onFormalWeightInput"
-            bindblur="onFormalInputBlur"
-          />
-          <text class="warmup-unit">kg</text>
-          <text class="warmup-sep">×</text>
-          <input
-            type="number"
-            class="warmup-input warmup-input-sm"
-            value="{{item.reps}}"
-            data-index="{{index}}"
-            bindinput="onFormalRepsInput"
-            bindblur="onFormalInputBlur"
-          />
-          <text class="warmup-unit">次</text>
-        </view>
-        <view
-          wx:if="{{formalSets.length > 1}}"
-          class="warmup-delete-btn"
-          data-index="{{index}}"
-          bindtap="onDeleteFormalSet"
-        >
-          <text>×</text>
-        </view>
+        <text class="stage-tab-text">热身组</text>
+        <text class="stage-tab-count">{{warmupCompletedCount}}/{{warmupSets.length}}</text>
+      </view>
+      <view
+        class="stage-tab {{activeStage === 'formal' ? 'active' : ''}}"
+        data-stage="formal"
+        bindtap="onSwitchStage"
+      >
+        <text class="stage-tab-text">正式组</text>
+        <text class="stage-tab-count">{{currentExercise.completed_sets || 0}}/{{currentExercise.target_sets || 0}}</text>
       </view>
     </view>
 
-    <view class="formal-add-btn" bindtap="onAddFormalSet">
-      <text>+ 添加正式组</text>
-    </view>
-
-    <!-- 更多操作折叠面板 -->
-    <view class="more-section">
-      <view class="more-toggle" bindtap="onToggleMoreActions">
-        <text class="more-toggle-text">{{showMoreActions ? '收起' : '更多选项'}}</text>
-        <text class="more-toggle-arrow {{showMoreActions ? 'open' : ''}}">▼</text>
-      </view>
-
-      <view wx:if="{{showMoreActions}}" class="more-panel">
-        <!-- RPE选择 -->
-        <view class="rpe-section">
-          <text class="rpe-label">自觉力竭程度</text>
-          <view class="rpe-options">
+    <scroll-view scroll-y class="training-scroll" show-scrollbar="{{false}}">
+      <!-- 热身组平铺列表 -->
+      <block wx:if="{{activeStage === 'warmup'}}">
+        <view class="warmup-list">
+          <view
+            wx:for="{{warmupSets}}"
+            wx:key="index"
+            class="warmup-item {{item.completed ? 'completed' : ''}} {{index === currentWarmupIndex ? 'current' : ''}}"
+          >
+            <view class="warmup-check" data-index="{{index}}" bindtap="onToggleWarmupSet">
+              <text wx:if="{{item.completed}}" class="warmup-check-icon">✓</text>
+              <text wx:else class="warmup-check-num">{{index + 1}}</text>
+            </view>
+            <view class="warmup-info">
+              <input
+                type="digit"
+                class="warmup-input"
+                value="{{item.weight}}"
+                data-index="{{index}}"
+                bindinput="onWarmupWeightInput"
+                bindblur="onWarmupInputBlur"
+              />
+              <text class="warmup-unit">kg</text>
+              <text class="warmup-sep">×</text>
+              <input
+                type="number"
+                class="warmup-input warmup-input-sm"
+                value="{{item.reps}}"
+                data-index="{{index}}"
+                bindinput="onWarmupRepsInput"
+                bindblur="onWarmupInputBlur"
+              />
+              <text class="warmup-unit">次</text>
+            </view>
             <view
-              wx:for="{{rpeOptions}}"
-              wx:key="index"
-              class="rpe-option {{selectedRPE === index ? 'active' : ''}}"
-              bindtap="onSelectRPE"
-              data-value="{{index}}"
+              wx:if="{{warmupSets.length > 1}}"
+              class="warmup-delete-btn"
+              data-index="{{index}}"
+              bindtap="onDeleteWarmupSet"
             >
-              <text class="rpe-value">{{item}}</text>
+              <text>×</text>
             </view>
           </view>
         </view>
 
-        <!-- 组备注 -->
-        <view class="note-section">
-          <text class="note-label">备注</text>
-          <input
-            class="note-input"
-            type="text"
-            placeholder="记录体感、疼痛点、动作感受等..."
-            value="{{setNote}}"
-            bindinput="onSetNoteChange"
-          />
+        <view class="warmup-add-btn" bindtap="onAddWarmupSet">
+          <text>+ 添加热身组</text>
+        </view>
+      </block>
+
+      <!-- 正式组平铺列表 -->
+      <block wx:else>
+        <view class="formal-list">
+          <view
+            wx:for="{{formalSets}}"
+            wx:key="index"
+            class="formal-item {{item.completed ? 'completed' : ''}} {{index === currentSetIndex ? 'current' : ''}}"
+          >
+            <view class="formal-check" data-index="{{index}}" bindtap="onToggleFormalSet">
+              <text wx:if="{{item.completed}}" class="formal-check-icon">✓</text>
+              <text wx:else class="formal-check-num">{{index + 1}}</text>
+            </view>
+            <view class="warmup-info">
+              <input
+                type="digit"
+                class="warmup-input"
+                value="{{item.weight}}"
+                data-index="{{index}}"
+                bindinput="onFormalWeightInput"
+                bindblur="onFormalInputBlur"
+              />
+              <text class="warmup-unit">kg</text>
+              <text class="warmup-sep">×</text>
+              <input
+                type="number"
+                class="warmup-input warmup-input-sm"
+                value="{{item.reps}}"
+                data-index="{{index}}"
+                bindinput="onFormalRepsInput"
+                bindblur="onFormalInputBlur"
+              />
+              <text class="warmup-unit">次</text>
+            </view>
+            <view
+              wx:if="{{formalSets.length > 1}}"
+              class="warmup-delete-btn"
+              data-index="{{index}}"
+              bindtap="onDeleteFormalSet"
+            >
+              <text>×</text>
+            </view>
+          </view>
         </view>
 
-        <!-- 替换/跳过 -->
-        <view class="secondary-actions">
-          <view class="btn btn-secondary btn-sm" bindtap="onReplaceExercise">替换动作</view>
-          <view class="btn btn-secondary btn-sm" bindtap="onSkipExercise">跳过动作</view>
+        <view class="formal-add-btn" bindtap="onAddFormalSet">
+          <text>+ 添加正式组</text>
         </view>
-      </view>
-    </view>
+
+        <!-- 更多操作折叠面板 -->
+        <view class="more-section">
+          <view class="more-toggle" bindtap="onToggleMoreActions">
+            <text class="more-toggle-text">{{showMoreActions ? '收起' : '更多选项'}}</text>
+            <text class="more-toggle-arrow {{showMoreActions ? 'open' : ''}}">▼</text>
+          </view>
+
+          <view wx:if="{{showMoreActions}}" class="more-panel">
+            <!-- RPE选择 -->
+            <view class="rpe-section">
+              <text class="rpe-label">自觉力竭程度</text>
+              <view class="rpe-options">
+                <view
+                  wx:for="{{rpeOptions}}"
+                  wx:key="index"
+                  class="rpe-option {{selectedRPE === index ? 'active' : ''}}"
+                  bindtap="onSelectRPE"
+                  data-value="{{index}}"
+                >
+                  <text class="rpe-value">{{item}}</text>
+                </view>
+              </view>
+            </view>
+
+            <!-- 组备注 -->
+            <view class="note-section">
+              <text class="note-label">备注</text>
+              <input
+                class="note-input"
+                type="text"
+                placeholder="记录体感、疼痛点、动作感受等..."
+                value="{{setNote}}"
+                bindinput="onSetNoteChange"
+              />
+            </view>
+
+            <!-- 替换/跳过 -->
+            <view class="secondary-actions">
+              <view class="btn btn-secondary btn-sm" bindtap="onReplaceExercise">替换动作</view>
+              <view class="btn btn-secondary btn-sm" bindtap="onSkipExercise">跳过动作</view>
+            </view>
+          </view>
+        </view>
+      </block>
     </scroll-view>
 
-    <!-- 完成按钮固定在底部操作栏上方，展开更多选项也不被遮挡 -->
+    <!-- 底部固定主操作栏 -->
     <view class="complete-action">
-      <view wx:if="{{currentExercise.isDone}}" class="btn btn-primary btn-md btn-block" bindtap="onAddExtraSet">
-        <text class="btn-complete-icon">+</text>
-        <text>加练一组（第 {{currentExercise.target_sets + 1}} 组）</text>
-      </view>
-      <view wx:else class="btn btn-primary btn-md btn-block" bindtap="onCompleteSet">
-        <text class="btn-complete-icon">✓</text>
-        <text>完成 {{currentExercise.currentSetNumber}}/{{currentExercise.target_sets}} 组</text>
-      </view>
-      <view wx:if="{{completedSets.length > 0}}" class="undo-last-btn" bindtap="onUndoLastSet">
-        <text>↩ 撤回上一组</text>
-      </view>
+      <block wx:if="{{activeStage === 'warmup'}}">
+        <view
+          wx:if="{{currentWarmupIndex < warmupSets.length}}"
+          class="btn btn-warmup-primary btn-md btn-block"
+          bindtap="onCompleteWarmupSet"
+        >
+          <text class="btn-complete-icon">✓</text>
+          <text>完成 {{currentWarmupIndex + 1}}/{{warmupSets.length}} 组热身</text>
+        </view>
+        <view
+          wx:else
+          class="btn btn-primary btn-md btn-block"
+          bindtap="onFinishWarmup"
+        >
+          <text>开始正式组</text>
+        </view>
+      </block>
+      <block wx:else>
+        <view wx:if="{{currentExercise.isDone}}" class="btn btn-primary btn-md btn-block" bindtap="onAddExtraSet">
+          <text class="btn-complete-icon">+</text>
+          <text>加练一组（第 {{currentExercise.target_sets + 1}} 组）</text>
+        </view>
+        <view wx:else class="btn btn-primary btn-md btn-block" bindtap="onCompleteSet">
+          <text class="btn-complete-icon">✓</text>
+          <text>完成 {{currentExercise.currentSetNumber}}/{{currentExercise.target_sets}} 组</text>
+        </view>
+        <view wx:if="{{completedSets.length > 0}}" class="undo-last-btn" bindtap="onUndoLastSet">
+          <text>↩ 撤回上一组</text>
+        </view>
+      </block>
     </view>
   </view>
 

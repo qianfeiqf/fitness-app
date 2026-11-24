@@ -22,7 +22,11 @@ Page({
     // 动作列表
     exercises: [],
 
-    // 正式组平铺列表
+    // 热身与正式组双 Tab 状态
+    activeStage: 'formal',
+    warmupSets: [],
+    currentWarmupIndex: 0,
+    warmupCompletedCount: 0,
     formalSets: [],
 
     // 倒计时
@@ -356,21 +360,23 @@ Page({
       alternatives: []
     };
 
-    const needsWarmup = !isFreeWorkout && (exercise.target_weight || 0) >= 30 && !exercise.warmup_completed;
-    if (needsWarmup) {
-      this.showWarmupPanel(exercise, exerciseDetail);
-      return;
-    }
-
     const formalSets = this._ensureFormalSets(exercise, completedSets);
+    const warmupSets = this._ensureWarmupSets(exercise);
     const doneCount = formalSets.filter(s => s.completed).length;
     const nextIdx = formalSets.findIndex(s => !s.completed);
     const activeIdx = nextIdx >= 0 ? nextIdx : formalSets.length;
     const isDone = nextIdx === -1;
 
+    const warmupCompletedCount = warmupSets.filter(s => s.completed).length;
+    const currentWarmupIndex = this._findNextWarmupIndex(warmupSets);
+    const defaultStage = (!isFreeWorkout && (exercise.target_weight || 0) >= 30 && !exercise.warmup_completed && doneCount === 0)
+      ? 'warmup'
+      : 'formal';
+
     const nextExercises = exercises.map((ex, i) => i === currentExerciseIndex ? {
       ...ex,
       formal_sets: formalSets,
+      warmup_sets: warmupSets,
       target_sets: formalSets.length,
       completed_sets: doneCount
     } : ex);
@@ -383,6 +389,11 @@ Page({
     this.setData({
       exercises: nextExercises,
       formalSets,
+      warmupSets,
+      warmupCompletedCount,
+      currentWarmupIndex,
+      activeStage: defaultStage,
+      showWarmup: false,
       currentExercise: {
         ...nextExercises[currentExerciseIndex],
         ...exerciseDetail,
@@ -394,7 +405,6 @@ Page({
       currentSetIndex: activeIdx,
       selectedRPE: defaultRPE,
       setNote: '',
-      showWarmup: false,
       freeAllDone: false
     });
 
@@ -402,94 +412,81 @@ Page({
   },
 
   /**
-   * 显示热身面板
+   * 初始化或沿用某动作的热身组列表（切 Tab 或切动作不重置）
    */
-  showWarmupPanel(exercise, exerciseDetail) {
+  _ensureWarmupSets(exercise) {
+    if (Array.isArray(exercise.warmup_sets) && exercise.warmup_sets.length > 0) {
+      return exercise.warmup_sets.map(s => ({ ...s }));
+    }
+
     const targetWeight = exercise.target_weight || 0;
     const barWeight = 20;
-
-    // 计算热身组：空杆×10 → 40%×5 → 60%×3 → 80%×1
     const warmupSets = [];
 
-    // 第一组：空杆（如果目标重量足够大）
     if (targetWeight > barWeight + 10) {
-      warmupSets.push({
-        weight: barWeight,
-        reps: 10,
-        label: '空杆激活',
-        completed: false
-      });
+      warmupSets.push({ weight: barWeight, reps: 10, label: '空杆激活', completed: false });
     }
-
-    // 第二组：40%
     const w2 = Math.round((targetWeight * 0.4) * 2) / 2;
     if (w2 > barWeight) {
-      warmupSets.push({
-        weight: w2,
-        reps: 5,
-        label: '轻重量适应',
-        completed: false
-      });
+      warmupSets.push({ weight: w2, reps: 5, label: '轻重量适应', completed: false });
     }
-
-    // 第三组：60%
     const w3 = Math.round((targetWeight * 0.6) * 2) / 2;
     if (w3 > (warmupSets.length > 0 ? warmupSets[warmupSets.length - 1].weight : 0)) {
-      warmupSets.push({
-        weight: w3,
-        reps: 3,
-        label: '中等重量预热',
-        completed: false
-      });
+      warmupSets.push({ weight: w3, reps: 3, label: '中等重量预热', completed: false });
     }
-
-    // 第四组：80%
     const w4 = Math.round((targetWeight * 0.8) * 2) / 2;
     if (w4 > (warmupSets.length > 0 ? warmupSets[warmupSets.length - 1].weight : 0)) {
-      warmupSets.push({
-        weight: w4,
-        reps: 1,
-        label: '接近重量激活',
-        completed: false
-      });
+      warmupSets.push({ weight: w4, reps: 1, label: '接近重量激活', completed: false });
     }
-
-    // 兜底：若目标重量较轻（如哑铃/徒手/小重量）未生成默认热身组，则给 1 组 50% 轻重量预热
     if (warmupSets.length === 0) {
       const halfWeight = Math.max(0, Math.round((targetWeight * 0.5) * 2) / 2);
-      warmupSets.push({
-        weight: halfWeight,
-        reps: 10,
-        label: '轻重量热身',
-        completed: false
+      warmupSets.push({ weight: halfWeight, reps: 10, label: '轻重量热身', completed: false });
+    }
+    return warmupSets;
+  },
+
+  /**
+   * 持久化热身组列表回当前动作和会话
+   */
+  _syncWarmupSets(warmupSets) {
+    const { exercises, currentExerciseIndex, session } = this.data;
+    const warmupCompletedCount = warmupSets.filter(s => s.completed).length;
+    const currentWarmupIndex = this._findNextWarmupIndex(warmupSets);
+    const nextExercises = exercises.map((ex, i) => i === currentExerciseIndex ? { ...ex, warmup_sets: warmupSets } : ex);
+
+    if (session) {
+      update('sessions', session.id, {
+        pending_exercises: nextExercises,
+        updated_at: Date.now()
       });
     }
-
     this.setData({
-      showWarmup: true,
-      currentExercise: {
-        ...exercise,
-        ...exerciseDetail
-      },
+      exercises: nextExercises,
       warmupSets,
-      currentWarmupIndex: 0
+      warmupCompletedCount,
+      currentWarmupIndex
     });
   },
 
   /**
-   * 手动打开热身组面板（供自由训练或随时想加练热身时按需进入）
+   * 热身组 / 正式组双 Tab 互切
    */
-  onOpenWarmup() {
-    const { exercises, currentExerciseIndex } = this.data;
-    const exercise = exercises[currentExerciseIndex];
-    if (!exercise) return;
-    const exerciseDetail = findOne('exercises', { id: exercise.exercise_id }) || {
-      id: exercise.exercise_id,
-      name: exercise.exercise_name || exercise.name || '自定义动作',
-      muscle_group: exercise.muscle_group || '自由训练',
-      alternatives: []
-    };
-    this.showWarmupPanel(exercise, exerciseDetail);
+  onSwitchStage(e) {
+    const stage = e.currentTarget.dataset.stage;
+    if (!stage || stage === this.data.activeStage) return;
+
+    if (stage === 'formal') {
+      const { exercises, currentExerciseIndex, session } = this.data;
+      if (exercises[currentExerciseIndex] && !exercises[currentExerciseIndex].warmup_completed) {
+        const nextExercises = exercises.map((ex, i) => i === currentExerciseIndex ? { ...ex, warmup_completed: true } : ex);
+        if (session) {
+          update('sessions', session.id, { pending_exercises: nextExercises, updated_at: Date.now() });
+        }
+        this.setData({ exercises: nextExercises, activeStage: 'formal' });
+        return;
+      }
+    }
+    this.setData({ activeStage: stage });
   },
 
   /**
@@ -500,42 +497,43 @@ Page({
     return idx >= 0 ? idx : sets.length;
   },
 
-  /**
-   * 编辑热身组重量
-   */
   onWarmupWeightInput(e) {
     const idx = Number(e.currentTarget.dataset.index);
     if (Number.isNaN(idx) || !this.data.warmupSets[idx]) return;
     this.setData({ [`warmupSets[${idx}].weight`]: e.detail.value });
   },
 
-  /**
-   * 编辑热身组次数
-   */
   onWarmupRepsInput(e) {
     const idx = Number(e.currentTarget.dataset.index);
     if (Number.isNaN(idx) || !this.data.warmupSets[idx]) return;
     this.setData({ [`warmupSets[${idx}].reps`]: e.detail.value });
   },
 
-  /**
-   * 热身输入框失焦时规范化数值
-   */
   onWarmupInputBlur(e) {
     const idx = Number(e.currentTarget.dataset.index);
     const sets = this.data.warmupSets;
     if (Number.isNaN(idx) || !sets[idx]) return;
     const rawW = parseFloat(sets[idx].weight);
     const rawR = parseInt(sets[idx].reps, 10);
-    this.setData({
-      [`warmupSets[${idx}].weight`]: Number.isNaN(rawW) || rawW < 0 ? 0 : rawW,
-      [`warmupSets[${idx}].reps`]: Number.isNaN(rawR) || rawR < 1 ? 1 : rawR
-    });
+    const nextSets = sets.map((s, i) => i === idx ? {
+      ...s,
+      weight: Number.isNaN(rawW) || rawW < 0 ? 0 : rawW,
+      reps: Number.isNaN(rawR) || rawR < 1 ? 1 : rawR
+    } : s);
+    this._syncWarmupSets(nextSets);
   },
 
-  /**
-   * 添加一组热身
-   */
+  onToggleWarmupSet(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    const sets = this.data.warmupSets;
+    if (Number.isNaN(idx) || !sets[idx]) return;
+    const nextSets = sets.map((s, i) => i === idx ? { ...s, completed: !s.completed } : s);
+    this._syncWarmupSets(nextSets);
+    if (nextSets[idx].completed) {
+      UI.vibrateSuccess();
+    }
+  },
+
   onAddWarmupSet() {
     const warmupSets = [...this.data.warmupSets];
     const last = warmupSets[warmupSets.length - 1];
@@ -545,81 +543,36 @@ Page({
       label: '自定义热身',
       completed: false
     });
-    this.setData({
-      warmupSets,
-      currentWarmupIndex: this._findNextWarmupIndex(warmupSets)
-    });
+    this._syncWarmupSets(warmupSets);
   },
 
-  /**
-   * 删除指定热身组（至少保留 1 组）
-   */
   onDeleteWarmupSet(e) {
     const idx = Number(e.currentTarget.dataset.index);
     const warmupSets = [...this.data.warmupSets];
     if (warmupSets.length <= 1 || Number.isNaN(idx)) return;
     warmupSets.splice(idx, 1);
-    this.setData({
-      warmupSets,
-      currentWarmupIndex: this._findNextWarmupIndex(warmupSets)
-    });
+    this._syncWarmupSets(warmupSets);
   },
 
-  /**
-   * 完成一组热身
-   */
   onCompleteWarmupSet() {
     const { warmupSets, currentWarmupIndex } = this.data;
     if (!warmupSets[currentWarmupIndex]) return;
-
-    warmupSets[currentWarmupIndex].completed = true;
-    const nextIndex = this._findNextWarmupIndex(warmupSets);
-
-    this.setData({
-      warmupSets,
-      currentWarmupIndex: nextIndex
-    });
-
+    const nextSets = warmupSets.map((s, i) => i === currentWarmupIndex ? { ...s, completed: true } : s);
+    this._syncWarmupSets(nextSets);
     UI.vibrateSuccess();
-
-    if (nextIndex >= warmupSets.length) {
-      UI.showToast({
-        message: '热身完成！',
-        icon: 'check-circle',
-        context: this
-      });
+    if (this._findNextWarmupIndex(nextSets) >= nextSets.length) {
+      UI.showToast({ message: '热身完成', icon: 'check-circle', context: this });
     }
   },
 
-  /**
-   * 跳过热身
-   */
-  onSkipWarmup() {
-    const { exercises, currentExerciseIndex } = this.data;
-
-    exercises[currentExerciseIndex].warmup_completed = true;
-
-    this.setData({
-      exercises,
-      showWarmup: false
-    });
-
-    this.setCurrentExercise();
-  },
-
-  /**
-   * 热身完成，进入正式训练
-   */
   onFinishWarmup() {
     const { exercises, currentExerciseIndex, session } = this.data;
     if (!exercises[currentExerciseIndex]) return;
-    exercises[currentExerciseIndex].warmup_completed = true;
-    update('sessions', session.id, {
-      pending_exercises: exercises,
-      updated_at: Date.now()
-    });
-    this.setData({ exercises, showWarmup: false });
-    this.setCurrentExercise();
+    const nextExercises = exercises.map((ex, i) => i === currentExerciseIndex ? { ...ex, warmup_completed: true } : ex);
+    if (session) {
+      update('sessions', session.id, { pending_exercises: nextExercises, updated_at: Date.now() });
+    }
+    this.setData({ exercises: nextExercises, activeStage: 'formal' });
   },
 
   /**

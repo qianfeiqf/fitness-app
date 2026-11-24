@@ -571,26 +571,27 @@
   display: flex;
   flex-direction: column;
   gap: 16rpx;
-  margin-bottom: 32rpx;
+  margin-top: 8rpx;
+  margin-bottom: 20rpx;
 }
 
 .warmup-item {
   display: flex;
   align-items: center;
   gap: 20rpx;
-  padding: 24rpx;
+  padding: 22rpx 24rpx;
   background: #FFFFFF;
   border-radius: 16rpx;
   border: 1rpx solid #E5E5E5;
 }
 
 .warmup-item.current {
-  background-color: #FFFBF5;
-  border-color: #FDBA74;
+  background-color: #F7F7F7;
+  border-color: #D0D0D0;
 }
 
 .warmup-item.completed {
-  opacity: 0.6;
+  opacity: 0.72;
 }
 
 .warmup-check {
@@ -598,8 +599,8 @@
   height: 56rpx;
   padding: 0;
   border-radius: 50%;
-  background: #FFF7ED;
-  border: 1rpx solid #FED7AA;
+  background: #F0F0F0;
+  border: 1rpx solid #E0E0E0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -608,8 +609,8 @@
 }
 
 .warmup-item.current .warmup-check {
-  background: #D97706;
-  border-color: #D97706;
+  background: #333333;
+  border-color: #333333;
 }
 
 .warmup-item.current .warmup-check-num {
@@ -629,7 +630,7 @@
 
 .warmup-check-num {
   font-size: 26rpx;
-  color: #D97706;
+  color: #666666;
   font-weight: 700;
 }
 
@@ -748,7 +749,7 @@
 }
 
 .btn-warmup-primary {
-  background: #D97706;
+  background: #1A1A1A;
   color: #FFFFFF;
   border-radius: 9999rpx;
   font-weight: 600;
@@ -787,10 +788,11 @@
 }
 
 .exercise-header {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24rpx;
+  margin-bottom: 16rpx;
 }
 
 .exercise-tags {
@@ -799,32 +801,57 @@
   gap: 12rpx;
 }
 
-.formal-stage-badge {
-  display: inline-flex;
+/* 热身组 / 正式组 极简分段 Tab */
+.stage-tabs {
+  flex-shrink: 0;
+  display: flex;
   align-items: center;
-  padding: 6rpx 16rpx;
-  border-radius: 9999rpx;
-  background: #E8F8EE;
-  border: 1rpx solid #A7E3BE;
-  color: #07C160;
-  font-size: 22rpx;
+  padding: 6rpx;
+  margin-bottom: 16rpx;
+  border-radius: 16rpx;
+  background: #F3F4F6;
+}
+
+.stage-tab {
+  flex: 1;
+  height: 68rpx;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  color: #666666;
+  transition: all 0.15s ease;
+}
+
+.stage-tab.active {
+  background: #FFFFFF;
+  color: #1A1A1A;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.stage-tab-text {
+  font-size: 26rpx;
+  font-weight: 500;
+}
+
+.stage-tab.active .stage-tab-text {
   font-weight: 700;
 }
 
-.warmup-entry-btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 6rpx 18rpx;
-  border-radius: 9999rpx;
-  background: #FFF7ED;
-  border: 1rpx solid #FDBA74;
-  color: #D97706;
+.stage-tab-count {
   font-size: 22rpx;
+  color: #999999;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+.stage-tab.active .stage-tab-count {
+  color: #555555;
   font-weight: 600;
 }
 
-.warmup-entry-btn:active {
-  opacity: 0.8;
+.set-indicator-warmup {
+  background: #333333;
 }
 
 .set-indicator {

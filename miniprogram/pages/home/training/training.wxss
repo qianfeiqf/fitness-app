@@ -811,6 +811,22 @@
   font-weight: 700;
 }
 
+.warmup-entry-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 18rpx;
+  border-radius: 9999rpx;
+  background: #FFF7ED;
+  border: 1rpx solid #FDBA74;
+  color: #D97706;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.warmup-entry-btn:active {
+  opacity: 0.8;
+}
+
 .set-indicator {
   display: flex;
   align-items: baseline;
@@ -901,6 +917,7 @@
   display: flex;
   gap: 20rpx;
   justify-content: center;
+  margin-top: 24rpx;
   margin-bottom: 24rpx;
 }
 

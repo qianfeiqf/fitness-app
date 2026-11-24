@@ -179,6 +179,7 @@
       <view class="exercise-tags">
         <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
         <view class="formal-stage-badge">正式组</view>
+        <view wx:if="{{!currentExercise.isDone}}" class="warmup-entry-btn" bindtap="onOpenWarmup">热身</view>
       </view>
       <view class="set-indicator-wrap">
         <view class="set-indicator">
@@ -194,21 +195,6 @@
       </view>
     </view>
 
-    <!-- 目标展示 -->
-    <view class="target-display">
-      <text class="target-label">目标</text>
-      <view class="target-values">
-        <text class="target-weight">{{currentExercise.target_weight}}</text>
-        <text class="target-unit">kg</text>
-        <text class="target-sep">×</text>
-        <text class="target-reps">{{currentExercise.target_reps}}</text>
-        <text class="target-unit">次</text>
-      </view>
-      <view wx:if="{{plateHint}}" class="plate-hint-bar" bindtap="onToggleBarWeight">
-        <text class="plate-hint-text">🏋️ {{plateHint}}</text>
-        <text class="plate-hint-switch">切换杆重</text>
-      </view>
-    </view>
 
     <!-- 实际录入 — 刻度拨盘 -->
     <view class="actual-input">
@@ -288,7 +274,7 @@
       </view>
       <view wx:else class="btn btn-primary btn-md btn-block" bindtap="onCompleteSet">
         <text class="btn-complete-icon">✓</text>
-        <text>完成一组</text>
+        <text>完成 {{currentExercise.currentSetNumber}}/{{currentExercise.target_sets}} 组</text>
       </view>
       <view wx:if="{{completedSets.length > 0}}" class="undo-last-btn" bindtap="onUndoLastSet">
         <text>↩ 撤回上一组</text>

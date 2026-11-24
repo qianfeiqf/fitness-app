@@ -398,6 +398,17 @@ Page({
       });
     }
 
+    // 兜底：若目标重量较轻（如哑铃/徒手/小重量）未生成默认热身组，则给 1 组 50% 轻重量预热
+    if (warmupSets.length === 0) {
+      const halfWeight = Math.max(0, Math.round((targetWeight * 0.5) * 2) / 2);
+      warmupSets.push({
+        weight: halfWeight,
+        reps: 10,
+        label: '轻重量热身',
+        completed: false
+      });
+    }
+
     this.setData({
       showWarmup: true,
       currentExercise: {
@@ -407,6 +418,22 @@ Page({
       warmupSets,
       currentWarmupIndex: 0
     });
+  },
+
+  /**
+   * 手动打开热身组面板（供自由训练或随时想加练热身时按需进入）
+   */
+  onOpenWarmup() {
+    const { exercises, currentExerciseIndex } = this.data;
+    const exercise = exercises[currentExerciseIndex];
+    if (!exercise) return;
+    const exerciseDetail = findOne('exercises', { id: exercise.exercise_id }) || {
+      id: exercise.exercise_id,
+      name: exercise.exercise_name || exercise.name || '自定义动作',
+      muscle_group: exercise.muscle_group || '自由训练',
+      alternatives: []
+    };
+    this.showWarmupPanel(exercise, exerciseDetail);
   },
 
   /**

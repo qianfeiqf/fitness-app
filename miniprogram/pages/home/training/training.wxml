@@ -92,24 +92,10 @@
 
   <!-- 主训练区域：热身组与正式组双 Tab 平级切换 -->
   <view hidden="{{!currentExercise || freeAllDone}}" class="training-main">
-    <!-- 动作肌群标签 + 当前阶段进度 -->
+    <!-- 动作肌群标签 -->
     <view class="exercise-header">
       <view class="exercise-tags">
         <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
-      </view>
-      <view class="set-indicator-wrap">
-        <view wx:if="{{activeStage === 'warmup'}}" class="set-indicator set-indicator-warmup">
-          <text class="set-current">{{warmupCompletedCount}}</text>
-          <text class="set-sep">/</text>
-          <text class="set-total">{{warmupSets.length}}</text>
-          <text class="set-label">热身</text>
-        </view>
-        <view wx:else class="set-indicator">
-          <text class="set-current">{{currentExercise.currentSetNumber}}</text>
-          <text class="set-sep">/</text>
-          <text class="set-total">{{currentExercise.target_sets}}</text>
-          <text class="set-label">{{currentExercise.isDone ? '组 (已完成)' : '组'}}</text>
-        </view>
       </view>
     </view>
 
@@ -286,7 +272,7 @@
           class="btn btn-warmup-primary btn-md btn-block"
           bindtap="onCompleteWarmupSet"
         >
-          <text>完成 {{currentWarmupIndex + 1}}/{{warmupSets.length}} 组热身</text>
+          <text>完成第 {{currentWarmupIndex + 1}} 组热身</text>
         </view>
         <view
           wx:else
@@ -301,7 +287,7 @@
           <text>+ 加练一组（第 {{currentExercise.target_sets + 1}} 组）</text>
         </view>
         <view wx:else class="btn btn-primary btn-md btn-block" bindtap="onCompleteSet">
-          <text>完成 {{currentExercise.currentSetNumber}}/{{currentExercise.target_sets}} 组</text>
+          <text>完成第 {{currentExercise.currentSetNumber}} 组</text>
         </view>
         <view wx:if="{{completedSets.length > 0}}" class="undo-last-btn" bindtap="onUndoLastSet">
           <text>撤回上一组</text>

@@ -135,6 +135,7 @@ Page({
   onUnload() {
     this.clearRestTimer();
     this.stopDurationTimer();
+    this._clearWarmupAutoSwitchTimer();
     if (this.data.session && !this.data.isCompleted) {
       const latest = findOne('sessions', { id: this.data.session.id });
       if (latest && latest.status !== 'completed' && latest.status !== 'aborted') {
@@ -475,6 +476,7 @@ Page({
   onSwitchStage(e) {
     const stage = e.currentTarget.dataset.stage;
     if (!stage || stage === this.data.activeStage) return;
+    this._clearWarmupAutoSwitchTimer();
 
     if (stage === 'formal') {
       const { exercises, currentExerciseIndex, session } = this.data;
@@ -524,6 +526,25 @@ Page({
     this._syncWarmupSets(nextSets);
   },
 
+  _clearWarmupAutoSwitchTimer() {
+    if (this._warmupAutoSwitchTimer) {
+      clearTimeout(this._warmupAutoSwitchTimer);
+      this._warmupAutoSwitchTimer = null;
+    }
+  },
+
+  _scheduleAutoSwitchToFormal() {
+    this._clearWarmupAutoSwitchTimer();
+    const targetExerciseIndex = this.data.currentExerciseIndex;
+    UI.showToast({ message: '热身完成', icon: 'check-circle', context: this });
+    this._warmupAutoSwitchTimer = setTimeout(() => {
+      this._warmupAutoSwitchTimer = null;
+      if (this.data.activeStage === 'warmup' && this.data.currentExerciseIndex === targetExerciseIndex) {
+        this.onFinishWarmup();
+      }
+    }, 450);
+  },
+
   onToggleWarmupSet(e) {
     const idx = Number(e.currentTarget.dataset.index);
     const sets = this.data.warmupSets;
@@ -532,6 +553,11 @@ Page({
     this._syncWarmupSets(nextSets);
     if (nextSets[idx].completed) {
       UI.vibrateSuccess();
+      if (this._findNextWarmupIndex(nextSets) >= nextSets.length) {
+        this._scheduleAutoSwitchToFormal();
+      }
+    } else {
+      this._clearWarmupAutoSwitchTimer();
     }
   },
 
@@ -562,11 +588,12 @@ Page({
     this._syncWarmupSets(nextSets);
     UI.vibrateSuccess();
     if (this._findNextWarmupIndex(nextSets) >= nextSets.length) {
-      UI.showToast({ message: '热身完成', icon: 'check-circle', context: this });
+      this._scheduleAutoSwitchToFormal();
     }
   },
 
   onFinishWarmup() {
+    this._clearWarmupAutoSwitchTimer();
     const { exercises, currentExerciseIndex, session } = this.data;
     if (!exercises[currentExerciseIndex]) return;
     const nextExercises = exercises.map((ex, i) => i === currentExerciseIndex ? { ...ex, warmup_completed: true } : ex);

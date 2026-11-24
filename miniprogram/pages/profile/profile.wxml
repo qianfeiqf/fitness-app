@@ -39,7 +39,6 @@
 
       <view class="profile-inputs">
         <view class="profile-input-item">
-          <view class="input-icon">⚖</view>
           <view class="input-content">
             <text class="input-label">体重</text>
             <view class="input-row">
@@ -56,7 +55,6 @@
         <view class="input-divider"></view>
 
         <view class="profile-input-item">
-          <view class="input-icon">📏</view>
           <view class="input-content">
             <text class="input-label">身高</text>
             <view class="input-row">
@@ -98,7 +96,7 @@
               <view class="progress-fill" style="{{item.progressStyle}}"></view>
             </view>
             <text class="progress-text">{{item.progress}}%</text>
-            <view class="goal-delete" bindtap="onDeleteGoal" data-id="{{item.id}}">✕</view>
+            <view class="goal-delete" bindtap="onDeleteGoal" data-id="{{item.id}}"><mp-icon icon="close" color="#999999" size="{{14}}" /></view>
           </view>
           <view wx:if="{{item.deadline}}" class="goal-deadline">
             截止日期: {{item.deadline}}
@@ -229,7 +227,7 @@
   <!-- 训练悬浮窗 -->
   <view wx:if="{{trainingFloat}}" class="training-float" bindtap="onTapTrainingFloat">
     <view class="training-float-content">
-      <text class="training-float-icon">💪</text>
+      <mp-icon icon="play2" color="#07C160" size="{{22}}" />
       <view class="training-float-info">
         <text class="training-float-name">{{trainingFloat.exerciseName}}</text>
         <text class="training-float-set">第 {{trainingFloat.currentSet}}/{{trainingFloat.totalSets}} 组</text>

@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "训练完成",
-  "usingComponents": {}
+  "usingComponents": {
+    "mp-icon": "weui-miniprogram/icon/icon"
+  }
 }

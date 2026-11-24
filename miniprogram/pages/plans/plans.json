@@ -1,7 +1,8 @@
 {
   "usingComponents": {
     "modal-sheet": "../../components/modal-sheet/modal-sheet",
-    "mp-tabs": "../../components/mp-tabs/mp-tabs"
+    "mp-tabs": "../../components/mp-tabs/mp-tabs",
+    "mp-icon": "weui-miniprogram/icon/icon"
   },
   "navigationBarTitleText": "训练计划",
   "navigationStyle": "custom"

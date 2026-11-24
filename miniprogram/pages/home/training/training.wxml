@@ -58,14 +58,14 @@
   <!-- PR徽章展示 -->
   <view wx:if="{{prBadges.length > 0}}" class="pr-badges">
     <view wx:for="{{prBadges}}" wx:key="id" class="pr-badge-item">
-      <text class="pr-badge-icon">🏆</text>
+      <mp-icon icon="star" color="#07C160" size="{{16}}" />
       <text class="pr-badge-text">{{item.exerciseName}} 新PR: {{item.value}}kg</text>
     </view>
   </view>
 
   <!-- 自由训练：尚无动作时的空态引导 -->
   <view wx:if="{{isFreeWorkout && exercises.length === 0}}" class="free-empty-state">
-    <text class="free-empty-icon">🏋️</text>
+    <mp-icon icon="add2" color="#CCCCCC" size="{{44}}" />
     <text class="free-empty-title">自由训练已开始</text>
     <text class="free-empty-desc">可以先一次性选好几个动作再逐个练，也可以练完一个再加下一个</text>
     <view class="btn btn-primary btn-md free-empty-btn" bindtap="onAddExercise">
@@ -494,7 +494,7 @@
     </view>
 
     <view class="rest-overlay-body">
-      <text class="rest-overlay-icon">💪</text>
+
       <text class="rest-overlay-title">休息一下</text>
 
     </view>

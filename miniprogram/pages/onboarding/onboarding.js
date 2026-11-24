@@ -22,10 +22,10 @@ Page({
     
     // 步骤1：健身目标
     goals: [
-      { id: 'muscle', name: '增肌塑形', icon: '\u{1F4AA}', desc: '增加肌肉量，改善体型线条' },
-      { id: 'fatloss', name: '减脂瘦身', icon: '\u{1F525}', desc: '降低体脂率，提升代谢水平' },
-      { id: 'strength', name: '力量提升', icon: '\u{1F3CB}', desc: '提升最大力量，突破重量瓶颈' },
-      { id: 'general', name: '综合健康', icon: '❤', desc: '全面提升身体素质，保持健康' }
+      { id: 'muscle', name: '增肌塑形', icon: '', desc: '增加肌肉量，改善体型线条' },
+      { id: 'fatloss', name: '减脂瘦身', icon: '', desc: '降低体脂率，提升代谢水平' },
+      { id: 'strength', name: '力量提升', icon: '', desc: '提升最大力量，突破重量瓶颈' },
+      { id: 'general', name: '综合健康', icon: '', desc: '全面提升身体素质，保持健康' }
     ],
     selectedGoal: null,
     

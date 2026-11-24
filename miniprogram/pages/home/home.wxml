@@ -17,7 +17,7 @@
   <view wx:if="{{!isLoggedIn}}" class="login-section">
     <view class="login-hero">
       <view class="login-avatar">
-        <text class="login-avatar-icon">💪</text>
+        <mp-icon icon="me" color="#1A1A1A" size="{{36}}" />
       </view>
       <text class="login-headline">准备好突破了</text>
       <text class="login-subhead">登录后同步训练数据，追踪你的每一步进步</text>
@@ -37,7 +37,7 @@
   <!-- 无训练计划 -->
   <view wx:elif="{{!todayPlan}}" class="empty-section">
     <view class="empty-visual">
-      <text class="empty-icon">🏋️</text>
+      <mp-icon icon="add2" color="#CCCCCC" size="{{44}}" />
     </view>
     <text class="empty-title">还没有训练计划</text>
     <text class="empty-desc">选择一个计划，或者直接进入自由训练边练边记</text>
@@ -137,7 +137,6 @@
             <text class="progress-ring-label">本周训练</text>
           </view>
           <view class="streak-wrap" wx:if="{{streak > 0}}">
-            <view class="streak-flame">🔥</view>
             <text class="streak-num">{{streak}}</text>
             <text class="streak-label">连续训练天</text>
           </view>
@@ -149,7 +148,7 @@
 
           <!-- 休息日提示（单计划时轻量带出计划名，多计划时由顶部页签承载避免重复） -->
           <view wx:if="{{pd.isRestDay}}" class="rest-day-inline">
-            <text class="rest-day-inline-icon">☕</text>
+            <mp-icon icon="time" color="#666666" size="{{26}}" />
             <view class="rest-day-inline-content">
               <text class="rest-day-inline-title">今日是休息日</text>
               <text class="rest-day-inline-desc">{{planDataList.length === 1 ? pd.plan.name + ' · ' : ''}}适当放松，让身体恢复，明天继续加油</text>
@@ -170,25 +169,16 @@
             <!-- 训练数据网格 -->
             <view class="stats-grid">
               <view class="stat-item">
-                <view class="stat-icon-wrap">
-                  <text class="stat-icon">⏱</text>
-                </view>
                 <text class="stat-value">{{pd.estimatedMinutes}}</text>
                 <text class="stat-label">分钟</text>
               </view>
               <view class="stat-divider"></view>
               <view class="stat-item">
-                <view class="stat-icon-wrap">
-                  <text class="stat-icon">🔥</text>
-                </view>
                 <text class="stat-value">{{pd.totalSets}}</text>
                 <text class="stat-label">组数</text>
               </view>
               <view class="stat-divider"></view>
               <view class="stat-item">
-                <view class="stat-icon-wrap">
-                  <text class="stat-icon">💎</text>
-                </view>
                 <text class="stat-value-sm">{{pd.muscleGroups}}</text>
                 <text class="stat-label">肌群</text>
               </view>
@@ -258,14 +248,14 @@
     bind:close="onAbandonTraining"
   >
     <view class="modal-icon-wrap" style="text-align:center;margin-bottom:16rpx;">
-      <text style="font-size:64rpx;">⚡</text>
+      <icon type="info" size="40" color="#07C160" />
     </view>
   </modal-sheet>
 
   <!-- 训练悬浮窗 -->
   <view wx:if="{{trainingFloat}}" class="training-float" bindtap="onTapTrainingFloat">
     <view class="training-float-content">
-      <text class="training-float-icon">💪</text>
+      <mp-icon icon="play2" color="#07C160" size="{{22}}" />
       <view class="training-float-info">
         <text class="training-float-name">{{trainingFloat.exerciseName}}</text>
         <text class="training-float-set">第 {{trainingFloat.currentSet}}/{{trainingFloat.totalSets}} 组</text>

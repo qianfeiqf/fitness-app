@@ -29,7 +29,7 @@
         </view>
       </view>
       <view wx:if="{{prCount > 0}}" class="detail-pr">
-        <text class="pr-icon">🏆</text>
+        <mp-icon icon="star" color="#07C160" size="{{18}}" />
         <text>本次刷新 {{prCount}} 个 PR</text>
       </view>
     </view>
@@ -52,7 +52,8 @@
               <text wx:if="{{set.is_pr}}" class="set-pr">PR</text>
             </view>
             <view wx:if="{{set.note}}" class="set-note">
-              <text>💬 {{set.note}}</text>
+              <mp-icon icon="comment" color="#999999" size="{{14}}" />
+              <text>{{set.note}}</text>
             </view>
           </view>
         </view>

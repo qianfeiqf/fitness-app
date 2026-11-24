@@ -201,7 +201,7 @@
     <view class="chart-card radar-card">
       <canvas type="2d" id="muscleRadarChart" class="radar-chart"></canvas>
       <view wx:if="{{muscleAdvice}}" class="muscle-advice">
-        <text class="advice-icon">💡</text>
+        <mp-icon icon="info" color="#07C160" size="{{18}}" />
         <text class="advice-text">{{muscleAdvice}}</text>
       </view>
     </view>
@@ -215,7 +215,7 @@
 
     <view wx:if="{{recentPRs.length === 0}}" class="empty-state">
       <view class="empty-visual">
-        <text class="empty-icon">🏆</text>
+        <mp-icon icon="star" color="#CCCCCC" size="{{40}}" />
       </view>
       <text class="empty-title">暂无PR记录</text>
       <text class="empty-desc">完成训练后记录会自动保存</text>
@@ -228,7 +228,7 @@
             class="pr-item"
             hover-class="item-pressed">
         <view class="pr-icon-wrap">
-          <text class="pr-icon">🏆</text>
+          <mp-icon icon="star" color="#07C160" size="{{20}}" />
         </view>
         <view class="pr-info">
           <text class="pr-exercise">{{item.exercise}}</text>
@@ -245,7 +245,7 @@
   <!-- 训练悬浮窗 -->
   <view wx:if="{{trainingFloat}}" class="training-float" bindtap="onTapTrainingFloat">
     <view class="training-float-content">
-      <text class="training-float-icon">💪</text>
+      <mp-icon icon="play2" color="#07C160" size="{{22}}" />
       <view class="training-float-info">
         <text class="training-float-name">{{trainingFloat.exerciseName}}</text>
         <text class="training-float-set">第 {{trainingFloat.currentSet}}/{{trainingFloat.totalSets}} 组</text>

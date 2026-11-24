@@ -115,6 +115,11 @@ Page({
   },
 
   onShow() {
+    const app = getApp();
+    if (app && app.globalData && this.data.sessionId && app.globalData.trainingMinimizedSessionId === this.data.sessionId) {
+      app.globalData.trainingMinimized = false;
+      app.globalData.trainingMinimizedSessionId = null;
+    }
     if (this.data.isResting && this.restEndTime && !this.data.restCompleting) {
       const remaining = Math.ceil((this.restEndTime - Date.now()) / 1000);
       if (remaining <= 0) {
@@ -279,6 +284,9 @@ Page({
     } else if (isFreeWorkout && exercises.length === 0) {
       this.onAddExercise();
     }
+
+    // 若全局存在当前会话的组间休息倒计时，无缝恢复
+    this._restoreGlobalRestState(session.id);
   },
 
   /**
@@ -937,6 +945,7 @@ Page({
 
     this.saveSnapshot();
     this.restEndTime = Date.now() + restSeconds * 1000;
+    this._syncGlobalRestState({ restTimeTotal: restSeconds, nextSetPreview, restMinimized: false });
     this._startRestInterval();
     this.checkAndSave1RM(setRecord);
     UI.vibrateSuccess();
@@ -1040,6 +1049,7 @@ Page({
         if (!res.confirm) return;
         this.clearRestTimer();
         this.restEndTime = null;
+        this._clearGlobalRestState();
 
         remove('session_sets', lastSet.id);
         const nextCompletedSets = completedSets.slice(0, -1);
@@ -1174,6 +1184,60 @@ Page({
   },
 
   /**
+   * 同步组间休息状态到全局，确保离开页面后悬浮条继续倒计时且返回可无缝续上
+   */
+  _syncGlobalRestState(overrides = {}) {
+    const app = getApp();
+    if (!app || !app.globalData) return;
+    const { session, restTimeTotal, nextSetPreview, restMinimized } = this.data;
+    if (!session || !this.restEndTime) return;
+    app.globalData.activeRest = {
+      sessionId: session.id,
+      restEndTime: this.restEndTime,
+      restTimeTotal: overrides.restTimeTotal !== undefined ? overrides.restTimeTotal : restTimeTotal,
+      nextSetPreview: overrides.nextSetPreview !== undefined ? overrides.nextSetPreview : nextSetPreview,
+      restMinimized: overrides.restMinimized !== undefined ? overrides.restMinimized : restMinimized,
+      notified: false
+    };
+  },
+
+  /**
+   * 清除当前会话的全局休息状态
+   */
+  _clearGlobalRestState() {
+    const app = getApp();
+    if (app && app.globalData && app.globalData.activeRest) {
+      if (!this.data.session || app.globalData.activeRest.sessionId === this.data.session.id) {
+        app.globalData.activeRest = null;
+      }
+    }
+  },
+
+  /**
+   * 重新进入训练页时从全局恢复未到期的组间休息倒计时
+   */
+  _restoreGlobalRestState(sessionId) {
+    const app = getApp();
+    const activeRest = app && app.globalData ? app.globalData.activeRest : null;
+    if (!activeRest || activeRest.sessionId !== sessionId || !activeRest.restEndTime) return;
+    const remaining = Math.ceil((activeRest.restEndTime - Date.now()) / 1000);
+    if (remaining > 0) {
+      this.restEndTime = activeRest.restEndTime;
+      this.setData({
+        isResting: true,
+        restTimeLeft: remaining,
+        restTimeTotal: activeRest.restTimeTotal || remaining,
+        nextSetPreview: activeRest.nextSetPreview || '',
+        restMinimized: !!activeRest.restMinimized,
+        restCompleting: false
+      });
+      this._startRestInterval();
+    } else {
+      app.globalData.activeRest = null;
+    }
+  },
+
+  /**
    * 开始休息倒计时
    */
   startRestTimer(seconds) {
@@ -1185,6 +1249,7 @@ Page({
       restTimeTotal: seconds,
       restCompleting: false
     });
+    this._syncGlobalRestState({ restTimeTotal: seconds, restMinimized: false });
 
     // 保存快照
     this.saveSnapshot();
@@ -1199,6 +1264,7 @@ Page({
   onRestComplete() {
     this.clearRestTimer();
     this.restEndTime = null;
+    this._clearGlobalRestState();
 
     audio.playCompleteSound();
     UI.vibrate();
@@ -1254,6 +1320,7 @@ Page({
    */
   onMinimizeRest() {
     this.setData({ restMinimized: true });
+    this._syncGlobalRestState({ restMinimized: true });
   },
 
   /**
@@ -1261,6 +1328,7 @@ Page({
    */
   onExpandRest() {
     this.setData({ restMinimized: false });
+    this._syncGlobalRestState({ restMinimized: false });
   },
 
   /**
@@ -1271,6 +1339,7 @@ Page({
     const newTime = Math.min(restTimeLeft + 30, 300); // 最多5分钟
     this.restEndTime = Date.now() + newTime * 1000;
     this.setData({ restTimeLeft: newTime, restTimeTotal: newTime });
+    this._syncGlobalRestState({ restTimeTotal: newTime });
   },
 
   /**
@@ -1281,6 +1350,7 @@ Page({
     const newTime = Math.max(restTimeLeft - 30, 30); // 最少30秒
     this.restEndTime = Date.now() + newTime * 1000;
     this.setData({ restTimeLeft: newTime, restTimeTotal: newTime });
+    this._syncGlobalRestState({ restTimeTotal: newTime });
   },
 
   /**
@@ -1903,6 +1973,9 @@ Page({
    */
   _discardCurrentSession() {
     this._isDiscarding = true;
+    this.clearRestTimer();
+    this.restEndTime = null;
+    this._clearGlobalRestState();
     const { session } = this.data;
     if (session) {
       update('sessions', session.id, {
@@ -2036,6 +2109,8 @@ Page({
    */
   async onTrainingComplete() {
     this.clearRestTimer();
+    this.restEndTime = null;
+    this._clearGlobalRestState();
     const { session, completedSets, exercises } = this.data;
     const totalDurationSeconds = Math.max(60, this._getCurrentTotalDurationSeconds());
     const shouldCalcProgression = !this.data.isFreeWorkout && !session.progression_calculated;

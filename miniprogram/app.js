@@ -77,7 +77,12 @@ App({
     cloudEnvId: CLOUD_ENV_ID,
     // 隐私授权回调暂存
     pendingPrivacyResolve: null,
-    privacyContractName: '《小程序隐私保护指引》'
+    privacyContractName: '《小程序隐私保护指引》',
+    // 全局训练收起悬浮条与组间休息倒计时状态
+    trainingMinimized: false,
+    trainingMinimizedSessionId: null,
+    trainingSnapshot: null,
+    activeRest: null
   },
 
   // 小程序初始化

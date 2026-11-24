@@ -1,0 +1,18 @@
+<view
+  wx:if="{{visible}}"
+  class="training-float {{restActive ? 'resting' : (restDone ? 'rest-done' : '')}}"
+  bindtap="onTapFloat"
+>
+  <view class="training-float-content">
+    <mp-icon
+      icon="{{restActive ? 'time' : 'play2'}}"
+      color="#07C160"
+      size="{{22}}"
+    />
+    <view class="training-float-info">
+      <text class="training-float-name {{restDone ? 'highlight' : ''}}">{{titleText}}</text>
+      <text class="training-float-set">{{subText}}</text>
+    </view>
+    <text class="training-float-arrow">›</text>
+  </view>
+</view>

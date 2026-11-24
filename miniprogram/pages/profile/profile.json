@@ -2,6 +2,7 @@
   "usingComponents": {
     "modal-sheet": "../../components/modal-sheet/modal-sheet",
     "privacy-popup": "../../components/privacy-popup/privacy-popup",
+    "training-float": "../../components/training-float/training-float",
     "mp-icon": "weui-miniprogram/icon/icon"
   },
   "navigationBarTitleText": "个人中心",

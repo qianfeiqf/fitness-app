@@ -911,14 +911,90 @@
 }
 
 /* =====================
-   实际录入 — 内凹槽
+   正式组平铺列表（与热身组一致的交互，绿/黑视觉体系区分）
    ===================== */
-.actual-input {
+.formal-list {
   display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-top: 8rpx;
+  margin-bottom: 20rpx;
+}
+
+.formal-item {
+  display: flex;
+  align-items: center;
   gap: 20rpx;
+  padding: 22rpx 24rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.formal-item.current {
+  background-color: #F4FBF7;
+  border-color: #A7E3BE;
+}
+
+.formal-item.completed {
+  opacity: 0.72;
+}
+
+.formal-check {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: #F0F0F0;
+  border: 1rpx solid #E0E0E0;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  margin-top: 24rpx;
-  margin-bottom: 24rpx;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.formal-item.current .formal-check {
+  background: #1A1A1A;
+  border-color: #1A1A1A;
+}
+
+.formal-item.current .formal-check-num {
+  color: #FFFFFF;
+}
+
+.formal-item.completed .formal-check {
+  background: #07C160;
+  border-color: #07C160;
+}
+
+.formal-check-icon {
+  font-size: 26rpx;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.formal-check-num {
+  font-size: 26rpx;
+  color: #666666;
+  font-weight: 700;
+}
+
+.formal-add-btn {
+  height: 76rpx;
+  margin-bottom: 20rpx;
+  border-radius: 16rpx;
+  border: 2rpx dashed #D8D8D8;
+  background: #FAFAFA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #555555;
+}
+
+.formal-add-btn:active {
+  background: #F0F0F0;
 }
 
 .input-card {

@@ -22,6 +22,9 @@ Page({
     // 动作列表
     exercises: [],
 
+    // 正式组平铺列表
+    formalSets: [],
+
     // 倒计时
     isResting: false,
     restTimeLeft: 0,
@@ -283,20 +286,69 @@ Page({
   /**
    * 设置当前动作
    */
+  /**
+   * 初始化或对齐某动作的平铺正式组列表
+   */
+  _ensureFormalSets(exercise, completedSets = []) {
+    const exRecords = completedSets.filter(s => s && s.exercise_id === exercise.exercise_id);
+    const recordMap = {};
+    exRecords.forEach(r => { recordMap[r.id] = r; });
+
+    if (Array.isArray(exercise.formal_sets) && exercise.formal_sets.length > 0) {
+      return exercise.formal_sets.map(s => {
+        if (s.completed && s.recordId && !recordMap[s.recordId]) {
+          return { ...s, completed: false, recordId: null };
+        }
+        if (s.recordId && recordMap[s.recordId]) {
+          const rec = recordMap[s.recordId];
+          return { ...s, completed: true, weight: rec.actual_weight, reps: rec.actual_reps };
+        }
+        return { ...s };
+      });
+    }
+
+    const totalSets = Math.max(1, exercise.target_sets || 3, exRecords.length);
+    const lastDone = exRecords.length > 0 ? exRecords[exRecords.length - 1] : null;
+    const fallbackWeight = lastDone ? lastDone.actual_weight : (exercise.target_weight || 0);
+    const fallbackReps = lastDone ? lastDone.actual_reps : (exercise.target_reps || 10);
+
+    const list = [];
+    for (let i = 0; i < totalSets; i++) {
+      if (i < exRecords.length) {
+        const rec = exRecords[i];
+        list.push({
+          weight: rec.actual_weight,
+          reps: rec.actual_reps,
+          completed: true,
+          recordId: rec.id,
+          userEdited: true
+        });
+      } else {
+        list.push({
+          weight: fallbackWeight,
+          reps: fallbackReps,
+          completed: false,
+          recordId: null,
+          userEdited: false
+        });
+      }
+    }
+    return list;
+  },
+
   setCurrentExercise() {
-    const { exercises, currentExerciseIndex, isFreeWorkout } = this.data;
+    const { exercises, currentExerciseIndex, isFreeWorkout, completedSets } = this.data;
     const exercise = exercises[currentExerciseIndex];
 
     if (!exercise) {
       if (isFreeWorkout) {
-        this.setData({ freeAllDone: exercises.length > 0, currentExercise: null });
+        this.setData({ freeAllDone: exercises.length > 0, currentExercise: null, formalSets: [] });
         return;
       }
       this.onTrainingComplete();
       return;
     }
 
-    // 获取动作详情（兼容自由训练自定义动作）
     const exerciseDetail = findOne('exercises', { id: exercise.exercise_id }) || {
       id: exercise.exercise_id,
       name: exercise.exercise_name || exercise.name || '自定义动作',
@@ -304,44 +356,48 @@ Page({
       alternatives: []
     };
 
-    // 自由训练模式不自动弹出热身组面板，直接进入重量/次数记录
     const needsWarmup = !isFreeWorkout && (exercise.target_weight || 0) >= 30 && !exercise.warmup_completed;
-
     if (needsWarmup) {
       this.showWarmupPanel(exercise, exerciseDetail);
       return;
     }
 
-    // 查找该动作最近一次的训练记录，作为默认值
-    const lastRecord = this.getLastExerciseRecord(exercise.exercise_id);
+    const formalSets = this._ensureFormalSets(exercise, completedSets);
+    const doneCount = formalSets.filter(s => s.completed).length;
+    const nextIdx = formalSets.findIndex(s => !s.completed);
+    const activeIdx = nextIdx >= 0 ? nextIdx : formalSets.length;
+    const isDone = nextIdx === -1;
 
-    // 确定实际重量和次数的默认值：每个动作第 1 组统一取目标重量和目标次数；后续组沿用上一组实际值
-    const isFirstSet = (exercise.completed_sets || 0) === 0;
-    const defaultWeight = isFirstSet ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
-    const defaultReps = isFirstSet ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 10));
-    const defaultRPE = isFirstSet ? 1 : (lastRecord && lastRecord.rpe ? (lastRecord.rpe - 1) : 1); // rpeOptions索引：0=轻量,1=中等,2=吃力,3=力竭
+    const nextExercises = exercises.map((ex, i) => i === currentExerciseIndex ? {
+      ...ex,
+      formal_sets: formalSets,
+      target_sets: formalSets.length,
+      completed_sets: doneCount
+    } : ex);
 
-    const isDone = (exercise.completed_sets || 0) >= (exercise.target_sets || 1);
+    const exRecords = completedSets.filter(s => s && s.exercise_id === exercise.exercise_id);
+    const lastInSession = exRecords.length > 0 ? exRecords[exRecords.length - 1] : null;
+    const defaultRPE = doneCount === 0 ? 1 : (lastInSession && lastInSession.rpe ? (lastInSession.rpe - 1) : 1);
+
+    const activeRow = formalSets[activeIdx] || formalSets[formalSets.length - 1] || { weight: 0, reps: 10 };
     this.setData({
+      exercises: nextExercises,
+      formalSets,
       currentExercise: {
-        ...exercise,
+        ...nextExercises[currentExerciseIndex],
         ...exerciseDetail,
         isDone,
-        currentSetNumber: isDone ? (exercise.target_sets || 1) : (exercise.completed_sets || 0) + 1,
-        actual_weight: defaultWeight,
-        actual_reps: defaultReps
+        currentSetNumber: isDone ? formalSets.length : activeIdx + 1,
+        actual_weight: activeRow.weight,
+        actual_reps: activeRow.reps
       },
-      currentSetIndex: exercise.completed_sets || 0,
+      currentSetIndex: activeIdx,
       selectedRPE: defaultRPE,
-      setNote: '', // 每组备注初始为空
+      setNote: '',
       showWarmup: false,
-      freeAllDone: false,
-      weightOptions: this._buildWeightOptions(defaultWeight),
-      repOptions: this._buildRepOptions(defaultReps),
-      plateHint: this._calcBarbellPlates(defaultWeight, this.data.barWeight)
+      freeAllDone: false
     });
 
-    // 更新整体进度
     this.calculateOverallProgress();
   },
 
@@ -556,56 +612,14 @@ Page({
    */
   onFinishWarmup() {
     const { exercises, currentExerciseIndex, session } = this.data;
-
+    if (!exercises[currentExerciseIndex]) return;
     exercises[currentExerciseIndex].warmup_completed = true;
-
-    // 保存到 session
     update('sessions', session.id, {
       pending_exercises: exercises,
       updated_at: Date.now()
     });
-
-    // 查找该动作最近一次的训练记录，作为默认值
-    const exercise = exercises[currentExerciseIndex];
-    const exerciseDetail = findOne('exercises', { id: exercise.exercise_id });
-    const lastRecord = this.getLastExerciseRecord(exercise.exercise_id);
-    const isFirstSet = (exercise.completed_sets || 0) === 0;
-    const defaultWeight = isFirstSet ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
-    const defaultReps = isFirstSet ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 10));
-    const defaultRPE = isFirstSet ? 1 : (lastRecord && lastRecord.rpe ? (lastRecord.rpe - 1) : 1);
-
-    // 合并 calculateOverallProgress 数据，避免二次 setData
-    let completedCount = 0;
-    const statusList = exercises.map((ex, idx) => {
-      const isCompleted = ex.completed_sets >= ex.target_sets;
-      if (isCompleted) completedCount++;
-      return {
-        name: ex.exercise_name,
-        status: isCompleted ? 'completed' : (idx === currentExerciseIndex ? 'current' : 'pending')
-      };
-    });
-    const totalAngle = exercises.length > 0 ? (completedCount / exercises.length) * 360 : 0;
-
-    this.setData({
-      exercises,
-      showWarmup: false,
-      currentExercise: {
-        ...exercise,
-        ...exerciseDetail,
-        currentSetNumber: exercise.completed_sets + 1,
-        actual_weight: defaultWeight,
-        actual_reps: defaultReps
-      },
-      currentSetIndex: exercise.completed_sets || 0,
-      selectedRPE: defaultRPE,
-      setNote: '',
-      weightOptions: this._buildWeightOptions(defaultWeight),
-      repOptions: this._buildRepOptions(defaultReps),
-      plateHint: this._calcBarbellPlates(defaultWeight, this.data.barWeight),
-      completedExerciseCount: completedCount,
-      overallProgressAngle: totalAngle,
-      exerciseStatusList: statusList
-    });
+    this.setData({ exercises, showWarmup: false });
+    this.setCurrentExercise();
   },
 
   /**
@@ -637,34 +651,224 @@ Page({
     });
   },
 
-  /**
-   * 一键完成当前组
-   */
-  onCompleteSet() {
-    const { currentExercise, session, currentSetIndex, currentExerciseIndex, exercises, completedSets } = this.data;
+  onFormalWeightInput(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(idx) || !this.data.formalSets[idx]) return;
+    this.setData({
+      [`formalSets[${idx}].weight`]: e.detail.value,
+      [`formalSets[${idx}].userEdited`]: true
+    });
+  },
 
-    // 空值检查
-    if (!currentExercise || !session) {
+  onFormalRepsInput(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(idx) || !this.data.formalSets[idx]) return;
+    this.setData({
+      [`formalSets[${idx}].reps`]: e.detail.value,
+      [`formalSets[${idx}].userEdited`]: true
+    });
+  },
+
+  onFormalInputBlur(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    const { formalSets, exercises, currentExerciseIndex, completedSets, session } = this.data;
+    if (Number.isNaN(idx) || !formalSets[idx] || !session) return;
+
+    const rawW = parseFloat(formalSets[idx].weight);
+    const rawR = parseInt(formalSets[idx].reps, 10);
+    const weight = Number.isNaN(rawW) || rawW < 0 ? 0 : rawW;
+    const reps = Number.isNaN(rawR) || rawR < 1 ? 1 : rawR;
+
+    const nextFormalSets = formalSets.map((s, i) => {
+      if (i === idx) return { ...s, weight, reps, userEdited: true };
+      if (!formalSets[idx].completed && i > idx && !s.completed && !s.userEdited) {
+        return { ...s, weight, reps };
+      }
+      return s;
+    });
+
+    let nextCompletedSets = completedSets;
+    const row = nextFormalSets[idx];
+    if (row.completed && row.recordId) {
+      update('session_sets', row.recordId, {
+        actual_weight: weight,
+        actual_reps: reps,
+        updated_at: Date.now()
+      });
+      nextCompletedSets = completedSets.map(s => s.id === row.recordId ? { ...s, actual_weight: weight, actual_reps: reps } : s);
+    }
+
+    const nextExercises = exercises.map((ex, i) => i === currentExerciseIndex ? { ...ex, formal_sets: nextFormalSets } : ex);
+    update('sessions', session.id, {
+      pending_exercises: nextExercises,
+      completed_sets: nextCompletedSets,
+      updated_at: Date.now()
+    });
+
+    this.setData({
+      formalSets: nextFormalSets,
+      exercises: nextExercises,
+      completedSets: nextCompletedSets
+    });
+  },
+
+  onToggleFormalSet(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    const { formalSets } = this.data;
+    if (Number.isNaN(idx) || !formalSets[idx]) return;
+    if (formalSets[idx].completed) {
+      this._uncompleteFormalSetAt(idx);
+    } else {
+      this._completeFormalSetAt(idx);
+    }
+  },
+
+  _uncompleteFormalSetAt(idx) {
+    const { formalSets, exercises, currentExerciseIndex, completedSets, session } = this.data;
+    const row = formalSets[idx];
+    if (!row || !row.completed || !session) return;
+
+    if (row.recordId) {
+      remove('session_sets', row.recordId);
+    }
+    const nextCompletedSets = completedSets.filter(s => s.id !== row.recordId);
+    const nextFormalSets = formalSets.map((s, i) => i === idx ? { ...s, completed: false, recordId: null } : s);
+    const doneCount = nextFormalSets.filter(s => s.completed).length;
+    const nextExercises = exercises.map((ex, i) => i === currentExerciseIndex ? {
+      ...ex,
+      formal_sets: nextFormalSets,
+      completed_sets: doneCount,
+      target_sets: nextFormalSets.length
+    } : ex);
+
+    update('sessions', session.id, {
+      pending_exercises: nextExercises,
+      completed_sets: nextCompletedSets,
+      updated_at: Date.now()
+    });
+
+    this.setData({
+      exercises: nextExercises,
+      completedSets: nextCompletedSets
+    });
+    this.setCurrentExercise();
+    wx.showToast({ title: `已取消第 ${idx + 1} 组`, icon: 'none' });
+  },
+
+  onAddFormalSet() {
+    const { formalSets, exercises, currentExerciseIndex, session } = this.data;
+    if (!session || !exercises[currentExerciseIndex]) return;
+    if (formalSets.length >= 20) {
+      wx.showToast({ title: '最多 20 组', icon: 'none' });
+      return;
+    }
+
+    const last = formalSets[formalSets.length - 1];
+    const nextFormalSets = [
+      ...formalSets,
+      {
+        weight: last ? (parseFloat(last.weight) || 0) : (exercises[currentExerciseIndex].target_weight || 0),
+        reps: last ? (parseInt(last.reps, 10) || 10) : (exercises[currentExerciseIndex].target_reps || 10),
+        completed: false,
+        recordId: null,
+        userEdited: false
+      }
+    ];
+
+    const nextExercises = exercises.map((ex, i) => i === currentExerciseIndex ? {
+      ...ex,
+      formal_sets: nextFormalSets,
+      target_sets: nextFormalSets.length
+    } : ex);
+
+    update('sessions', session.id, {
+      pending_exercises: nextExercises,
+      updated_at: Date.now()
+    });
+
+    this.setData({ exercises: nextExercises, freeAllDone: false });
+    this.setCurrentExercise();
+  },
+
+  onDeleteFormalSet(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    const { formalSets, exercises, currentExerciseIndex, completedSets, session } = this.data;
+    if (formalSets.length <= 1 || Number.isNaN(idx) || !formalSets[idx] || !session) return;
+
+    const doDelete = () => {
+      const targetRow = formalSets[idx];
+      let nextCompletedSets = completedSets;
+      if (targetRow.completed && targetRow.recordId) {
+        remove('session_sets', targetRow.recordId);
+        nextCompletedSets = completedSets.filter(s => s.id !== targetRow.recordId);
+      }
+      const nextFormalSets = formalSets.filter((_, i) => i !== idx);
+      const doneCount = nextFormalSets.filter(s => s.completed).length;
+      const nextExercises = exercises.map((ex, i) => i === currentExerciseIndex ? {
+        ...ex,
+        formal_sets: nextFormalSets,
+        target_sets: nextFormalSets.length,
+        completed_sets: doneCount
+      } : ex);
+
+      update('sessions', session.id, {
+        pending_exercises: nextExercises,
+        completed_sets: nextCompletedSets,
+        updated_at: Date.now()
+      });
+
+      this.setData({
+        exercises: nextExercises,
+        completedSets: nextCompletedSets
+      });
+      this.setCurrentExercise();
+    };
+
+    if (formalSets[idx].completed) {
+      wx.showModal({
+        title: '删除已完成组',
+        content: `确定删除已完成的第 ${idx + 1} 组记录吗？`,
+        confirmText: '确认删除',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) doDelete();
+        }
+      });
+    } else {
+      doDelete();
+    }
+  },
+
+  onCompleteSet() {
+    const { formalSets, currentSetIndex } = this.data;
+    const idx = (formalSets[currentSetIndex] && !formalSets[currentSetIndex].completed)
+      ? currentSetIndex
+      : formalSets.findIndex(s => !s.completed);
+    if (idx < 0) return;
+    this._completeFormalSetAt(idx);
+  },
+
+  _completeFormalSetAt(idx) {
+    const { currentExercise, session, currentExerciseIndex, exercises, completedSets, formalSets } = this.data;
+
+    if (!currentExercise || !session || !formalSets[idx]) {
       console.error('currentExercise or session is null');
       UI.showError('数据异常，请重试', this);
       return;
     }
 
-    // 使用用户调整后的实际值（如未调整则使用目标值）
-    const actualWeight = currentExercise.actual_weight !== undefined
-      ? currentExercise.actual_weight
-      : currentExercise.target_weight;
-    const actualReps = currentExercise.actual_reps !== undefined
-      ? currentExercise.actual_reps
-      : currentExercise.target_reps;
+    const row = formalSets[idx];
+    const rawW = parseFloat(row.weight);
+    const rawR = parseInt(row.reps, 10);
+    const actualWeight = Number.isNaN(rawW) || rawW < 0 ? 0 : rawW;
+    const actualReps = Number.isNaN(rawR) || rawR < 1 ? 1 : rawR;
 
-    // 记录完成的数据
     const setRecord = {
-      id: 'set_' + Date.now(),
+      id: 'set_' + Date.now() + '_' + idx,
       session_id: session.id,
       exercise_id: currentExercise.exercise_id,
       exercise_name: currentExercise.name,
-      set_number: currentSetIndex + 1,
+      set_number: idx + 1,
       target_weight: currentExercise.target_weight,
       actual_weight: actualWeight,
       target_reps: currentExercise.target_reps,
@@ -676,31 +880,39 @@ Page({
       created_at: Date.now()
     };
 
-    // 保存到本地
     insert('session_sets', setRecord);
-
-    // 更新完成数组
     const newCompletedSets = [...completedSets, setRecord];
 
-    // 更新动作进度
-    const newExercises = [...exercises];
-    newExercises[currentExerciseIndex].completed_sets = currentSetIndex + 1;
+    const nextFormalSets = formalSets.map((s, i) => {
+      if (i === idx) {
+        return { ...s, weight: actualWeight, reps: actualReps, completed: true, recordId: setRecord.id, userEdited: true };
+      }
+      if (i > idx && !s.completed && !s.userEdited) {
+        return { ...s, weight: actualWeight, reps: actualReps };
+      }
+      return s;
+    });
+
+    const doneCount = nextFormalSets.filter(s => s.completed).length;
+    const nextUndoneSetIdx = nextFormalSets.findIndex(s => !s.completed);
+    const newExercises = exercises.map((ex, i) => i === currentExerciseIndex ? {
+      ...ex,
+      formal_sets: nextFormalSets,
+      target_sets: nextFormalSets.length,
+      completed_sets: doneCount
+    } : ex);
 
     let newExerciseIndex = currentExerciseIndex;
-    let newSetIndex = 0;
-    if (currentSetIndex + 1 >= currentExercise.target_sets) {
-      // 先找后面未完成的动作，若后面都完成了再找前面跳过去未完成的动作
-      let nextUndoneIdx = newExercises.findIndex((ex, idx) => idx > currentExerciseIndex && (ex.completed_sets || 0) < (ex.target_sets || 1));
+    let newSetIndex = nextUndoneSetIdx >= 0 ? nextUndoneSetIdx : nextFormalSets.length;
+    if (nextUndoneSetIdx === -1) {
+      let nextUndoneIdx = newExercises.findIndex((ex, i) => i > currentExerciseIndex && (ex.completed_sets || 0) < (ex.target_sets || 1));
       if (nextUndoneIdx === -1) {
         nextUndoneIdx = newExercises.findIndex((ex) => (ex.completed_sets || 0) < (ex.target_sets || 1));
       }
       newExerciseIndex = nextUndoneIdx !== -1 ? nextUndoneIdx : newExercises.length;
       newSetIndex = nextUndoneIdx !== -1 ? (newExercises[nextUndoneIdx].completed_sets || 0) : 0;
-    } else {
-      newSetIndex = currentSetIndex + 1;
     }
 
-    // 保存会话状态
     update('sessions', session.id, {
       pending_exercises: newExercises,
       current_exercise_index: newExerciseIndex,
@@ -708,17 +920,14 @@ Page({
       updated_at: Date.now()
     });
 
-    // 合并 setData — 一次性更新所有状态，避免多次渲染导致闪动
     const restSeconds = currentExercise.rest_seconds || 120;
-
-    // 合并 calculateOverallProgress 数据
     let completedCount = 0;
-    const statusList = newExercises.map((ex, idx) => {
+    const statusList = newExercises.map((ex, i) => {
       const isCompleted = ex.completed_sets >= ex.target_sets;
       if (isCompleted) completedCount++;
       return {
         name: ex.exercise_name,
-        status: isCompleted ? 'completed' : (idx === newExerciseIndex ? 'current' : 'pending')
+        status: isCompleted ? 'completed' : (i === newExerciseIndex ? 'current' : 'pending')
       };
     });
     const totalAngle = newExercises.length > 0 ? (completedCount / newExercises.length) * 360 : 0;
@@ -726,6 +935,7 @@ Page({
     this.setData({
       completedSets: newCompletedSets,
       exercises: newExercises,
+      formalSets: nextFormalSets,
       currentExerciseIndex: newExerciseIndex,
       currentSetIndex: newSetIndex,
       isResting: true,
@@ -737,17 +947,10 @@ Page({
       exerciseStatusList: statusList
     });
 
-    // 保存快照
     this.saveSnapshot();
-
-    // 基于截止时间戳启动倒计时
     this.restEndTime = Date.now() + restSeconds * 1000;
     this._startRestInterval();
-
-    // 计算1RM（异步，PR徽章单独更新）
     this.checkAndSave1RM(setRecord);
-
-    // 震动反馈
     UI.vibrateSuccess();
   },
 
@@ -857,7 +1060,15 @@ Page({
         if (targetExIdx === -1) targetExIdx = Math.max(0, this.data.currentExerciseIndex - 1);
 
         if (nextExercises[targetExIdx]) {
-          nextExercises[targetExIdx].completed_sets = Math.max(0, (nextExercises[targetExIdx].completed_sets || 1) - 1);
+          const targetEx = nextExercises[targetExIdx];
+          if (Array.isArray(targetEx.formal_sets)) {
+            targetEx.formal_sets = targetEx.formal_sets.map(s =>
+              s.recordId === lastSet.id ? { ...s, completed: false, recordId: null } : s
+            );
+            targetEx.completed_sets = targetEx.formal_sets.filter(s => s.completed).length;
+          } else {
+            targetEx.completed_sets = Math.max(0, (targetEx.completed_sets || 1) - 1);
+          }
         }
         const targetSetIdx = nextExercises[targetExIdx] ? nextExercises[targetExIdx].completed_sets : 0;
 
@@ -869,12 +1080,6 @@ Page({
           updated_at: Date.now()
         });
 
-        const targetEx = nextExercises[targetExIdx];
-        const exerciseDetail = targetEx ? (findOne('exercises', { id: targetEx.exercise_id }) || {}) : {};
-        const restoredWeight = lastSet.actual_weight !== undefined ? lastSet.actual_weight : (targetEx ? targetEx.target_weight : 0);
-        const restoredReps = lastSet.actual_reps !== undefined ? lastSet.actual_reps : (targetEx ? targetEx.target_reps : 0);
-        const restoredRPE = lastSet.rpe ? Math.max(0, lastSet.rpe - 1) : 2;
-
         this.setData({
           isResting: false,
           restTimeLeft: 0,
@@ -883,21 +1088,9 @@ Page({
           completedSets: nextCompletedSets,
           exercises: nextExercises,
           currentExerciseIndex: targetExIdx,
-          currentSetIndex: targetSetIdx,
-          currentExercise: targetEx ? {
-            ...targetEx,
-            ...exerciseDetail,
-            currentSetNumber: targetSetIdx + 1,
-            actual_weight: restoredWeight,
-            actual_reps: restoredReps
-          } : this.data.currentExercise,
-          selectedRPE: restoredRPE,
-          setNote: lastSet.note || '',
-          weightOptions: this._buildWeightOptions(restoredWeight),
-          repOptions: this._buildRepOptions(restoredReps),
-          plateHint: this._calcBarbellPlates(restoredWeight, this.data.barWeight)
+          currentSetIndex: targetSetIdx
         });
-        this.calculateOverallProgress();
+        this.setCurrentExercise();
         wx.showToast({ title: '已撤回上一组', icon: 'success' });
       }
     });
@@ -1043,78 +1236,12 @@ Page({
    * 休息结束恢复训练 — 合并 setData 避免闪动
    */
   _restoreFromRest() {
-    const { exercises, currentExerciseIndex, isFreeWorkout } = this.data;
-    const exercise = exercises[currentExerciseIndex];
-
-    if (!exercise) {
-      this.setData({ isResting: false, restTimeLeft: 0, restMinimized: false });
-      if (isFreeWorkout) {
-        this.setData({ freeAllDone: exercises.length > 0, currentExercise: null });
-      } else {
-        this.onTrainingComplete();
-      }
-      return;
-    }
-
-    const exerciseDetail = findOne('exercises', { id: exercise.exercise_id }) || {
-      id: exercise.exercise_id,
-      name: exercise.exercise_name || exercise.name || '自定义动作',
-      muscle_group: exercise.muscle_group || '自由训练',
-      alternatives: []
-    };
-
-    const needsWarmup = !isFreeWorkout && (exercise.target_weight || 0) >= 30 && !exercise.warmup_completed;
-
-    if (needsWarmup) {
-      this.setData({
-        isResting: false,
-        restTimeLeft: 0,
-        restMinimized: false
-      });
-      this.showWarmupPanel(exercise, exerciseDetail);
-      return;
-    }
-
-    const lastRecord = this.getLastExerciseRecord(exercise.exercise_id);
-    const isFirstSet = (exercise.completed_sets || 0) === 0;
-    const defaultWeight = isFirstSet ? (exercise.target_weight || 0) : (lastRecord ? lastRecord.actual_weight : (exercise.target_weight || 0));
-    const defaultReps = isFirstSet ? (exercise.target_reps || 10) : (lastRecord ? lastRecord.actual_reps : (exercise.target_reps || 10));
-    const defaultRPE = isFirstSet ? 1 : (lastRecord && lastRecord.rpe ? (lastRecord.rpe - 1) : 1);
-
-    // 合并 calculateOverallProgress 的数据，避免二次 setData
-    let completedCount = 0;
-    const statusList = exercises.map((ex, idx) => {
-      const isCompleted = ex.completed_sets >= ex.target_sets;
-      if (isCompleted) completedCount++;
-      return {
-        name: ex.exercise_name,
-        status: isCompleted ? 'completed' : (idx === currentExerciseIndex ? 'current' : 'pending')
-      };
-    });
-    const totalAngle = exercises.length > 0 ? (completedCount / exercises.length) * 360 : 0;
-
     this.setData({
       isResting: false,
       restTimeLeft: 0,
-      restMinimized: false,
-      currentExercise: {
-        ...exercise,
-        ...exerciseDetail,
-        currentSetNumber: exercise.completed_sets + 1,
-        actual_weight: defaultWeight,
-        actual_reps: defaultReps
-      },
-      currentSetIndex: exercise.completed_sets || 0,
-      selectedRPE: defaultRPE,
-      setNote: '',
-      showWarmup: false,
-      weightOptions: this._buildWeightOptions(defaultWeight),
-      repOptions: this._buildRepOptions(defaultReps),
-      plateHint: this._calcBarbellPlates(defaultWeight, this.data.barWeight),
-      completedExerciseCount: completedCount,
-      overallProgressAngle: totalAngle,
-      exerciseStatusList: statusList
+      restMinimized: false
     });
+    this.setCurrentExercise();
   },
 
   /**
@@ -1528,30 +1655,46 @@ Page({
   },
 
   /**
-   * 自由训练：为当前动作（或刚完成的最后一个动作）再加一组
+   * 为当前动作（或刚完成的最后一个动作）再加一组
    */
   onAddExtraSet() {
-    const { exercises, currentExerciseIndex, freeAllDone, session } = this.data;
+    const { exercises, currentExerciseIndex, freeAllDone, session, completedSets } = this.data;
     if (!exercises || exercises.length === 0 || !session) return;
     const targetIdx = freeAllDone ? exercises.length - 1 : currentExerciseIndex;
     const target = exercises[targetIdx];
     if (!target) return;
 
+    const baseSets = this._ensureFormalSets(target, completedSets);
+    if (baseSets.length >= 20) {
+      wx.showToast({ title: '最多 20 组', icon: 'none' });
+      return;
+    }
+    const last = baseSets[baseSets.length - 1];
+    const nextFormalSets = [
+      ...baseSets,
+      {
+        weight: last ? (parseFloat(last.weight) || 0) : (target.target_weight || 0),
+        reps: last ? (parseInt(last.reps, 10) || 10) : (target.target_reps || 10),
+        completed: false,
+        recordId: null,
+        userEdited: false
+      }
+    ];
+
     const nextExercises = exercises.map((ex, i) =>
-      i === targetIdx ? { ...ex, target_sets: Math.min(20, (ex.target_sets || 3) + 1) } : ex
+      i === targetIdx ? { ...ex, formal_sets: nextFormalSets, target_sets: nextFormalSets.length } : ex
     );
 
     update('sessions', session.id, {
       pending_exercises: nextExercises,
       current_exercise_index: targetIdx,
-      current_set_index: nextExercises[targetIdx].completed_sets || 0,
+      current_set_index: nextFormalSets.length - 1,
       updated_at: Date.now()
     });
 
     this.setData({
       exercises: nextExercises,
       currentExerciseIndex: targetIdx,
-      currentSetIndex: nextExercises[targetIdx].completed_sets || 0,
       freeAllDone: false
     });
     this.setCurrentExercise();

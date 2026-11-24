@@ -188,37 +188,54 @@
           <text class="set-total">{{currentExercise.target_sets}}</text>
           <text class="set-label">{{currentExercise.isDone ? '组 (已完成)' : '组'}}</text>
         </view>
-        <view wx:if="{{isFreeWorkout || currentExercise.isDone}}" class="extra-set-group">
-          <view class="extra-set-btn" bindtap="onReduceExtraSet">- 组</view>
-          <view class="extra-set-btn" bindtap="onAddExtraSet">+ 加组</view>
+      </view>
+    </view>
+
+    <!-- 正式组平铺列表（支持行内编辑重量/次数、点圆圈勾选/取消、增减组） -->
+    <view class="formal-list">
+      <view
+        wx:for="{{formalSets}}"
+        wx:key="index"
+        class="formal-item {{item.completed ? 'completed' : ''}} {{index === currentSetIndex ? 'current' : ''}}"
+      >
+        <view class="formal-check" data-index="{{index}}" bindtap="onToggleFormalSet">
+          <text wx:if="{{item.completed}}" class="formal-check-icon">✓</text>
+          <text wx:else class="formal-check-num">{{index + 1}}</text>
+        </view>
+        <view class="warmup-info">
+          <input
+            type="digit"
+            class="warmup-input"
+            value="{{item.weight}}"
+            data-index="{{index}}"
+            bindinput="onFormalWeightInput"
+            bindblur="onFormalInputBlur"
+          />
+          <text class="warmup-unit">kg</text>
+          <text class="warmup-sep">×</text>
+          <input
+            type="number"
+            class="warmup-input warmup-input-sm"
+            value="{{item.reps}}"
+            data-index="{{index}}"
+            bindinput="onFormalRepsInput"
+            bindblur="onFormalInputBlur"
+          />
+          <text class="warmup-unit">次</text>
+        </view>
+        <view
+          wx:if="{{formalSets.length > 1}}"
+          class="warmup-delete-btn"
+          data-index="{{index}}"
+          bindtap="onDeleteFormalSet"
+        >
+          <text>×</text>
         </view>
       </view>
     </view>
 
-
-    <!-- 实际录入 — 刻度拨盘 -->
-    <view class="actual-input">
-      <view class="input-card">
-        <text class="input-card-label">实际重量</text>
-        <dial-picker
-          items="{{weightOptions}}"
-          value="{{currentExercise.actual_weight}}"
-          unit="kg"
-          step="2.5"
-          bind:change="onWeightChange"
-        />
-      </view>
-
-      <view class="input-card">
-        <text class="input-card-label">实际次数</text>
-        <dial-picker
-          items="{{repOptions}}"
-          value="{{currentExercise.actual_reps}}"
-          unit="次"
-          step="1"
-          bind:change="onRepChange"
-        />
-      </view>
+    <view class="formal-add-btn" bindtap="onAddFormalSet">
+      <text>+ 添加正式组</text>
     </view>
 
     <!-- 更多操作折叠面板 -->

@@ -136,12 +136,7 @@ Page({
     this.clearRestTimer();
     this.stopDurationTimer();
     this._clearWarmupAutoSwitchTimer();
-    if (this.data.session && !this.data.isCompleted) {
-      const latest = findOne('sessions', { id: this.data.session.id });
-      if (latest && latest.status !== 'completed' && latest.status !== 'aborted') {
-        this.saveSnapshot();
-      }
-    }
+    this._minimizeToFloat();
     wx.eventCenter.off('appHidden', this.onAppHidden);
   },
 
@@ -219,13 +214,10 @@ Page({
   },
 
   /**
-   * 顶部自定义返回按钮（保存进度快照后返回）
+   * 顶部自定义返回按钮（自动收起为全局悬浮条并返回）
    */
   onBackFromTraining() {
-    const { session } = this.data;
-    if (session && session.status !== 'completed' && session.status !== 'aborted') {
-      this.saveSnapshot();
-    }
+    this._minimizeToFloat();
     wx.navigateBack({
       fail: () => {
         wx.switchTab({ url: '/pages/home/home' });
@@ -1370,39 +1362,84 @@ Page({
    * 跳过动作
    */
   /**
-   * 移除尚未练任何一组的动作（解决自由训练或临时加错动作删不掉的问题）
+   * 移除当前动作
    */
   onRemoveCurrentExercise() {
-    const { exercises, currentExerciseIndex, session, isFreeWorkout } = this.data;
-    const target = exercises[currentExerciseIndex];
-    if (!target || !session) return;
-    if ((target.completed_sets || 0) > 0) {
-      wx.showToast({ title: '已记录组数的动作不可移除', icon: 'none' });
+    this._removeExerciseAt(this.data.currentExerciseIndex);
+  },
+
+  /**
+   * 长按顶部动作卡片快捷移除
+   */
+  onLongPressExercise(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(idx)) return;
+    this._removeExerciseAt(idx);
+  },
+
+  /**
+   * 移除指定索引的动作（支持同步清理该动作已记录的组数据）
+   */
+  _removeExerciseAt(targetIndex) {
+    const { exercises, currentExerciseIndex, session, isFreeWorkout, completedSets, isResting } = this.data;
+    if (isResting) {
+      UI.showToast({ message: '休息中无法移除动作', icon: 'warning', context: this });
       return;
     }
+    const target = exercises[targetIndex];
+    if (!target || !session) return;
     if (!isFreeWorkout && exercises.length <= 1) {
-      wx.showToast({ title: '至少保留 1 个动作', icon: 'none' });
+      wx.showToast({ title: '这是最后一个动作，如需结束请点击底部完成', icon: 'none' });
       return;
     }
 
+    const recordIds = new Set(
+      (Array.isArray(target.formal_sets) ? target.formal_sets : [])
+        .map(s => s && s.recordId)
+        .filter(Boolean)
+    );
+    const matchedSets = completedSets.filter(s =>
+      recordIds.size > 0
+        ? recordIds.has(s.id)
+        : (s && s.exercise_id === target.exercise_id)
+    );
+    const doneCount = matchedSets.length || (target.completed_sets || 0);
+    const exName = target.exercise_name || target.name || '该动作';
+    const modalContent = doneCount > 0
+      ? `「${exName}」已记录 ${doneCount} 组，移除将同步删除这 ${doneCount} 组记录，确定移除吗？`
+      : `确定从本次训练中移除「${exName}」吗？`;
+
     wx.showModal({
       title: '移除动作',
-      content: `确定从本次训练中移除「${target.exercise_name || target.name}」吗？`,
+      content: modalContent,
       confirmText: '确认移除',
       confirmColor: '#FA5151',
       cancelText: '取消',
       success: (res) => {
         if (!res.confirm) return;
-        const nextExercises = exercises.filter((_, i) => i !== currentExerciseIndex);
-        const nextIdx = nextExercises.length === 0 ? 0 : Math.min(currentExerciseIndex, nextExercises.length - 1);
+        const removeIdSet = new Set(matchedSets.map(s => s.id));
+        matchedSets.forEach(s => remove('session_sets', s.id));
+        const nextCompletedSets = completedSets.filter(s => !removeIdSet.has(s.id));
+        const nextExercises = exercises.filter((_, i) => i !== targetIndex);
+        let nextIdx = 0;
+        if (nextExercises.length > 0) {
+          if (targetIndex < currentExerciseIndex) {
+            nextIdx = currentExerciseIndex - 1;
+          } else {
+            nextIdx = Math.min(currentExerciseIndex, nextExercises.length - 1);
+          }
+        }
+
         update('sessions', session.id, {
           pending_exercises: nextExercises,
+          completed_sets: nextCompletedSets,
           current_exercise_index: nextIdx,
           current_set_index: 0,
           updated_at: Date.now()
         });
         this.setData({
           exercises: nextExercises,
+          completedSets: nextCompletedSets,
           currentExerciseIndex: nextIdx,
           currentSetIndex: 0,
           showMoreActions: false
@@ -1865,6 +1902,7 @@ Page({
    * 作废当前训练会话并返回
    */
   _discardCurrentSession() {
+    this._isDiscarding = true;
     const { session } = this.data;
     if (session) {
       update('sessions', session.id, {
@@ -2044,33 +2082,44 @@ Page({
   },
 
   /**
-   * 收起训练页面 — 返回上一页并显示悬浮窗
+   * 自动收起训练状态为全局悬浮窗（离开页面但未完成/放弃时调用）
    */
-  onCollapseTraining() {
-    const { session, currentExercise, currentSetIndex, isFreeWorkout } = this.data;
-    if (!session) return;
+  _minimizeToFloat() {
+    const { session, currentExercise, currentSetIndex, isFreeWorkout, exercises, completedSets } = this.data;
+    if (!session || this.data.isCompleted || this._isDiscarding) return;
 
-    // 先落盘最新快照，再返回上一页，避免首页 onShow 读到旧数据
+    const latest = findOne('sessions', { id: session.id });
+    if (!latest || latest.status === 'completed' || latest.status === 'aborted') return;
+
+    // 自由训练 0 动作且 0 组时直接返回，静默作废空会话，不挂空壳悬浮条
+    if (isFreeWorkout && (!exercises || exercises.length === 0) && (!completedSets || completedSets.length === 0)) {
+      update('sessions', session.id, {
+        status: 'aborted',
+        aborted_at: Date.now(),
+        updated_at: Date.now()
+      });
+      const app = getApp();
+      if (app && app.globalData && app.globalData.trainingMinimizedSessionId === session.id) {
+        app.globalData.trainingMinimized = false;
+        app.globalData.trainingMinimizedSessionId = null;
+        app.globalData.trainingSnapshot = null;
+      }
+      return;
+    }
+
     this.saveSnapshot();
 
-    // 保存当前训练状态到全局
     const app = getApp();
-    app.globalData.trainingMinimized = true;
-    app.globalData.trainingMinimizedSessionId = session.id;
-    app.globalData.trainingSnapshot = {
-      sessionId: session.id,
-      exerciseName: currentExercise ? currentExercise.name : (isFreeWorkout ? '自由训练' : '进行中的训练'),
-      currentSet: currentSetIndex + 1,
-      totalSets: currentExercise ? currentExercise.target_sets : 0
-    };
-
-    // 返回上一页（打开训练前的页面）
-    wx.navigateBack({
-      fail: () => {
-        // 如果没有上一页（直接打开训练页），则回到首页
-        wx.switchTab({ url: '/pages/home/home' });
-      }
-    });
+    if (app && app.globalData) {
+      app.globalData.trainingMinimized = true;
+      app.globalData.trainingMinimizedSessionId = session.id;
+      app.globalData.trainingSnapshot = {
+        sessionId: session.id,
+        exerciseName: currentExercise ? currentExercise.name : (isFreeWorkout ? '自由训练' : '进行中的训练'),
+        currentSet: currentSetIndex + 1,
+        totalSets: currentExercise ? currentExercise.target_sets : 0
+      };
+    }
   },
 
   /**

@@ -809,6 +809,27 @@
   gap: 12rpx;
 }
 
+.exercise-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  height: 56rpx;
+  padding: 0 18rpx;
+  border-radius: 9999rpx;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.exercise-remove-btn:active {
+  background: #F3F4F6;
+}
+
+.exercise-remove-text {
+  font-size: 24rpx;
+  color: #888888;
+  font-weight: 500;
+}
+
 /* 热身组 / 正式组 极简分段 Tab */
 .stage-tabs {
   flex-shrink: 0;

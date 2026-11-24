@@ -37,6 +37,7 @@
         wx:key="index"
         class="exercise-chip {{item.completed_sets >= item.target_sets ? 'completed' : ''}} {{index === currentExerciseIndex ? 'current' : ''}}"
         bindtap="onTapExercise"
+        bindlongpress="onLongPressExercise"
         data-index="{{index}}"
       >
         <view class="chip-content">
@@ -92,10 +93,14 @@
 
   <!-- 主训练区域：热身组与正式组双 Tab 平级切换 -->
   <view hidden="{{!currentExercise || freeAllDone}}" class="training-main">
-    <!-- 动作肌群标签 -->
+    <!-- 动作肌群标签 + 移除动作入口 -->
     <view class="exercise-header">
       <view class="exercise-tags">
         <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
+      </view>
+      <view class="exercise-remove-btn" bindtap="onRemoveCurrentExercise">
+        <mp-icon icon="delete" color="#888888" size="{{15}}" />
+        <text class="exercise-remove-text">移除</text>
       </view>
     </view>
 
@@ -253,11 +258,10 @@
               />
             </view>
 
-            <!-- 替换/跳过/移除 -->
+            <!-- 替换/跳过 -->
             <view class="secondary-actions">
               <view class="btn btn-secondary btn-sm" bindtap="onReplaceExercise">替换动作</view>
               <view class="btn btn-secondary btn-sm" bindtap="onSkipExercise">跳过动作</view>
-              <view wx:if="{{(currentExercise.completed_sets || 0) === 0}}" class="btn btn-secondary btn-sm btn-remove-ex" bindtap="onRemoveCurrentExercise">移除动作</view>
             </view>
           </view>
         </view>
@@ -298,12 +302,6 @@
 
   <!-- 底部操作栏（单行紧凑图文 + 微信官方 WeUI 矢量图标） -->
   <view class="bottom-bar">
-    <view class="bottom-btn" bindtap="onCollapseTraining">
-      <view class="bottom-collapse-icon">
-        <mp-icon icon="arrow" color="#666666" size="{{12}}" />
-      </view>
-      <text class="bottom-label">收起</text>
-    </view>
     <view class="bottom-btn" bindtap="{{isPaused ? 'onResumeTraining' : 'onPauseTraining'}}">
       <mp-icon icon="{{isPaused ? 'play2' : 'pause'}}" color="#666666" size="{{18}}" />
       <text class="bottom-label">{{isPaused ? '继续' : '暂停'}}</text>

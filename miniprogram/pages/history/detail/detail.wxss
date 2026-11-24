@@ -179,6 +179,9 @@
 }
 
 .set-note {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
   margin-top: 10rpx;
   padding: 10rpx 16rpx;
   background: #F5F5F5;

@@ -400,15 +400,10 @@ mp-tabs {
 }
 
 .empty-visual {
-  width: 120rpx;
-  height: 120rpx;
-  background: #FFFFFF;
-  border-radius: 24rpx;
-  border: 1rpx solid #E5E5E5;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
 }
 
 .empty-icon {

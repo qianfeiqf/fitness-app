@@ -48,9 +48,8 @@
 .login-avatar {
   width: 120rpx;
   height: 120rpx;
-  background: #FFFFFF;
-  border-radius: 24rpx;
-  border: 1rpx solid #E5E5E5;
+  background: #F5F5F5;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -391,11 +390,10 @@
 }
 
 .menu-icon-wrap {
-  width: 72rpx;
-  height: 72rpx;
-  background: #FFFFFF;
+  width: 68rpx;
+  height: 68rpx;
+  background: #F5F5F5;
   border-radius: 16rpx;
-  border: 1rpx solid #E5E5E5;
   display: flex;
   align-items: center;
   justify-content: center;

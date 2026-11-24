@@ -846,13 +846,8 @@
   flex-shrink: 0;
 }
 
-/* 弹窗内图标容器 */
+/* 弹窗内图标容器（纯居中，不额外套方框） */
 .modal-icon-wrap {
-  width: 96rpx;
-  height: 96rpx;
-  background: #FFFFFF;
-  border-radius: 24rpx;
-  border: 1rpx solid #E5E5E5;
   display: flex;
   align-items: center;
   justify-content: center;

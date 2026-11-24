@@ -52,7 +52,7 @@
     <!-- 周期安排标题 -->
     <view class="schedule-header">
       <text class="schedule-title">训练安排</text>
-      <text class="schedule-subtitle">每周 {{plan.training_days || exercises.length > 0 ? (exercises.length > 0 ? '训练日已安排' : '') : ''}}</text>
+      <text class="schedule-subtitle">{{plan.training_days ? '每周 ' + plan.training_days + ' 天 · ' : ''}}共 {{exercises.length}} 个动作</text>
     </view>
 
     <!-- 周训练安排 -->

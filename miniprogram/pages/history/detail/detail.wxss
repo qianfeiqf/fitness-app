@@ -193,13 +193,13 @@
   color: #666666;
 }
 
-.resume-today-section {
+.detail-footer-actions {
   margin-top: 32rpx;
   padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12rpx;
+  gap: 20rpx;
 }
 
 .resume-today-btn {
@@ -220,7 +220,12 @@
   background: #F5F5F5;
 }
 
-.resume-today-tip {
-  font-size: 22rpx;
-  color: #999999;
+.delete-session-btn {
+  padding: 16rpx 32rpx;
+  font-size: 26rpx;
+  color: #FA5151;
+}
+
+.delete-session-btn:active {
+  opacity: 0.7;
 }

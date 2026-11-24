@@ -167,3 +167,13 @@
   font-size: 32rpx;
   color: #CCCCCC;
 }
+
+.item-exercises {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #888888;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 380rpx;
+}

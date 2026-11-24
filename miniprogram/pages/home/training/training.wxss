@@ -391,8 +391,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40rpx 0;
+  padding: 8rpx 0 28rpx;
   text-align: center;
+}
+
+.rest-next-preview {
+  font-size: 26rpx;
+  color: #555555;
+  background: #F5F5F5;
+  padding: 10rpx 24rpx;
+  border-radius: 9999rpx;
 }
 
 .rest-overlay-icon {
@@ -1466,9 +1474,17 @@
 .rest-undo-link {
   margin-top: 24rpx;
   text-align: center;
+  padding: 8rpx 0;
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.72);
-  text-decoration: underline;
+  color: #888888;
+}
+
+.rest-undo-link:active {
+  color: #1A1A1A;
+}
+
+.btn-remove-ex {
+  color: #FA5151 !important;
 }
 
 /* =====================

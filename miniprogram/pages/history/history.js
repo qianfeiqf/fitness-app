@@ -121,6 +121,17 @@ Page({
         duration = mins + '分钟';
       }
 
+      const completedSets = sets.filter(set => set.status === 'completed');
+      const uniqueNames = [];
+      completedSets.forEach(set => {
+        if (set.exercise_name && !uniqueNames.includes(set.exercise_name)) {
+          uniqueNames.push(set.exercise_name);
+        }
+      });
+      const exerciseSummary = uniqueNames.length > 0
+        ? uniqueNames.slice(0, 3).join(' · ') + (uniqueNames.length > 3 ? ` 等${uniqueNames.length}项` : '')
+        : '';
+
       const date = new Date(s.completed_at);
       const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
@@ -129,7 +140,8 @@ Page({
         volume: Math.round(volume),
         duration,
         dateStr,
-        setCount: sets.filter(set => set.status === 'completed').length
+        exerciseSummary,
+        setCount: completedSets.length
       };
     });
 

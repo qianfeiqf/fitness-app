@@ -267,10 +267,11 @@
               />
             </view>
 
-            <!-- 替换/跳过 -->
+            <!-- 替换/跳过/移除 -->
             <view class="secondary-actions">
               <view class="btn btn-secondary btn-sm" bindtap="onReplaceExercise">替换动作</view>
               <view class="btn btn-secondary btn-sm" bindtap="onSkipExercise">跳过动作</view>
+              <view wx:if="{{(currentExercise.completed_sets || 0) === 0}}" class="btn btn-secondary btn-sm btn-remove-ex" bindtap="onRemoveCurrentExercise">移除动作</view>
             </view>
           </view>
         </view>
@@ -493,10 +494,8 @@
       </view>
     </view>
 
-    <view class="rest-overlay-body">
-
-      <text class="rest-overlay-title">休息一下</text>
-
+    <view wx:if="{{nextSetPreview}}" class="rest-overlay-body">
+      <text class="rest-next-preview">下一组：{{nextSetPreview}}</text>
     </view>
     <view class="rest-overlay-actions">
       <view class="rest-overlay-btn" bindtap="onReduceRestTime">-30s</view>
@@ -512,7 +511,7 @@
 <!-- 休息悬浮倒计时（点击弹窗外区域后显示） -->
 <view hidden="{{!isResting || !restMinimized}}" class="rest-float" bindtap="onExpandRest">
   <view class="rest-float-content">
-    <text class="rest-float-icon">⏱</text>
+    <mp-icon icon="time" color="#FFFFFF" size="{{18}}" />
     <text class="rest-float-time">{{wxs.formatTime(restTimeLeft)}}</text>
     <text class="rest-float-label">组间休息</text>
   </view>

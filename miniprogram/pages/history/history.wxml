@@ -44,6 +44,7 @@
       <view class="item-left">
         <text class="item-date">{{item.dateStr}}</text>
         <text class="item-plan">{{item.plan_name || '自由训练'}}</text>
+        <text wx:if="{{item.exerciseSummary}}" class="item-exercises">{{item.exerciseSummary}}</text>
       </view>
       <view class="item-right">
         <view class="item-metric">

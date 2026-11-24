@@ -60,10 +60,13 @@
       </view>
     </view>
 
-    <!-- 当天已完成训练的低干扰补练入口 -->
-    <view wx:if="{{canResumeToday}}" class="resume-today-section">
-      <view class="resume-today-btn" bindtap="onResumeTodayWorkout">
+    <!-- 底部操作区：当天可继续补练，任意记录支持删除误录数据 -->
+    <view class="detail-footer-actions">
+      <view wx:if="{{canResumeToday}}" class="resume-today-btn" bindtap="onResumeTodayWorkout">
         <text>+ 继续补练 / 追加动作</text>
+      </view>
+      <view class="delete-session-btn" bindtap="onDeleteSession">
+        <text>删除本次记录</text>
       </view>
     </view>
   </view>

@@ -2,7 +2,7 @@
  * 单次训练详情页
  */
 
-const { findOne, find, update } = require('../../../localdb/db.js');
+const { findOne, find, update, remove } = require('../../../localdb/db.js');
 
 Page({
   data: {
@@ -159,6 +159,31 @@ Page({
         wx.navigateTo({
           url: '/pages/home/training/training?sessionId=' + session.id
         });
+      }
+    });
+  },
+
+  /**
+   * 删除本次训练记录（同步清理对应的 session_sets）
+   */
+  onDeleteSession() {
+    const { session } = this.data;
+    if (!session) return;
+    wx.showModal({
+      title: '删除训练记录',
+      content: '删除后本次训练及所有组记录将无法恢复，确定删除吗？',
+      confirmText: '确认删除',
+      confirmColor: '#FA5151',
+      cancelText: '取消',
+      success: (res) => {
+        if (!res.confirm) return;
+        const sets = find('session_sets', { session_id: session.id }) || [];
+        sets.forEach(s => remove('session_sets', s.id));
+        remove('sessions', session.id);
+        wx.showToast({ title: '已删除', icon: 'success' });
+        setTimeout(() => {
+          wx.navigateBack();
+        }, 400);
       }
     });
   },

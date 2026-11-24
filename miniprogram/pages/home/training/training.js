@@ -33,6 +33,7 @@ Page({
     isResting: false,
     restTimeLeft: 0,
     restTimeTotal: 120,
+    nextSetPreview: '',
 
     // RPE选择
     showRPEPicker: false,
@@ -885,6 +886,20 @@ Page({
     });
     const totalAngle = newExercises.length > 0 ? (completedCount / newExercises.length) * 360 : 0;
 
+    // 生成休息弹窗中的「下一组预告」
+    let nextSetPreview = '';
+    const nextEx = newExercises[newExerciseIndex];
+    if (nextEx) {
+      const nextExSets = Array.isArray(nextEx.formal_sets) && nextEx.formal_sets.length > 0 ? nextEx.formal_sets : null;
+      const nextRow = nextExSets ? (nextExSets[newSetIndex] || nextExSets.find(s => !s.completed)) : null;
+      const w = nextRow ? nextRow.weight : (nextEx.target_weight || 0);
+      const r = nextRow ? nextRow.reps : (nextEx.target_reps || 10);
+      const totalS = nextExSets ? nextExSets.length : (nextEx.target_sets || 1);
+      nextSetPreview = `${nextEx.exercise_name || nextEx.name} 第 ${Math.min(newSetIndex + 1, totalS)}/${totalS} 组 · ${w}kg × ${r}次`;
+    } else {
+      nextSetPreview = '全部动作已完成';
+    }
+
     this.setData({
       completedSets: newCompletedSets,
       exercises: newExercises,
@@ -895,6 +910,7 @@ Page({
       restTimeLeft: restSeconds,
       restTimeTotal: restSeconds,
       restCompleting: false,
+      nextSetPreview,
       completedExerciseCount: completedCount,
       overallProgressAngle: totalAngle,
       exerciseStatusList: statusList
@@ -1326,6 +1342,54 @@ Page({
   /**
    * 跳过动作
    */
+  /**
+   * 移除尚未练任何一组的动作（解决自由训练或临时加错动作删不掉的问题）
+   */
+  onRemoveCurrentExercise() {
+    const { exercises, currentExerciseIndex, session, isFreeWorkout } = this.data;
+    const target = exercises[currentExerciseIndex];
+    if (!target || !session) return;
+    if ((target.completed_sets || 0) > 0) {
+      wx.showToast({ title: '已记录组数的动作不可移除', icon: 'none' });
+      return;
+    }
+    if (!isFreeWorkout && exercises.length <= 1) {
+      wx.showToast({ title: '至少保留 1 个动作', icon: 'none' });
+      return;
+    }
+
+    wx.showModal({
+      title: '移除动作',
+      content: `确定从本次训练中移除「${target.exercise_name || target.name}」吗？`,
+      confirmText: '确认移除',
+      confirmColor: '#FA5151',
+      cancelText: '取消',
+      success: (res) => {
+        if (!res.confirm) return;
+        const nextExercises = exercises.filter((_, i) => i !== currentExerciseIndex);
+        const nextIdx = nextExercises.length === 0 ? 0 : Math.min(currentExerciseIndex, nextExercises.length - 1);
+        update('sessions', session.id, {
+          pending_exercises: nextExercises,
+          current_exercise_index: nextIdx,
+          current_set_index: 0,
+          updated_at: Date.now()
+        });
+        this.setData({
+          exercises: nextExercises,
+          currentExerciseIndex: nextIdx,
+          currentSetIndex: 0,
+          showMoreActions: false
+        });
+        if (nextExercises.length === 0) {
+          this.setData({ currentExercise: null, formalSets: [], warmupSets: [], freeAllDone: false });
+        } else {
+          this.setCurrentExercise();
+        }
+        wx.showToast({ title: '已移除动作', icon: 'none' });
+      }
+    });
+  },
+
   onSkipExercise() {
     this.setData({
       showSkipModal: true,

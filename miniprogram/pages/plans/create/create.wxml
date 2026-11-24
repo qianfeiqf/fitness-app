@@ -12,7 +12,6 @@
   <!-- 选择训练日 -->
   <view class="form-section">
     <text class="section-title">选择训练日</text>
-    <text class="section-hint">点击选择哪些天训练，选中后可添加动作</text>
     <view class="day-selector">
       <view wx:for="{{weekDays}}" wx:key="day"
             class="day-item {{selectedDaysIndex[item.day - 1] ? 'active' : ''}}"

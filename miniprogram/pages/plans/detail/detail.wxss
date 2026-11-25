@@ -3,8 +3,9 @@
 .page-detail {
   min-height: 100vh;
   background-color: #F5F5F5;
-  padding-top: calc(40rpx + env(safe-area-inset-top));
-  padding-bottom: 200rpx;
+  padding-top: 24rpx;
+  padding-bottom: 220rpx;
+  box-sizing: border-box;
 }
 
 /* 加载状态 */
@@ -23,8 +24,8 @@
 
 /* 计划头部 */
 .plan-header {
-  margin: 0 32rpx 32rpx;
-  padding: 32rpx;
+  margin: 0 32rpx 28rpx;
+  padding: 28rpx 32rpx;
   background-color: #FFFFFF;
   border-radius: 24rpx;
 }
@@ -32,14 +33,15 @@
 .plan-title-row {
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  margin-bottom: 16rpx;
+  gap: 16rpx;
+  margin-bottom: 12rpx;
   flex-wrap: wrap;
 }
 
 .plan-name {
-  font-size: 40rpx;
+  font-size: 34rpx;
   font-weight: 700;
+  line-height: 1.35;
   color: #1A1A1A;
 }
 
@@ -371,24 +373,4 @@
   width: 100%;
 }
 
-/* 返回按钮 */
-.back-button {
-  position: fixed;
-  top: 30rpx;
-  left: 30rpx;
-  width: 80rpx;
-  height: 80rpx;
-  background-color: #FFFFFF;
-  border-radius: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  border: 1rpx solid #E5E5E5;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
-}
 
-.back-icon {
-  font-size: 36rpx;
-  color: #1A1A1A;
-}

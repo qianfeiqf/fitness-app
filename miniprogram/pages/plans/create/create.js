@@ -173,8 +173,16 @@ Page({
     const cycleLength = template.cycle_length || 4;
     const cycleLabels = this.generateCycleLabels(cycleLength);
 
+    const existingNames = (find('plans') || []).map(p => (p.name || '').trim());
+    let defaultName = (template.name || '').trim() || '我的训练计划';
+    if (existingNames.includes(defaultName)) {
+      let idx = 2;
+      while (existingNames.includes(`${defaultName} ${idx}`)) { idx++; }
+      defaultName = `${defaultName} ${idx}`;
+    }
+
     this.setData({
-      planName: template.name + ' (副本)',
+      planName: defaultName,
       cycleType: template.cycle_type || 'natural_week',
       showAdvancedOptions: template.cycle_type === 'cycle',
       cycleLength,

@@ -116,9 +116,4 @@
       </button>
     </view>
   </view>
-
-  <!-- 返回按钮 -->
-  <view class="back-button" bindtap="onBack">
-    <text class="back-icon">←</text>
-  </view>
 </view>

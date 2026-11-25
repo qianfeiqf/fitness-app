@@ -240,7 +240,23 @@ Page({
   },
 
   /**
-   * 显示克隆模板弹窗
+   * 生成默认计划名称：直接使用原名，仅重名时顺延数字（2、3...），不拼「副本」
+   */
+  _getDefaultPlanName(baseName) {
+    const trimmed = (baseName || '').trim() || '我的训练计划';
+    const existing = (find('plans') || []).map(p => (p.name || '').trim());
+    if (!existing.includes(trimmed)) return trimmed;
+    let idx = 2;
+    while (existing.includes(`${trimmed} ${idx}`)) { idx++; }
+    return `${trimmed} ${idx}`;
+  },
+
+  onInputPlanName(e) {
+    this.setData({ newPlanName: e.detail.value });
+  },
+
+  /**
+   * 显示使用模板弹窗
    */
   onShowCloneTemplateModal(e) {
     const { templateId } = e.currentTarget.dataset;
@@ -250,13 +266,13 @@ Page({
       this.setData({
         showCloneModal: true,
         cloneSource: { type: 'template', data: template },
-        newPlanName: template.name + ' (副本)'
+        newPlanName: this._getDefaultPlanName(template.name)
       });
     }
   },
 
   /**
-   * 从详情弹窗触发克隆（无需 dataset）
+   * 从详情弹窗触发使用模板
    */
   onShowCloneTemplateFromDetail() {
     const template = this.data.selectedTemplate;
@@ -265,13 +281,13 @@ Page({
         showTemplateDetailModal: false,
         showCloneModal: true,
         cloneSource: { type: 'template', data: template },
-        newPlanName: template.name + ' (副本)'
+        newPlanName: this._getDefaultPlanName(template.name)
       });
     }
   },
 
   /**
-   * 从介绍弹窗触发克隆（无需 dataset）
+   * 从介绍弹窗触发使用模板
    */
   onShowCloneTemplateFromIntro() {
     const template = this.data.selectedTemplate;
@@ -280,29 +296,13 @@ Page({
         showTemplateIntroModal: false,
         showCloneModal: true,
         cloneSource: { type: 'template', data: template },
-        newPlanName: template.name + ' (副本)'
+        newPlanName: this._getDefaultPlanName(template.name)
       });
     }
   },
 
   /**
-   * 显示克隆计划弹窗（克隆已有计划）
-   */
-  onShowClonePlanModal(e) {
-    const { planId } = e.currentTarget.dataset;
-    const plan = findOne('plans', { id: planId });
-
-    if (plan) {
-      this.setData({
-        showCloneModal: true,
-        cloneSource: { type: 'plan', data: plan },
-        newPlanName: plan.name + ' (副本)'
-      });
-    }
-  },
-
-  /**
-   * 取消克隆
+   * 取消使用
    */
   onCancelClone() {
     this.setData({
@@ -313,7 +313,7 @@ Page({
   },
 
   /**
-   * 确认克隆
+   * 确认使用计划
    */
   onConfirmClone() {
     if (!this.data.newPlanName.trim()) {
@@ -340,7 +340,7 @@ Page({
         newPlanName: ''
       });
       this.loadPlans();
-      wx.showToast({ title: '计划复制成功', icon: 'success' });
+      wx.showToast({ title: '计划已添加', icon: 'success' });
     }
   },
 

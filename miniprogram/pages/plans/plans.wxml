@@ -35,11 +35,6 @@
           </text>
         </view>
         <view class="plan-right">
-          <button class="btn btn-sm btn-ghost"
-                  catchtap="onShowClonePlanModal"
-                  data-plan-id="{{item.id}}">
-            使用
-          </button>
           <text class="arrow-icon">›</text>
         </view>
       </view>

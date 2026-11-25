@@ -656,3 +656,158 @@
   font-size: 22rpx;
   color: #888888;
 }
+
+/* 添加目标：抽屉内大字号动作选择器 */
+.form-picker-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.form-picker-right {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  flex-shrink: 0;
+}
+
+.form-picker-rm {
+  font-size: 22rpx;
+  color: #07C160;
+  background: #F0FBF4;
+  padding: 4rpx 12rpx;
+  border-radius: 9999rpx;
+  font-weight: 500;
+}
+
+.goal-picker-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.goal-picker-search {
+  flex-shrink: 0;
+  margin-bottom: 16rpx;
+}
+
+.goal-search-input {
+  width: 100%;
+  height: 80rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+
+.goal-muscle-scroll {
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-bottom: 16rpx;
+}
+
+.goal-muscle-list {
+  display: inline-flex;
+  gap: 12rpx;
+}
+
+.goal-muscle-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 22rpx;
+  border-radius: 9999rpx;
+  background: #F4F5F7;
+  font-size: 24rpx;
+  color: #555555;
+}
+
+.goal-muscle-chip.active {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.goal-picker-list {
+  flex: 1;
+  min-height: 0;
+  height: 0;
+}
+
+.goal-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 24rpx 24rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  margin-bottom: 12rpx;
+  border: 1rpx solid transparent;
+}
+
+.goal-picker-item.selected {
+  background: #F0FBF4;
+  border-color: #07C160;
+}
+
+.goal-picker-item:active {
+  background: #EFEFF2;
+}
+
+.goal-picker-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.goal-picker-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.goal-picker-muscle {
+  font-size: 22rpx;
+  color: #888888;
+}
+
+.goal-picker-right {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
+.goal-picker-rm {
+  font-size: 22rpx;
+  color: #666666;
+  background: #FFFFFF;
+  padding: 4rpx 14rpx;
+  border-radius: 9999rpx;
+  font-variant-numeric: tabular-nums;
+}
+
+.goal-picker-check {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #07C160;
+}
+
+.goal-picker-empty {
+  text-align: center;
+  padding: 80rpx 0;
+  font-size: 26rpx;
+  color: #999999;
+}

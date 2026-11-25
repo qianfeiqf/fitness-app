@@ -143,27 +143,75 @@
     </view>
   </view>
 
-  <!-- 添加目标弹窗 -->
+  <!-- 添加目标弹窗（支持抽屉内直接搜索、筛选完整动作库） -->
   <modal-sheet
     visible="{{showGoalModal}}"
-    title="添加训练目标"
-    description="设定一个 1RM 目标，追踪你的进步"
+    tall="{{goalPickerMode}}"
+    title="{{goalPickerMode ? '选择目标动作' : '添加训练目标'}}"
+    description="{{goalPickerMode ? '支持搜索或按肌群筛选' : '设定一个 1RM 目标，追踪你的进步'}}"
+    showConfirm="{{!goalPickerMode}}"
     confirmText="保存目标"
-    cancelText="取消"
+    cancelText="{{goalPickerMode ? '返回' : '取消'}}"
     bind:confirm="onSaveGoal"
-    bind:cancel="onHideGoalModal"
+    bind:cancel="{{goalPickerMode ? 'onCloseGoalExercisePicker' : 'onHideGoalModal'}}"
     bind:close="onHideGoalModal"
   >
-    <view class="goal-form">
+    <!-- 动作库选择视图（大字号列表 + 搜索 + 肌群筛选） -->
+    <view wx:if="{{goalPickerMode}}" class="goal-picker-wrap">
+      <view class="goal-picker-search">
+        <input
+          class="goal-search-input"
+          type="text"
+          placeholder="搜索动作名称..."
+          value="{{goalExerciseSearch}}"
+          bindinput="onGoalExerciseSearch"
+        />
+      </view>
+      <scroll-view scroll-x class="goal-muscle-scroll" show-scrollbar="{{false}}">
+        <view class="goal-muscle-list">
+          <view
+            wx:for="{{goalMuscleGroups}}"
+            wx:key="*this"
+            class="goal-muscle-chip {{selectedGoalMuscle === item ? 'active' : ''}}"
+            data-muscle="{{item}}"
+            bindtap="onSelectGoalMuscle"
+          >{{item}}</view>
+        </view>
+      </scroll-view>
+      <scroll-view scroll-y class="goal-picker-list">
+        <view
+          wx:for="{{filteredGoalExercises}}"
+          wx:key="id"
+          class="goal-picker-item {{selectedGoalExercise && selectedGoalExercise.id === item.id ? 'selected' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="onChooseGoalExercise"
+        >
+          <view class="goal-picker-info">
+            <text class="goal-picker-name">{{item.name}}</text>
+            <text class="goal-picker-muscle">{{item.muscle_group}}</text>
+          </view>
+          <view class="goal-picker-right">
+            <text wx:if="{{item.current1RM > 0}}" class="goal-picker-rm">1RM {{item.current1RM}}kg</text>
+            <text wx:if="{{selectedGoalExercise && selectedGoalExercise.id === item.id}}" class="goal-picker-check">✓</text>
+          </view>
+        </view>
+        <view wx:if="{{filteredGoalExercises.length === 0}}" class="goal-picker-empty">
+          <text>未找到匹配动作</text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 目标表单视图 -->
+    <view wx:else class="goal-form">
       <view class="form-item">
         <text class="form-label">选择动作</text>
-        <picker mode="selector" range="{{goalExercises}}" range-key="name"
-                value="{{selectedGoalExerciseIndex}}" bindchange="onSelectGoalExercise">
-          <view class="form-picker">
-            <text>{{goalExercises[selectedGoalExerciseIndex].name}}</text>
+        <view class="form-picker" bindtap="onOpenGoalExercisePicker">
+          <text class="form-picker-name">{{selectedGoalExercise ? selectedGoalExercise.name : '请选择动作'}}</text>
+          <view class="form-picker-right">
+            <text wx:if="{{selectedGoalExercise && selectedGoalExercise.current1RM > 0}}" class="form-picker-rm">当前 {{selectedGoalExercise.current1RM}}kg</text>
             <text class="picker-arrow">›</text>
           </view>
-        </picker>
+        </view>
       </view>
 
       <view class="form-item">

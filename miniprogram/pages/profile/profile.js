@@ -21,15 +21,16 @@ Page({
     // 目标设定
     goals: [],
     showGoalModal: false,
-    selectedGoalExerciseIndex: 0,
-    goalExercises: [
-      { id: 'ex_001', name: '卧推' },
-      { id: 'ex_020', name: '深蹲' },
-      { id: 'ex_030', name: '硬拉' }
-    ],
+    goalPickerMode: false,
+    goalExercises: [],
+    filteredGoalExercises: [],
+    goalExerciseSearch: '',
+    goalMuscleGroups: ['全部', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
+    selectedGoalMuscle: '全部',
+    selectedGoalExercise: null,
     newGoal: {
-      exercise_id: 'ex_001',
-      target_weight: 100,
+      exercise_id: '',
+      target_weight: 60,
       deadline: ''
     },
 
@@ -191,19 +192,79 @@ Page({
   },
 
   /**
+   * 加载完整动作库并附加当前估算 1RM（有记录的动作和三大项优先排前）
+   */
+  _loadGoalExercises() {
+    const allExercises = getCollection('exercises') || [];
+    const rmHistory = getCollection('rm_history') || [];
+    const latestRM = {};
+    rmHistory.forEach(r => {
+      if (!r || !r.exercise_id) return;
+      if (!latestRM[r.exercise_id] || (r.recorded_at || 0) > (latestRM[r.exercise_id].recorded_at || 0)) {
+        latestRM[r.exercise_id] = r;
+      }
+    });
+    const priorityIds = ['ex_001', 'ex_020', 'ex_030'];
+    const list = allExercises.map(ex => ({
+      id: ex.id,
+      name: ex.name,
+      name_en: ex.name_en || '',
+      muscle_group: ex.muscle_group || '其他',
+      current1RM: latestRM[ex.id] ? Math.round(latestRM[ex.id].estimated_1rm || 0) : 0
+    }));
+    list.sort((a, b) => {
+      if (a.current1RM > 0 && b.current1RM === 0) return -1;
+      if (a.current1RM === 0 && b.current1RM > 0) return 1;
+      const pa = priorityIds.indexOf(a.id);
+      const pb = priorityIds.indexOf(b.id);
+      if (pa !== -1 && pb === -1) return -1;
+      if (pa === -1 && pb !== -1) return 1;
+      if (pa !== -1 && pb !== -1) return pa - pb;
+      return 0;
+    });
+    return list;
+  },
+
+  _suggestGoalWeight(current1RM) {
+    if (current1RM > 0) {
+      return Math.round((current1RM + 10) / 2.5) * 2.5;
+    }
+    return 60;
+  },
+
+  _filterGoalExercises(keyword, muscle) {
+    const kw = (keyword || '').trim().toLowerCase();
+    return (this.data.goalExercises || []).filter(ex => {
+      const matchMuscle = !muscle || muscle === '全部' || ex.muscle_group === muscle;
+      const matchKw = !kw ||
+        (ex.name && ex.name.toLowerCase().includes(kw)) ||
+        (ex.name_en && ex.name_en.toLowerCase().includes(kw)) ||
+        (ex.muscle_group && ex.muscle_group.toLowerCase().includes(kw));
+      return matchMuscle && matchKw;
+    });
+  },
+
+  /**
    * 显示添加目标弹窗
    */
   onShowGoalModal() {
     const today = new Date();
     const threeMonthsLater = new Date(today.getFullYear(), today.getMonth() + 3, today.getDate());
     const deadlineStr = this.formatDate(threeMonthsLater);
+    const goalExercises = this._loadGoalExercises();
+    const firstEx = goalExercises[0] || { id: 'ex_001', name: '卧推', current1RM: 0 };
 
     this.setData({
       showGoalModal: true,
-      selectedGoalExerciseIndex: 0,
+      goalPickerMode: false,
+      goalExercises,
+      filteredGoalExercises: goalExercises,
+      goalExerciseSearch: '',
+      selectedGoalMuscle: '全部',
+      selectedGoalExercise: firstEx,
       newGoal: {
-        exercise_id: 'ex_001',
-        target_weight: 100,
+        exercise_id: firstEx.id,
+        target_weight: this._suggestGoalWeight(firstEx.current1RM),
         deadline: deadlineStr
       }
     });
@@ -213,17 +274,47 @@ Page({
    * 隐藏添加目标弹窗
    */
   onHideGoalModal() {
-    this.setData({ showGoalModal: false });
+    this.setData({ showGoalModal: false, goalPickerMode: false });
   },
 
-  /**
-   * 选择目标动作
-   */
-  onSelectGoalExercise(e) {
-    const idx = parseInt(e.detail.value, 10) || 0;
+  onOpenGoalExercisePicker() {
     this.setData({
-      selectedGoalExerciseIndex: idx,
-      'newGoal.exercise_id': this.data.goalExercises[idx].id
+      goalPickerMode: true,
+      goalExerciseSearch: '',
+      selectedGoalMuscle: '全部',
+      filteredGoalExercises: this.data.goalExercises
+    });
+  },
+
+  onCloseGoalExercisePicker() {
+    this.setData({ goalPickerMode: false });
+  },
+
+  onGoalExerciseSearch(e) {
+    const kw = e.detail.value || '';
+    this.setData({
+      goalExerciseSearch: kw,
+      filteredGoalExercises: this._filterGoalExercises(kw, this.data.selectedGoalMuscle)
+    });
+  },
+
+  onSelectGoalMuscle(e) {
+    const muscle = e.currentTarget.dataset.muscle || '全部';
+    this.setData({
+      selectedGoalMuscle: muscle,
+      filteredGoalExercises: this._filterGoalExercises(this.data.goalExerciseSearch, muscle)
+    });
+  },
+
+  onChooseGoalExercise(e) {
+    const id = e.currentTarget.dataset.id;
+    const picked = (this.data.goalExercises || []).find(ex => ex.id === id);
+    if (!picked) return;
+    this.setData({
+      selectedGoalExercise: picked,
+      goalPickerMode: false,
+      'newGoal.exercise_id': picked.id,
+      'newGoal.target_weight': this._suggestGoalWeight(picked.current1RM)
     });
   },
 

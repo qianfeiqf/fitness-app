@@ -921,6 +921,14 @@
   flex-shrink: 0;
 }
 
+.exercise-arrow {
+  margin-left: 10rpx;
+  font-size: 32rpx;
+  color: #CCCCCC;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+
 /* 弹窗内图标容器（纯居中，不额外套方框） */
 .modal-icon-wrap {
   display: flex;

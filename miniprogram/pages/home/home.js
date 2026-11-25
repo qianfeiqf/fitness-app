@@ -63,7 +63,11 @@ Page({
     showProfileBanner: false,
 
     // 云端同步失败重试提示
-    syncFailed: false
+    syncFailed: false,
+
+    // 首页动作要领抽屉
+    showExerciseGuide: false,
+    guideExercise: null
   },
 
   // 空操作函数（用于阻止事件冒泡）
@@ -834,6 +838,27 @@ Page({
     // 跳转到计划详情页
     wx.navigateTo({
       url: `/pages/plans/detail/detail?planId=${planId}`
+    });
+  },
+
+  /**
+   * 点击首页今日动作/下次预告动作查看动图与要领
+   */
+  onTapTodayExercise(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId) return;
+    const ex = findOne('exercises', { id: exerciseId });
+    if (!ex) return;
+    this.setData({
+      showExerciseGuide: true,
+      guideExercise: ex
+    });
+  },
+
+  onCloseExerciseGuide() {
+    this.setData({
+      showExerciseGuide: false,
+      guideExercise: null
     });
   },
 

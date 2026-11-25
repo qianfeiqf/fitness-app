@@ -1,0 +1,56 @@
+<!-- 公共动作要领与 GIF 动图半屏抽屉（z-index: 1200，可稳稳覆盖在选动作/替换抽屉之上） -->
+<view wx:if="{{visible && exercise}}" class="ex-guide-overlay" bindtap="onClose" catchtouchmove="noop">
+  <view class="ex-guide-sheet" catchtap="noop">
+    <view class="ex-guide-handle"></view>
+
+    <view class="ex-guide-header">
+      <text class="ex-guide-title">{{exercise.name}}</text>
+      <text wx:if="{{exercise.name_en}}" class="ex-guide-subtitle">{{exercise.name_en}}</text>
+    </view>
+
+    <scroll-view scroll-y class="ex-guide-scroll" show-scrollbar="{{false}}">
+      <view wx:if="{{exercise.gif_url && !gifLoadError}}" class="ex-guide-gif-wrap">
+        <image
+          class="ex-guide-gif"
+          src="{{exercise.gif_url}}"
+          mode="aspectFit"
+          lazy-load="{{true}}"
+          binderror="onGifError"
+        />
+      </view>
+
+      <view class="ex-guide-tags">
+        <text wx:if="{{exercise.muscle_group}}" class="ex-guide-tag">{{exercise.muscle_group}}</text>
+        <text wx:if="{{exercise.equipment}}" class="ex-guide-tag tag-equip">{{exercise.equipment}}</text>
+        <text wx:if="{{exercise.is_system === false}}" class="ex-guide-tag">自定义动作</text>
+      </view>
+
+      <view wx:if="{{exercise.target_muscles}}" class="ex-guide-block">
+        <text class="ex-guide-label">目标肌群</text>
+        <text class="ex-guide-text">{{exercise.target_muscles}}</text>
+      </view>
+
+      <view wx:if="{{exercise.description}}" class="ex-guide-block">
+        <text class="ex-guide-label">动作要领</text>
+        <text class="ex-guide-text">{{exercise.description}}</text>
+      </view>
+
+      <view wx:if="{{exercise.tips}}" class="ex-guide-block ex-guide-tips">
+        <text class="ex-guide-label">呼吸与避坑</text>
+        <text class="ex-guide-text">{{exercise.tips}}</text>
+      </view>
+
+      <view wx:if="{{!exercise.description}}" class="ex-guide-block">
+        <text class="ex-guide-text">自定义动作暂无要领说明，可在训练或编排计划时直接使用。</text>
+      </view>
+
+      <view wx:if="{{allowDelete && exercise.is_system === false}}" class="ex-guide-delete" bindtap="onDelete">
+        <text>删除此自定义动作</text>
+      </view>
+    </scroll-view>
+
+    <view class="ex-guide-footer">
+      <view class="ex-guide-close-btn" bindtap="onClose">知道了</view>
+    </view>
+  </view>
+</view>

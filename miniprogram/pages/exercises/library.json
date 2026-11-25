@@ -2,6 +2,7 @@
   "navigationBarTitleText": "动作库",
   "usingComponents": {
     "modal-sheet": "../../components/modal-sheet/modal-sheet",
+    "exercise-guide-sheet": "../../components/exercise-guide-sheet/exercise-guide-sheet",
     "mp-searchbar": "weui-miniprogram/searchbar/searchbar",
     "mp-tabs": "../../components/mp-tabs/mp-tabs"
   }

@@ -22,7 +22,7 @@
       </view>
       <view class="progress-right">
         <text class="training-duration">{{wxs.formatTime(trainingDuration)}}</text>
-        <text class="exercise-name">{{currentExercise ? currentExercise.name : (isFreeWorkout ? '自由训练' : '')}}</text>
+        <text class="exercise-name" bindtap="onViewCurrentExerciseDetail">{{currentExercise ? currentExercise.name : (isFreeWorkout ? '自由训练' : '')}}</text>
       </view>
     </view>
     <view class="progress-bar-track">
@@ -524,51 +524,24 @@
       >
         <view class="alt-info">
           <text class="alt-name">{{item.name}}</text>
-          <text class="alt-muscle">{{item.muscle_group}}</text>
+          <text class="alt-muscle">{{item.muscle_group}}{{item.equipment ? ' · ' + item.equipment : ''}}</text>
         </view>
-        <text class="alt-arrow">›</text>
+        <view class="alt-right-actions">
+          <view wx:if="{{item.description}}" class="exercise-info-btn" catchtap="onViewExerciseDetail" data-exercise-id="{{item.id}}">
+            <text class="exercise-info-icon">i</text>
+          </view>
+          <text class="alt-arrow">›</text>
+        </view>
       </view>
     </view>
   </modal-sheet>
 
-  <!-- 动作要领半屏抽屉 -->
-  <modal-sheet
+  <!-- 动作要领与动图半屏抽屉（z-index: 1200，可叠加在添加/替换抽屉之上） -->
+  <exercise-guide-sheet
     visible="{{showExerciseDetail}}"
-    title="{{detailExercise ? detailExercise.name : ''}}"
-    description="{{detailExercise && detailExercise.name_en ? detailExercise.name_en : ''}}"
-    showConfirm="{{false}}"
-    cancelText="知道了"
-    bind:cancel="onCloseExerciseDetail"
+    exercise="{{detailExercise}}"
     bind:close="onCloseExerciseDetail"
-  >
-    <view wx:if="{{detailExercise}}" class="ex-detail-body">
-      <view wx:if="{{detailExercise.gif_url && !gifLoadError}}" class="ex-detail-gif-wrap">
-        <image
-          class="ex-detail-gif"
-          src="{{detailExercise.gif_url}}"
-          mode="aspectFit"
-          lazy-load="{{true}}"
-          binderror="onGifLoadError"
-        />
-      </view>
-      <view class="ex-detail-tags">
-        <text wx:if="{{detailExercise.muscle_group}}" class="ex-detail-tag">{{detailExercise.muscle_group}}</text>
-        <text wx:if="{{detailExercise.equipment}}" class="ex-detail-tag tag-equip">{{detailExercise.equipment}}</text>
-      </view>
-      <view wx:if="{{detailExercise.target_muscles}}" class="ex-detail-block">
-        <text class="ex-detail-label">目标肌群</text>
-        <text class="ex-detail-text">{{detailExercise.target_muscles}}</text>
-      </view>
-      <view wx:if="{{detailExercise.description}}" class="ex-detail-block">
-        <text class="ex-detail-label">动作要领</text>
-        <text class="ex-detail-text">{{detailExercise.description}}</text>
-      </view>
-      <view wx:if="{{detailExercise.tips}}" class="ex-detail-block ex-detail-tips">
-        <text class="ex-detail-label">呼吸与避坑</text>
-        <text class="ex-detail-text">{{detailExercise.tips}}</text>
-      </view>
-    </view>
-  </modal-sheet>
+  />
 </view>
 
 <!-- 组间休息遮罩层（放在 page-training 外部，避免被 overflow:hidden 截断；用 hidden 避免销毁/重建 DOM） -->

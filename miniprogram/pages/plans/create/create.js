@@ -33,7 +33,9 @@ Page({
 
     // 动作数据
     selectedDaysDisplay: [], // 带动作的显示数据
-    planExercises: [] // 待保存的动作数据
+    planExercises: [], // 待保存的动作数据
+    showExerciseGuide: false,
+    guideExercise: null
   },
 
   onLoad(options) {
@@ -371,6 +373,24 @@ Page({
   /**
    * 移除动作
    */
+  onViewExerciseGuide(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId) return;
+    const ex = findOne('exercises', { id: exerciseId });
+    if (!ex) return;
+    this.setData({
+      showExerciseGuide: true,
+      guideExercise: ex
+    });
+  },
+
+  onCloseExerciseGuide() {
+    this.setData({
+      showExerciseGuide: false,
+      guideExercise: null
+    });
+  },
+
   onRemoveExercise(e) {
     const { day, index } = e.currentTarget.dataset;
     const { planExercises } = this.data;

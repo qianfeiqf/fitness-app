@@ -163,7 +163,9 @@
       <view class="exercise-list">
         <view wx:for="{{currentPlanData.isRestDay ? currentPlanData.nextExercises : currentPlanData.exercises}}"
               wx:key="id"
-              class="exercise-item">
+              class="exercise-item"
+              bindtap="onTapTodayExercise"
+              data-exercise-id="{{item.id}}">
           <view class="exercise-number">{{index + 1}}</view>
           <view class="exercise-content">
             <text class="exercise-name">{{item.name}}</text>
@@ -174,6 +176,7 @@
             </view>
           </view>
           <view class="exercise-tag">{{item.muscle_group}}</view>
+          <text class="exercise-arrow">›</text>
         </view>
       </view>
     </view>
@@ -219,6 +222,13 @@
       <text>提前解锁{{currentPlanData.nextDayLabel ? ' · 练' + currentPlanData.nextDayLabel : ''}}</text>
     </button>
   </view>
+
+  <!-- 动作要领与动图半屏抽屉 -->
+  <exercise-guide-sheet
+    visible="{{showExerciseGuide}}"
+    exercise="{{guideExercise}}"
+    bind:close="onCloseExerciseGuide"
+  />
 
   <!-- 训练悬浮窗（含全局组间休息倒计时） -->
   <training-float />

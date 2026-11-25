@@ -81,9 +81,14 @@
       <!-- 动作列表 -->
       <view wx:for="{{item.exercises}}" wx:for-item="ex" wx:key="id" class="exercise-card">
         <view class="exercise-card-header">
-          <text class="exercise-card-name">{{ex.name}}</text>
+          <view class="exercise-card-name-wrap" bindtap="onViewExerciseGuide" data-exercise-id="{{ex.id}}">
+            <text class="exercise-card-name">{{ex.name}}</text>
+            <view class="exercise-info-btn">
+              <text class="exercise-info-icon">i</text>
+            </view>
+          </view>
           <text class="exercise-card-muscle">{{ex.muscle_group}}</text>
-          <view class="exercise-card-delete" bindtap="onRemoveExercise" data-day="{{item.dayOfWeek}}" data-index="{{index}}">×</view>
+          <view class="exercise-card-delete" catchtap="onRemoveExercise" data-day="{{item.dayOfWeek}}" data-index="{{index}}">×</view>
         </view>
         <view class="exercise-card-body">
           <view class="exercise-param">
@@ -123,4 +128,11 @@
       <text>{{isEditMode ? '保存修改' : '创建计划'}}</text>
     </view>
   </view>
+
+  <!-- 动作要领与动图半屏抽屉 -->
+  <exercise-guide-sheet
+    visible="{{showExerciseGuide}}"
+    exercise="{{guideExercise}}"
+    bind:close="onCloseExerciseGuide"
+  />
 </view>

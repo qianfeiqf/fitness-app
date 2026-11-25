@@ -34,16 +34,27 @@
     </view>
   </view>
 
-  <!-- 无训练计划（极简纯白卡片） -->
+  <!-- 无训练计划（两张独立矩形卡片：浏览训练计划 + 新建自由训练） -->
   <view wx:elif="{{!todayPlan}}" class="empty-section">
-    <view class="empty-card">
-      <text class="empty-title">暂无进行中的计划</text>
-      <text class="empty-desc">挑一套经典计划跟练，或直接自由开练</text>
-      <view class="empty-actions">
-        <view class="btn-cta" bindtap="onGoToPlans">浏览训练库</view>
-        <view class="free-workout-empty-btn {{activeFreeSession ? 'active' : ''}}" bindtap="onStartFreeWorkout">
-          <text>{{activeFreeSession ? '继续自由训练' : '直接自由训练'}}</text>
-        </view>
+    <view class="empty-entry-card primary" bindtap="onGoToPlans">
+      <view class="empty-entry-top">
+        <text class="empty-entry-tag primary">系统跟练</text>
+      </view>
+      <text class="empty-entry-title">浏览训练计划</text>
+      <text class="empty-entry-desc">17 套经典力量与增肌模板，自动安排每日训练</text>
+      <view class="empty-entry-footer">
+        <view class="empty-entry-btn primary">去挑选 ›</view>
+      </view>
+    </view>
+
+    <view class="empty-entry-card {{activeFreeSession ? 'free-active' : ''}}" bindtap="onStartFreeWorkout">
+      <view class="empty-entry-top">
+        <text class="empty-entry-tag {{activeFreeSession ? 'primary' : ''}}">{{activeFreeSession ? '进行中' : '随时开练'}}</text>
+      </view>
+      <text class="empty-entry-title">{{activeFreeSession ? '继续自由训练' : '新建自由训练'}}</text>
+      <text class="empty-entry-desc">{{activeFreeSession ? activeFreeSummary : '不拘泥于固定计划，随选动作边练边记'}}</text>
+      <view class="empty-entry-footer">
+        <view class="empty-entry-btn {{activeFreeSession ? 'primary' : 'secondary'}}">{{activeFreeSession ? '继续训练 ›' : '立即开始 ›'}}</view>
       </view>
     </view>
   </view>

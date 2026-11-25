@@ -1559,7 +1559,8 @@
    添加动作弹窗
    ===================== */
 .add-exercise-search {
-  margin-bottom: 20rpx;
+  flex-shrink: 0;
+  margin-bottom: 16rpx;
 }
 
 .add-search-input {
@@ -1579,8 +1580,9 @@
 }
 
 .add-exercise-list {
-  max-height: 400rpx;
-  margin-bottom: 24rpx;
+  flex: 1;
+  min-height: 0;
+  height: 0;
 }
 
 /* =====================
@@ -1771,6 +1773,7 @@
 }
 
 .add-muscle-scroll {
+  flex-shrink: 0;
   white-space: nowrap;
   margin-bottom: 16rpx;
 }

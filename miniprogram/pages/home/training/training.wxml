@@ -402,9 +402,10 @@
     </view>
   </modal-sheet>
 
-  <!-- 添加动作弹窗（支持按肌群筛选、多选批量添加与自定义动作） -->
+  <!-- 添加动作弹窗（85vh 大抽屉：支持按肌群筛选、多选批量添加与自定义动作） -->
   <modal-sheet
     visible="{{showAddExerciseModal}}"
+    tall="{{true}}"
     title="添加训练动作"
     description="支持多选或自定义"
     confirmText="{{selectedAddIds.length > 0 ? '添加已选 (' + selectedAddIds.length + ')' : '确定添加'}}"

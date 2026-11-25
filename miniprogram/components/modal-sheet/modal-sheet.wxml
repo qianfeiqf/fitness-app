@@ -1,5 +1,5 @@
 <view wx:if="{{visible}}" class="modal-sheet-overlay" bindtap="onMaskTap">
-  <view class="modal-sheet-container" catchtap="noop">
+  <view class="modal-sheet-container {{tall ? 'tall' : ''}}" catchtap="noop">
     <view class="modal-sheet-handle"></view>
 
     <view wx:if="{{title}}" class="modal-sheet-title">{{title}}</view>

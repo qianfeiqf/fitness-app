@@ -40,6 +40,10 @@ Component({
     closeOnMaskTap: {
       type: Boolean,
       value: true
+    },
+    tall: {
+      type: Boolean,
+      value: false
     }
   },
 

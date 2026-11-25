@@ -958,14 +958,22 @@ Page({
   },
 
   /**
-   * 获取某动作最近一次的训练记录
+   * 获取某动作最近一次的训练记录（含上次同会话完成的组数）
    */
   getLastExerciseRecord(exerciseId) {
     const allSets = getCollection('session_sets');
     const records = allSets
       .filter(s => s.exercise_id === exerciseId && s.status === 'completed')
       .sort((a, b) => b.completed_at - a.completed_at);
-    return records.length > 0 ? records[0] : null;
+    if (records.length === 0) return null;
+    const latest = records[0];
+    const sameSessionCount = latest.session_id
+      ? records.filter(s => s.session_id === latest.session_id).length
+      : 0;
+    return {
+      ...latest,
+      sets_count: Math.min(20, Math.max(1, sameSessionCount || 3))
+    };
   },
 
   /**
@@ -1674,7 +1682,7 @@ Page({
       nextIds = [...selectedAddIds, exerciseId];
       const lastRecord = this.getLastExerciseRecord(exerciseId);
       nextConfigs[exerciseId] = {
-        sets: 3,
+        sets: lastRecord ? (lastRecord.sets_count || 3) : 3,
         reps: lastRecord ? (lastRecord.actual_reps || 10) : 10,
         weight: lastRecord ? (lastRecord.actual_weight || 20) : 20
       };
@@ -1757,7 +1765,9 @@ Page({
     exerciseList.forEach(exercise => {
       const cfg = selectedAddConfigs[exercise.id];
       const lastRecord = cfg ? null : this.getLastExerciseRecord(exercise.id);
-      const targetSets = cfg ? Math.min(20, Math.max(1, parseInt(cfg.sets, 10) || 3)) : 3;
+      const targetSets = cfg
+        ? Math.min(20, Math.max(1, parseInt(cfg.sets, 10) || 3))
+        : (lastRecord ? (lastRecord.sets_count || 3) : 3);
       const targetReps = cfg ? Math.max(1, parseInt(cfg.reps, 10) || 10) : (lastRecord ? (lastRecord.actual_reps || 10) : 10);
       const targetWeight = cfg ? Math.max(0, parseFloat(cfg.weight) || 0) : (lastRecord ? (lastRecord.actual_weight || 20) : 20);
       nextExercises.push({

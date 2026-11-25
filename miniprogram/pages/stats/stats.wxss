@@ -5,7 +5,7 @@
   background: #FFFFFF;
   padding: 40rpx;
   padding-top: 200rpx; /* JS 动态覆盖 */
-  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  padding-bottom: 48rpx;
   color: #1A1A1A;
   width: 100%;
   box-sizing: border-box;

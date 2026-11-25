@@ -5,7 +5,7 @@
 .page-plans {
   min-height: 100vh;
   background-color: #F7F8FA;
-  padding: 0 32rpx calc(140rpx + env(safe-area-inset-bottom));
+  padding: 0 32rpx 48rpx;
   box-sizing: border-box;
 }
 

@@ -364,6 +364,10 @@ Page({
       });
       this.loadPlans();
       wx.showToast({ title: '计划已添加', icon: 'success' });
+      const app = getApp();
+      if (app && typeof app.startSync === 'function') {
+        app.startSync();
+      }
     }
   },
 

@@ -268,6 +268,7 @@ Page({
     this.setData({ showGoalModal: false });
     wx.showToast({ title: '目标已添加', icon: 'success' });
     this.loadGoals();
+    this._triggerSilentSync();
   },
 
   /**
@@ -285,6 +286,7 @@ Page({
           remove('goals', goalId);
           wx.showToast({ title: '已删除', icon: 'success' });
           this.loadGoals();
+          this._triggerSilentSync();
         }
       }
     });
@@ -321,12 +323,20 @@ Page({
   },
 
   /**
-   * 身体档案失焦时给予轻量已保存反馈
+   * 身体档案失焦时给予轻量已保存反馈并静默同步到云端
    */
   onProfileInputBlur() {
     if (this._profileDirty) {
       this._profileDirty = false;
       wx.showToast({ title: '身体档案已保存', icon: 'success', duration: 1200 });
+      this._triggerSilentSync();
+    }
+  },
+
+  _triggerSilentSync() {
+    const app = getApp();
+    if (app && typeof app.startSync === 'function') {
+      app.startSync();
     }
   },
 
@@ -455,26 +465,7 @@ Page({
     });
   },
 
-  /**
-   * 同步数据（本地 <-> 微信云数据库）
-   */
-  async onSyncData() {
-    const app = getApp();
-    wx.showLoading({ title: '正在同步...' });
-    const res = await app.startSync();
-    wx.hideLoading();
 
-    if (res && res.success) {
-      const pushed = res.syncedCount || 0;
-      const pulled = res.pulledCount || 0;
-      wx.showToast({ title: `同步完成 ↑${pushed} ↓${pulled}`, icon: 'success' });
-      this.loadProfile();
-    } else if (res && res.reason === 'offline') {
-      wx.showToast({ title: '请先登录云端账号', icon: 'none' });
-    } else {
-      wx.showToast({ title: '同步失败，请稍后重试', icon: 'none' });
-    }
-  },
 
   /**
    * 查看隐私保护指引

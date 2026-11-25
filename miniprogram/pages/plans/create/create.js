@@ -503,6 +503,11 @@ Page({
       wx.showToast({ title: '计划已创建', icon: 'success' });
     }
 
+    const app = getApp();
+    if (app && typeof app.startSync === 'function') {
+      app.startSync();
+    }
+
     setTimeout(() => {
       wx.navigateBack();
     }, 1500);

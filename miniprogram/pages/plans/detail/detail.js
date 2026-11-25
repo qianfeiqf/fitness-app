@@ -219,6 +219,7 @@ Page({
     update('plans', plan.id, { status: 'active', updated_at: Date.now() });
     wx.showToast({ title: '计划已激活', icon: 'success' });
     this.loadPlan(plan.id);
+    this._triggerSilentSync();
   },
 
   /**
@@ -229,6 +230,14 @@ Page({
     update('plans', plan.id, { status: 'archived', updated_at: Date.now() });
     wx.showToast({ title: '已归档，移出首页', icon: 'success' });
     this.loadPlan(plan.id);
+    this._triggerSilentSync();
+  },
+
+  _triggerSilentSync() {
+    const app = getApp();
+    if (app && typeof app.startSync === 'function') {
+      app.startSync();
+    }
   },
 
   /**
@@ -261,6 +270,7 @@ Page({
 
           // 删除计划
           remove('plans', plan.id);
+          this._triggerSilentSync();
 
           wx.showToast({ title: '计划已删除', icon: 'success' });
 

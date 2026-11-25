@@ -120,17 +120,6 @@
         <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
 
-      <view class="menu-item" bindtap="onSyncData">
-        <view class="menu-icon-wrap">
-          <mp-icon icon="refresh" color="#1A1A1A" size="{{22}}" />
-        </view>
-        <view class="menu-content">
-          <text class="menu-title">同步数据</text>
-          <text class="menu-desc">将本地数据同步到云端</text>
-        </view>
-        <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
-      </view>
-
       <view class="menu-item" bindtap="onOpenPrivacyPolicy">
         <view class="menu-icon-wrap">
           <mp-icon icon="lock" color="#1A1A1A" size="{{22}}" />

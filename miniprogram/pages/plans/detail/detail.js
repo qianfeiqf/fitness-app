@@ -28,6 +28,12 @@ Page({
     }
   },
 
+  onShow() {
+    if (!this.data.isTemplate && this.data.planId) {
+      this.loadPlan(this.data.planId);
+    }
+  },
+
   /**
    * 加载用户计划详情
    */
@@ -206,25 +212,22 @@ Page({
   noop() {},
 
   /**
-   * 激活计划
+   * 激活计划（支持首页多计划并行，不再强行归档其他计划）
    */
   onActivatePlan() {
     const { plan } = this.data;
-
-    // 先停用当前计划
-    const plans = find('plans') || [];
-    plans.forEach(p => {
-      if (p.status === 'active') {
-        update('plans', p.id, { status: 'archived' });
-      }
-    });
-
-    // 激活当前计划
-    update('plans', plan.id, { status: 'active' });
-
+    update('plans', plan.id, { status: 'active', updated_at: Date.now() });
     wx.showToast({ title: '计划已激活', icon: 'success' });
+    this.loadPlan(plan.id);
+  },
 
-    // 刷新数据
+  /**
+   * 归档计划（移出首页训练切换栏，保留记录可随时重新激活）
+   */
+  onArchivePlan() {
+    const { plan } = this.data;
+    update('plans', plan.id, { status: 'archived', updated_at: Date.now() });
+    wx.showToast({ title: '已归档，移出首页', icon: 'success' });
     this.loadPlan(plan.id);
   },
 

@@ -14,7 +14,7 @@
     "pages/profile/profile"
   ],
   "window": {
-    "navigationBarTitleText": "健身训练计划",
+    "navigationBarTitleText": "训练记一记",
     "navigationBarBackgroundColor": "#FFFFFF",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#FFFFFF",

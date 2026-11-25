@@ -306,7 +306,7 @@ Page({
   onUpdateWeight(e) {
     const weight = parseFloat(e.detail.value) || 0;
     this.setData({ weight });
-
+    this._profileDirty = true;
     this.saveProfile({ weight });
   },
 
@@ -316,8 +316,18 @@ Page({
   onUpdateHeight(e) {
     const height = parseFloat(e.detail.value) || 0;
     this.setData({ height });
-
+    this._profileDirty = true;
     this.saveProfile({ height });
+  },
+
+  /**
+   * 身体档案失焦时给予轻量已保存反馈
+   */
+  onProfileInputBlur() {
+    if (this._profileDirty) {
+      this._profileDirty = false;
+      wx.showToast({ title: '身体档案已保存', icon: 'success', duration: 1200 });
+    }
   },
 
   /**

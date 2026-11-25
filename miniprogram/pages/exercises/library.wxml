@@ -16,13 +16,16 @@
   <scroll-view class="exercise-list" scroll-y>
     <view wx:for="{{groupedExercises}}" wx:key="group" class="exercise-group">
       <view class="group-header">{{item.group}}</view>
-      <view wx:for="{{item.exercises}}" wx:key="id" class="exercise-item"
-            bindtap="onSelectExercise" data-exercise="{{item}}">
+      <view wx:for="{{item.exercises}}" wx:for-item="ex" wx:key="id"
+            class="exercise-item {{selectedMap[ex.id] ? 'selected' : ''}}"
+            bindtap="onSelectExercise" data-exercise-id="{{ex.id}}">
         <view class="exercise-info">
-          <text class="exercise-name">{{item.name}}</text>
-          <text class="exercise-name-en">{{item.name_en}}</text>
+          <text class="exercise-name">{{ex.name}}</text>
+          <text wx:if="{{ex.name_en}}" class="exercise-name-en">{{ex.name_en}}</text>
         </view>
-        <view class="exercise-arrow">›</view>
+        <view class="select-circle {{selectedMap[ex.id] ? 'checked' : ''}}">
+          <text wx:if="{{selectedMap[ex.id]}}">✓</text>
+        </view>
       </view>
     </view>
 
@@ -32,10 +35,14 @@
     </view>
   </scroll-view>
 
-  <!-- 添加自定义动作按钮 -->
-  <view class="add-custom-btn" bindtap="onShowAddCustom">
-    <text class="add-icon">+</text>
-    <text>添加自定义动作</text>
+  <!-- 底部操作栏：支持自定义动作 + 批量确认已选 -->
+  <view class="library-bottom-bar">
+    <view class="custom-secondary-btn" bindtap="onShowAddCustom">
+      <text>+ 自定义动作</text>
+    </view>
+    <view class="confirm-add-btn {{selectedIds.length === 0 ? 'disabled' : ''}}" bindtap="onConfirmSelect">
+      <text>{{selectedIds.length > 0 ? '添加已选 (' + selectedIds.length + ')' : '请选择动作'}}</text>
+    </view>
   </view>
 
   <!-- 添加自定义动作弹窗 -->

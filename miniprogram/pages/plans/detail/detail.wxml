@@ -76,13 +76,6 @@
             <view class="exercise-main">
               <view class="exercise-name-row">
                 <text class="exercise-name">{{ex.exercise_name}}</text>
-                <view wx:if="{{ex.video_url}}" class="video-btn"
-                      bindtap="onViewVideo"
-                      data-video-url="{{ex.video_url}}"
-                      data-exercise-name="{{ex.exercise_name}}">
-                  <text class="video-icon">▶</text>
-                  <text class="video-text">教学</text>
-                </view>
               </view>
               <text wx:if="{{ex.muscle_group}}" class="exercise-muscle">{{ex.muscle_group}}</text>
               <text class="exercise-sets">{{ex.target_sets}}组 × {{ex.target_reps}}次 · 初始 {{ex.initial_weight}}kg · 休{{ex.rest_seconds}}秒</text>
@@ -109,6 +102,11 @@
       <button wx:if="{{!isTemplate}}" class="btn btn-secondary btn-block"
               bindtap="onEditPlan">
         编辑计划
+      </button>
+      <button wx:if="{{!isTemplate && plan.status === 'active'}}"
+              class="btn btn-outline btn-block"
+              bindtap="onArchivePlan">
+        归档（移出首页）
       </button>
       <button wx:if="{{!isTemplate}}" class="btn btn-outline btn-block"
               bindtap="onDeletePlan">

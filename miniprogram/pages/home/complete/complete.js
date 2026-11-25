@@ -11,6 +11,7 @@ Page({
     sessionId: null,
     session: null,
     completedSets: [],
+    groupedSets: [],
     totalVolume: 0,
     duration: '',
     prCount: 0,
@@ -125,12 +126,36 @@ Page({
       duration = mins + '分钟';
     }
 
+    // 按动作分组汇总（供页面展示与分享卡片复用）
+    const groupMap = {};
+    completedSets.forEach(set => {
+      const key = set.exercise_id || set.exercise_name;
+      if (!groupMap[key]) {
+        groupMap[key] = {
+          exercise_id: key,
+          exercise_name: set.exercise_name || '动作',
+          sets: [],
+          maxWeight: 0,
+          hasPR: false
+        };
+      }
+      groupMap[key].sets.push(set);
+      if ((set.actual_weight || 0) > groupMap[key].maxWeight) {
+        groupMap[key].maxWeight = set.actual_weight || 0;
+      }
+      if (set.is_pr || set.milestone) {
+        groupMap[key].hasPR = true;
+      }
+    });
+    const groupedSets = Object.values(groupMap);
+
     // PR数量（通过检查是否有里程碑）
     const prCount = completedSets.filter(set => set.is_pr || set.milestone).length;
 
     this.setData({
       session,
       completedSets,
+      groupedSets,
       totalVolume: Math.round(totalVolume),
       duration,
       prCount
@@ -154,7 +179,7 @@ Page({
    * 生成并分享训练卡片
    */
   onShareCard() {
-    const { session, totalVolume, duration, prCount, completedSets } = this.data;
+    const { session, totalVolume, duration, prCount, completedSets, groupedSets } = this.data;
     if (!session) return;
 
     wx.showLoading({ title: '生成中...' });
@@ -164,7 +189,8 @@ Page({
       totalVolume,
       duration,
       prCount,
-      completedSets
+      completedSets,
+      groupedSets
     }).then(filePath => {
       wx.hideLoading();
       wx.showShareImageMenu({
@@ -224,35 +250,35 @@ Page({
           canvas.height = height * dpr;
           ctx.scale(dpr, dpr);
 
-          // 背景
-          ctx.fillStyle = '#1a1a2e';
+          // 背景（极简炭黑 + 微信绿品牌风格）
+          ctx.fillStyle = '#1A1A1A';
           ctx.fillRect(0, 0, width, height);
 
-          // 顶部装饰条
-          ctx.fillStyle = '#FFFFFF';
+          // 顶部微信绿装饰条
+          ctx.fillStyle = '#07C160';
           ctx.fillRect(0, 0, width, 12);
 
           // 标题
-          ctx.fillStyle = '#ffffff';
+          ctx.fillStyle = '#FFFFFF';
           ctx.font = 'bold 44px sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText('训练完成', width / 2, 100);
 
           // 计划名
-          ctx.fillStyle = '#aaaaaa';
+          ctx.fillStyle = '#BBBBBB';
           ctx.font = '28px sans-serif';
           ctx.fillText(data.planName || '今日训练', width / 2, 150);
 
           // 日期
           const now = new Date();
           const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
-          ctx.fillStyle = '#888888';
+          ctx.fillStyle = '#777777';
           ctx.font = '24px sans-serif';
           ctx.fillText(dateStr, width / 2, 190);
 
           // 数据卡片区域背景
           ctx.fillStyle = 'rgba(255,255,255,0.06)';
-          roundRect(ctx, 50, 230, 650, 280, 20);
+          roundRect(ctx, 50, 230, 650, 220, 20);
           ctx.fill();
 
           // 三个核心数据
@@ -263,72 +289,63 @@ Page({
           ];
 
           metrics.forEach((m, i) => {
-            const x = 120 + i * 210;
-            const y = 320;
+            const x = 160 + i * 215;
+            const y = 330;
 
-            // 数值
             ctx.fillStyle = '#FFFFFF';
             ctx.font = 'bold 40px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(m.value, x, y);
 
-            // 标签
             ctx.fillStyle = '#999999';
             ctx.font = '24px sans-serif';
-            ctx.fillText(m.label, x, y + 45);
+            ctx.fillText(m.label, x, y + 48);
           });
 
           // PR 区域
           if (data.prCount > 0) {
-            ctx.fillStyle = '#FFFFFF';
-            roundRect(ctx, 50, 540, 650, 80, 16);
+            ctx.fillStyle = '#07C160';
+            roundRect(ctx, 50, 480, 650, 76, 16);
             ctx.fill();
 
-            ctx.fillStyle = '#1A1A1A';
-            ctx.font = 'bold 30px sans-serif';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 28px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(`PR 恭喜刷新 ${data.prCount} 个个人纪录！`, width / 2, 590);
+            ctx.fillText(`恭喜刷新 ${data.prCount} 个个人纪录 (PR)`, width / 2, 528);
           }
 
-          // 动作列表标题
-          const listY = data.prCount > 0 ? 680 : 560;
-          ctx.fillStyle = '#ffffff';
+          // 动作列表标题（按动作汇总，避免单动作占满全部行数）
+          const listY = data.prCount > 0 ? 610 : 510;
+          ctx.fillStyle = '#FFFFFF';
           ctx.font = 'bold 28px sans-serif';
           ctx.textAlign = 'left';
           ctx.fillText('训练动作', 60, listY);
 
-          // 动作列表（最多展示5个）
-          const sets = data.completedSets.slice(0, 5);
-          sets.forEach((set, i) => {
-            const y = listY + 55 + i * 55;
-            ctx.fillStyle = 'rgba(255,255,255,0.05)';
-            roundRect(ctx, 50, y - 35, 650, 48, 10);
+          const groups = (data.groupedSets || []).slice(0, 6);
+          groups.forEach((g, i) => {
+            const y = listY + 52 + i * 54;
+            ctx.fillStyle = 'rgba(255,255,255,0.06)';
+            roundRect(ctx, 50, y - 34, 650, 46, 10);
             ctx.fill();
 
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = '#FFFFFF';
             ctx.font = '24px sans-serif';
             ctx.textAlign = 'left';
-            ctx.fillText(set.exercise_name, 70, y);
+            ctx.fillText(g.exercise_name, 70, y - 2);
 
-            ctx.fillStyle = '#aaaaaa';
+            ctx.fillStyle = '#BBBBBB';
             ctx.font = '22px sans-serif';
             ctx.textAlign = 'right';
-            ctx.fillText(`${set.actual_weight}kg × ${set.actual_reps}次`, 670, y);
-
-            if (set.is_pr) {
-              ctx.fillStyle = '#ffd700';
-              ctx.font = 'bold 20px sans-serif';
-              ctx.textAlign = 'right';
-              ctx.fillText('PR', 620, y);
-            }
+            const summary = `${g.sets.length}组 · 最高 ${g.maxWeight}kg${g.hasPR ? ' · PR' : ''}`;
+            ctx.fillText(summary, 676, y - 2);
           });
 
           // 底部品牌
-          const bottomY = height - 60;
-          ctx.fillStyle = '#555555';
+          const bottomY = height - 56;
+          ctx.fillStyle = '#666666';
           ctx.font = '22px sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText('健身训练计划小程序', width / 2, bottomY);
+          ctx.fillText('训练记一记', width / 2, bottomY);
 
           // 生成图片
           wx.canvasToTempFilePath({

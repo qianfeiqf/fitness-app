@@ -56,9 +56,9 @@ Page({
     ],
     wizardSelectedDays: null,
     wizardExpOptions: [
-      { id: 'beginner', name: '纯新手', tag: '入门', icon: '\u{1F331}', desc: '刚开始接触健身，或从未系统训练过' },
-      { id: 'intermediate', name: '有半年经验', tag: '中级', icon: '\u{1F33F}', desc: '已经训练过一段时间，熟悉基础动作' },
-      { id: 'advanced', name: '老手', tag: '进阶', icon: '\u{1F333}', desc: '系统训练一年以上，追求突破' }
+      { id: 'beginner', name: '纯新手', tag: '入门', desc: '刚开始接触健身，或从未系统训练过' },
+      { id: 'intermediate', name: '有半年经验', tag: '中级', desc: '已经训练过一段时间，熟悉基础动作' },
+      { id: 'advanced', name: '老手', tag: '进阶', desc: '系统训练一年以上，追求突破' }
     ],
     wizardSelectedExp: null,
     wizardRecommended: [],

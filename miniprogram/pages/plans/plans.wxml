@@ -217,7 +217,6 @@
           bindtap="onWizardSelectGoal"
           data-id="{{item.id}}"
         >
-          <text class="wizard-option-icon">{{item.icon}}</text>
           <text class="wizard-option-name">{{item.name}}</text>
           <text class="wizard-option-desc">{{item.desc}}</text>
           <view wx:if="{{wizardSelectedGoal === item.id}}" class="wizard-option-check">✓</view>
@@ -274,7 +273,6 @@
           data-id="{{item.id}}"
         >
           <view class="wizard-exp-header">
-            <text class="wizard-option-icon">{{item.icon}}</text>
             <view class="wizard-option-info">
               <text class="wizard-option-name">{{item.name}}</text>
               <text class="wizard-exp-tag">{{item.tag}}</text>

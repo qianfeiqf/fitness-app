@@ -25,6 +25,8 @@ Page({
     ],
     showAddCustom: false,
     dayOfWeek: null,
+    selectedIds: [],
+    selectedMap: {},
     customExercise: {
       name: '',
       name_en: '',
@@ -137,20 +139,46 @@ Page({
   },
 
   /**
-   * 选择动作
+   * 勾选/取消勾选动作（支持一次多选）
    */
   onSelectExercise(e) {
-    const exercise = e.currentTarget.dataset.exercise;
+    const exerciseId = e.currentTarget.dataset.exerciseId;
+    if (!exerciseId) return;
+    const { selectedIds, selectedMap } = this.data;
+    const nextMap = { ...selectedMap };
+    let nextIds;
+    if (nextMap[exerciseId]) {
+      delete nextMap[exerciseId];
+      nextIds = selectedIds.filter(id => id !== exerciseId);
+    } else {
+      nextMap[exerciseId] = true;
+      nextIds = [...selectedIds, exerciseId];
+    }
+    this.setData({ selectedIds: nextIds, selectedMap: nextMap });
+  },
 
-    // 添加 dayOfWeek
-    exercise.dayOfWeek = this.data.dayOfWeek;
+  /**
+   * 批量确认添加已选动作
+   */
+  onConfirmSelect() {
+    const { selectedIds, allExercises, dayOfWeek } = this.data;
+    if (!selectedIds || selectedIds.length === 0) {
+      wx.showToast({ title: '请先选择至少一个动作', icon: 'none' });
+      return;
+    }
+    const exMap = {};
+    allExercises.forEach(ex => { exMap[ex.id] = ex; });
+    const chosen = selectedIds
+      .map(id => exMap[id])
+      .filter(Boolean)
+      .map(ex => ({ ...ex, dayOfWeek }));
 
-    // 获取上一个页面并传递选中的动作
     const pages = getCurrentPages();
     const prevPage = pages[pages.length - 2];
-
-    if (prevPage && prevPage.selectExercise) {
-      prevPage.selectExercise(exercise);
+    if (prevPage && typeof prevPage.selectExercises === 'function') {
+      prevPage.selectExercises(chosen);
+    } else if (prevPage && typeof prevPage.selectExercise === 'function') {
+      chosen.forEach(ex => prevPage.selectExercise(ex));
     }
 
     wx.navigateBack();

@@ -49,7 +49,8 @@ Page({
       .filter(s => s.status === 'completed')
       .sort((a, b) => a.completed_at - b.completed_at);
 
-    // 按动作分组
+    // 按动作分组，并将数字 RPE 映射回中文体感
+    const rpeLabels = ['', '轻量', '中等', '吃力', '力竭'];
     const exerciseMap = {};
     allSets.forEach(set => {
       if (!exerciseMap[set.exercise_id]) {
@@ -59,7 +60,10 @@ Page({
           sets: []
         };
       }
-      exerciseMap[set.exercise_id].sets.push(set);
+      exerciseMap[set.exercise_id].sets.push({
+        ...set,
+        rpeLabel: set.rpe ? (rpeLabels[set.rpe] || '') : ''
+      });
     });
 
     const groupedSets = Object.values(exerciseMap);

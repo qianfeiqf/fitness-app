@@ -61,15 +61,21 @@
     </view>
   </view>
 
-  <!-- 完成动作列表 -->
+  <!-- 完成动作列表（按动作分组展示） -->
   <view class="completed-list">
     <text class="section-title">完成动作</text>
-    <view wx:for="{{completedSets}}" wx:key="id" class="completed-item">
-      <view class="item-info">
-        <text class="item-name">{{item.exercise_name}}</text>
-        <text class="item-detail">第{{item.set_number}}组 · {{item.actual_weight}}kg × {{item.actual_reps}}次</text>
+    <view wx:for="{{groupedSets}}" wx:key="exercise_id" class="completed-group">
+      <view class="completed-group-header">
+        <text class="completed-group-name">{{item.exercise_name}}</text>
+        <text class="completed-group-count">{{item.sets.length}} 组</text>
       </view>
-      <view wx:if="{{item.is_pr}}" class="pr-badge">PR</view>
+      <view class="completed-group-sets">
+        <view wx:for="{{item.sets}}" wx:for-item="set" wx:key="id" class="completed-set-row">
+          <text class="completed-set-num">第{{set.set_number}}组</text>
+          <text class="completed-set-val">{{set.actual_weight}}kg × {{set.actual_reps}}次</text>
+          <view wx:if="{{set.is_pr}}" class="pr-badge">PR</view>
+        </view>
+      </view>
     </view>
   </view>
 

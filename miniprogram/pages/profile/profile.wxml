@@ -46,7 +46,8 @@
                      type="digit"
                      placeholder="0"
                      value="{{weight}}"
-                     bindinput="onUpdateWeight" />
+                     bindinput="onUpdateWeight"
+                     bindblur="onProfileInputBlur" />
               <text class="input-unit">kg</text>
             </view>
           </view>
@@ -62,7 +63,8 @@
                      type="digit"
                      placeholder="0"
                      value="{{height}}"
-                     bindinput="onUpdateHeight" />
+                     bindinput="onUpdateHeight"
+                     bindblur="onProfileInputBlur" />
               <text class="input-unit">cm</text>
             </view>
           </view>
@@ -176,7 +178,7 @@
 
     <!-- 版本信息 -->
     <view class="version-info">
-      <text class="version-text">健身训练计划小程序 v1.0.0</text>
+      <text class="version-text">训练记一记 v1.0.0</text>
     </view>
   </view>
 

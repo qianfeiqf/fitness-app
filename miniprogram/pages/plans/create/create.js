@@ -340,27 +340,32 @@ Page({
   },
 
   /**
-   * 选择动作回调（从动作库返回时调用）
+   * 批量选择动作回调（从多选动作库返回时调用）
+   */
+  selectExercises(exercisesList) {
+    if (!Array.isArray(exercisesList) || exercisesList.length === 0) return;
+    const additions = exercisesList.map(ex => {
+      const { dayOfWeek, ...rest } = ex;
+      return {
+        ...rest,
+        dayOfWeek,
+        target_sets: 4,
+        target_reps: 8,
+        initial_weight: 20,
+        rest_seconds: 120
+      };
+    });
+    this.setData({
+      planExercises: [...this.data.planExercises, ...additions]
+    });
+    this.updateSelectedDaysDisplay();
+  },
+
+  /**
+   * 选择动作回调（兼容单选）
    */
   selectExercise(exercise) {
-    const dayOfWeek = exercise.dayOfWeek;
-    delete exercise.dayOfWeek; // 移除临时字段
-
-    // 默认参数
-    const newExercise = {
-      ...exercise,
-      dayOfWeek,
-      target_sets: 4,
-      target_reps: 8,
-      initial_weight: 20,
-      rest_seconds: 120
-    };
-
-    this.setData({
-      planExercises: [...this.data.planExercises, newExercise]
-    });
-
-    this.updateSelectedDaysDisplay();
+    this.selectExercises([exercise]);
   },
 
   /**

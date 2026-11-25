@@ -48,7 +48,7 @@
               <text class="set-value">{{set.actual_weight}}kg × {{set.actual_reps}}次</text>
             </view>
             <view class="set-meta">
-              <text wx:if="{{set.rpe}}" class="set-rpe">RPE: {{set.rpe}}</text>
+              <text wx:if="{{set.rpeLabel}}" class="set-rpe">{{set.rpeLabel}}</text>
               <text wx:if="{{set.is_pr}}" class="set-pr">PR</text>
             </view>
             <view wx:if="{{set.note}}" class="set-note">

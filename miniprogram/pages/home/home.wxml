@@ -123,6 +123,7 @@
       <swiper-item wx:for="{{planDataList}}" wx:key="id" wx:for-item="pd">
         <view class="plan-swiper-item-inner">
           <view class="training-card">
+            <view class="training-card-watermark"></view>
             <view class="hero-card-row">
               <view class="hero-card-left">
                 <view class="hero-title-row">
@@ -144,7 +145,7 @@
 
               <view class="hero-ring-wrap">
                 <view class="progress-ring-bg">
-                  <view class="progress-ring-fill" style="background: conic-gradient(#07C160 {{pd.weekProgress.percent * 3.6}}deg, #EFEFEF 0deg);"></view>
+                  <view class="progress-ring-fill" style="background: conic-gradient(#07C160 {{pd.weekProgress.percent * 3.6}}deg, rgba(255, 255, 255, 0.14) 0deg);"></view>
                   <view class="progress-ring-center">
                     <text class="progress-ring-num">{{pd.weekProgress.completedDays}}</text>
                     <text class="progress-ring-total">/{{pd.weekProgress.plannedDays}}</text>

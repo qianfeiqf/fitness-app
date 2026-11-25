@@ -306,8 +306,15 @@ Page({
       const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
       const todayWeek = weekDays[now.getDay()];
 
-      const currentIndex = this.data.currentPlanIndex || 0;
-      const safeIndex = Math.min(currentIndex, activePlans.length - 1);
+      const app = getApp();
+      const focusPlanId = app && app.globalData && app.globalData.focusPlanId;
+      let targetIndex = this.data.currentPlanIndex || 0;
+      if (focusPlanId) {
+        delete app.globalData.focusPlanId;
+        const foundIdx = activePlans.findIndex(p => p.id === focusPlanId);
+        targetIndex = foundIdx !== -1 ? foundIdx : 0;
+      }
+      const safeIndex = Math.min(targetIndex, activePlans.length - 1);
       const currentData = planDataList[safeIndex];
 
       this.setData({

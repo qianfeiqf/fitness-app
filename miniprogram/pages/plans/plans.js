@@ -494,9 +494,15 @@ Page({
       this.loadPlans();
       wx.showToast({ title: '计划已添加', icon: 'success' });
       const app = getApp();
-      if (app && typeof app.startSync === 'function') {
-        app.startSync();
+      if (app) {
+        app.globalData.focusPlanId = newPlan.id;
+        if (typeof app.startSync === 'function') {
+          app.startSync();
+        }
       }
+      setTimeout(() => {
+        wx.switchTab({ url: '/pages/home/home' });
+      }, 600);
     }
   },
 

@@ -521,6 +521,19 @@ Page({
       });
 
       wx.showToast({ title: '计划已创建', icon: 'success' });
+
+      const app = getApp();
+      if (app) {
+        app.globalData.focusPlanId = plan.id;
+        if (typeof app.startSync === 'function') {
+          app.startSync();
+        }
+      }
+
+      setTimeout(() => {
+        wx.switchTab({ url: '/pages/home/home' });
+      }, 600);
+      return;
     }
 
     const app = getApp();
@@ -530,6 +543,6 @@ Page({
 
     setTimeout(() => {
       wx.navigateBack();
-    }, 1500);
+    }, 1000);
   }
 });

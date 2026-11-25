@@ -91,127 +91,105 @@
       <mp-icon icon="close" color="#999999" size="{{14}}" />
     </view>
 
-    <!-- 多计划切换栏 -->
-    <view wx:if="{{planDataList.length > 1}}" class="plan-tabs-section">
-      <scroll-view class="plan-tabs-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
-        <view class="plan-tabs-list">
-          <view
-            wx:for="{{planDataList}}"
-            wx:key="id"
-            class="plan-tab-pill {{index === currentPlanIndex ? 'active' : ''}}"
-            data-index="{{index}}"
-            bindtap="onSelectPlanTab"
-          >
-            <text class="plan-tab-name">{{item.plan.name}}</text>
-            <text class="plan-tab-tag">{{item.isRestDay ? '休' : '练'}}</text>
-          </view>
-        </view>
-      </scroll-view>
-    </view>
-
-    <!-- 主内容 — 左右滑动切换计划 -->
+    <!-- 主内容 — 露边卡片直接左右滑动切换计划 -->
     <swiper
       wx:if="{{planDataList.length > 0}}"
       class="plan-swiper"
       style="height: {{swiperHeight}}rpx;"
       current="{{currentPlanIndex}}"
+      next-margin="{{planDataList.length > 1 ? '44rpx' : '0rpx'}}"
       bindchange="onPlanChange"
-      duration="300"
+      duration="280"
     >
       <swiper-item wx:for="{{planDataList}}" wx:key="id" wx:for-item="pd">
-        <scroll-view scroll-y class="plan-scroll-view" style="height: {{swiperHeight}}rpx;" show-scrollbar="{{false}}">
-        <!-- 今日训练主卡片（首屏核心） -->
-        <view class="training-card">
-          <!-- 休息日提示 -->
-          <view wx:if="{{pd.isRestDay}}" class="rest-day-inline">
-            <mp-icon icon="time" color="#888888" size="{{26}}" />
-            <view class="rest-day-inline-content">
-              <text class="rest-day-inline-title">今日休息日</text>
-              <text class="rest-day-inline-desc">{{planDataList.length === 1 ? pd.plan.name + ' · ' : ''}}充分恢复，下一次训练更稳</text>
-            </view>
-          </view>
-
-          <view wx:else class="card-body-clean">
-            <view class="card-header-modern">
-              <text class="card-title">{{pd.plan.name}}</text>
-              <text wx:if="{{pd.muscleGroups}}" class="badge-pill">{{pd.muscleGroups}}</text>
-            </view>
-
-            <view class="card-meta-line">
-              <text class="meta-chip">{{pd.exercises.length}} 个动作</text>
-              <text class="meta-dot">·</text>
-              <text class="meta-chip">{{pd.totalSets}} 组</text>
-              <text class="meta-dot">·</text>
-              <text class="meta-chip">约 {{pd.estimatedMinutes}} 分钟</text>
-            </view>
-
-            <view class="card-action">
-              <button wx:if="{{!pd.session || pd.session.status === 'completed' || pd.session.status === 'aborted'}}"
-                      class="btn-start"
-                      data-plan-id="{{pd.plan.id}}"
-                      bindtap="onStartTrainingForPlan">
-                <text class="btn-start-text">开始训练</text>
-              </button>
-              <button wx:else
-                      class="btn-resume"
-                      data-session-id="{{pd.session.id}}"
-                      bindtap="onResumeTrainingForPlan">
-                <text class="btn-start-text">继续训练</text>
-              </button>
-            </view>
-          </view>
-        </view>
-
-        <!-- 本周训练轻量进度条（保留小圆环，合并连续天数，紧凑不占位） -->
-        <view class="week-summary-card">
-          <view class="week-summary-left">
-            <view class="progress-ring-bg">
-              <view class="progress-ring-fill" style="background: conic-gradient(#07C160 {{pd.weekProgress.percent * 3.6}}deg, #EFEFEF 0deg);"></view>
-              <view class="progress-ring-center">
-                <text class="progress-ring-num">{{pd.weekProgress.completedDays}}</text>
-                <text class="progress-ring-total">/{{pd.weekProgress.plannedDays}}</text>
+        <view class="plan-swiper-item-inner {{planDataList.length > 1 ? 'multi' : ''}}">
+          <!-- 今日训练主卡片（轻盈无按钮，主操作移至底部吸屏） -->
+          <view class="training-card">
+            <view wx:if="{{pd.isRestDay}}" class="card-body-clean">
+              <view class="card-header-modern">
+                <text class="card-title">{{pd.plan.name}}</text>
+                <text class="badge-pill rest">休息日</text>
+              </view>
+              <view class="card-meta-line compact">
+                <text class="meta-chip">今日休整恢复{{pd.nextDayLabel ? ' · 下次训练为 ' + pd.nextDayLabel : ''}}</text>
               </view>
             </view>
-            <view class="week-summary-info">
-              <text class="week-summary-title">本周训练</text>
-              <text class="week-summary-sub">已完成 {{pd.weekProgress.completedDays}} 天 · 目标 {{pd.weekProgress.plannedDays}} 天</text>
-            </view>
-          </view>
-          <view wx:if="{{streak > 0}}" class="streak-pill">
-            <text>连续 {{streak}} 天</text>
-          </view>
-        </view>
 
-        <!-- 动作预览列表 -->
-        <view class="exercises-section" wx:if="{{pd.exercises.length > 0}}">
-          <view class="section-header">
-            <text class="section-title">动作预览</text>
-            <view class="section-link" data-plan-id="{{pd.plan.id}}" bindtap="onPreviewPlanById">
-              <text>查看详情</text>
-              <text class="link-arrow">›</text>
+            <view wx:else class="card-body-clean">
+              <view class="card-header-modern">
+                <text class="card-title">{{pd.plan.name}}</text>
+                <text wx:if="{{pd.muscleGroups}}" class="badge-pill">{{pd.muscleGroups}}</text>
+              </view>
+              <view class="card-meta-line compact">
+                <text class="meta-chip">{{pd.exercises.length}} 个动作</text>
+                <text class="meta-dot">·</text>
+                <text class="meta-chip">{{pd.totalSets}} 组</text>
+                <text class="meta-dot">·</text>
+                <text class="meta-chip">约 {{pd.estimatedMinutes}} 分钟</text>
+              </view>
             </view>
           </view>
 
-          <view class="exercise-list">
-            <view wx:for="{{pd.exercises}}"
-                  wx:key="id"
-                  class="exercise-item">
-              <view class="exercise-number">{{index + 1}}</view>
-              <view class="exercise-content">
-                <text class="exercise-name">{{item.name}}</text>
-                <view class="exercise-details">
-                  <text class="exercise-sets">{{item.target_sets}}组 × {{item.target_reps}}次</text>
-                  <text class="exercise-sep">·</text>
-                  <text class="exercise-weight">{{item.target_weight}}kg</text>
+          <!-- 多计划极简圆点指示器 -->
+          <view wx:if="{{planDataList.length > 1}}" class="plan-dots">
+            <view
+              wx:for="{{planDataList}}"
+              wx:key="id"
+              wx:for-index="dotIdx"
+              class="plan-dot {{dotIdx === currentPlanIndex ? 'active' : ''}}"
+            ></view>
+          </view>
+
+          <!-- 本周训练轻量进度卡（保留小圆环，合并连续天数） -->
+          <view class="week-summary-card">
+            <view class="week-summary-left">
+              <view class="progress-ring-bg">
+                <view class="progress-ring-fill" style="background: conic-gradient(#07C160 {{pd.weekProgress.percent * 3.6}}deg, #EFEFEF 0deg);"></view>
+                <view class="progress-ring-center">
+                  <text class="progress-ring-num">{{pd.weekProgress.completedDays}}</text>
+                  <text class="progress-ring-total">/{{pd.weekProgress.plannedDays}}</text>
                 </view>
               </view>
-              <view class="exercise-tag">{{item.muscle_group}}</view>
+              <view class="week-summary-info">
+                <text class="week-summary-title">本周训练</text>
+                <text class="week-summary-sub">已完成 {{pd.weekProgress.completedDays}} 天 · 目标 {{pd.weekProgress.plannedDays}} 天</text>
+              </view>
+            </view>
+            <view wx:if="{{streak > 0}}" class="streak-pill">
+              <text>连续 {{streak}} 天</text>
+            </view>
+          </view>
+
+          <!-- 动作预览列表（训练日展示今日动作；休息日预告下一次训练动作） -->
+          <view class="exercises-section" wx:if="{{(!pd.isRestDay && pd.exercises.length > 0) || (pd.isRestDay && pd.nextExercises.length > 0)}}">
+            <view class="section-header">
+              <text class="section-title">{{pd.isRestDay ? ('下次预告 · ' + pd.nextDayLabel) : '今日动作'}}</text>
+              <view class="section-link" data-plan-id="{{pd.plan.id}}" bindtap="onPreviewPlanById">
+                <text>计划详情</text>
+                <text class="link-arrow">›</text>
+              </view>
+            </view>
+
+            <view class="exercise-list">
+              <view wx:for="{{pd.isRestDay ? pd.nextExercises : pd.exercises}}"
+                    wx:key="id"
+                    class="exercise-item">
+                <view class="exercise-number">{{index + 1}}</view>
+                <view class="exercise-content">
+                  <text class="exercise-name">{{item.name}}</text>
+                  <view class="exercise-details">
+                    <text class="exercise-sets">{{item.target_sets}}组 × {{item.target_reps}}次</text>
+                    <text class="exercise-sep">·</text>
+                    <text class="exercise-weight">{{item.target_weight}}kg</text>
+                  </view>
+                </view>
+                <view class="exercise-tag">{{item.muscle_group}}</view>
+              </view>
             </view>
           </view>
         </view>
-      </scroll-view>
-    </swiper-item>
-  </swiper>
+      </swiper-item>
+    </swiper>
 </view>
 
   <!-- 恢复训练弹窗 -->
@@ -229,6 +207,31 @@
       <icon type="info" size="40" color="#07C160" />
     </view>
   </modal-sheet>
+
+  <!-- 底部吸屏主操作按钮（有全局悬浮条时自动让位隐藏） -->
+  <view wx:if="{{isLoggedIn && currentPlanData && !hasMinimizedFloat}}" class="home-sticky-cta">
+    <button
+      wx:if="{{currentPlanData.session && currentPlanData.session.status !== 'completed' && currentPlanData.session.status !== 'aborted'}}"
+      class="sticky-cta-btn"
+      bindtap="onPrimaryAction"
+    >
+      <text>继续训练</text>
+    </button>
+    <button
+      wx:elif="{{!currentPlanData.isRestDay}}"
+      class="sticky-cta-btn"
+      bindtap="onPrimaryAction"
+    >
+      <text>开始训练</text>
+    </button>
+    <button
+      wx:else
+      class="sticky-cta-btn unlock"
+      bindtap="onPrimaryAction"
+    >
+      <text>提前解锁{{currentPlanData.nextDayLabel ? ' · 练' + currentPlanData.nextDayLabel : ''}}</text>
+    </button>
+  </view>
 
   <!-- 训练悬浮窗（含全局组间休息倒计时） -->
   <training-float />

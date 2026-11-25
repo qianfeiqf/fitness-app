@@ -6,7 +6,7 @@
   background: #F7F8FA;
   padding: 32rpx;
   padding-top: 200rpx; /* JS 动态覆盖 */
-  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(190rpx + env(safe-area-inset-bottom));
   width: 100%;
   box-sizing: border-box;
 }
@@ -579,45 +579,39 @@
   box-sizing: border-box;
 }
 
-.plan-swiper .training-card {
-  margin: 0 4rpx;
-}
-
-/* =====================
-   卡片内休息日提示
-   ===================== */
-.rest-day-inline {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-  padding: 48rpx 32rpx;
+.plan-swiper-item-inner {
+  padding: 4rpx 4rpx 0;
   box-sizing: border-box;
 }
 
-.rest-day-inline-icon {
-  font-size: 48rpx;
-  flex-shrink: 0;
+.plan-swiper-item-inner.multi {
+  padding-right: 20rpx;
 }
 
-.rest-day-inline-content {
+/* 多计划极简圆点指示器 */
+.plan-dots {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  margin-top: 16rpx;
 }
 
-.rest-day-inline-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #1A1A1A;
+.plan-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 9999rpx;
+  background: #D8DCE2;
+  transition: all 0.2s ease;
 }
 
-.rest-day-inline-desc {
-  font-size: 24rpx;
-  color: #666666;
-  margin-top: 4rpx;
+.plan-dot.active {
+  width: 28rpx;
+  background: #1A1A1A;
 }
 
 /* =====================
-   训练主卡片（纯白无边框，首屏绝对视觉中心）
+   训练主卡片（纯白无边框，轻盈聚焦日程）
    ===================== */
 .training-card {
   background: #FFFFFF;
@@ -628,7 +622,7 @@
 }
 
 .card-body-clean {
-  padding: 32rpx 32rpx 32rpx;
+  padding: 30rpx 32rpx;
 }
 
 .card-header-modern {
@@ -636,7 +630,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 16rpx;
-  margin-bottom: 14rpx;
+  margin-bottom: 12rpx;
 }
 
 .card-title {
@@ -660,12 +654,59 @@
   flex-shrink: 0;
 }
 
+.badge-pill.rest {
+  background: #F0FBF4;
+  color: #07C160;
+}
+
 .card-meta-line {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 10rpx;
   margin-bottom: 28rpx;
+}
+
+.card-meta-line.compact {
+  margin-bottom: 0;
+}
+
+/* =====================
+   底部吸屏主操作按钮
+   ===================== */
+.home-sticky-cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(247, 248, 250, 0) 0%, rgba(247, 248, 250, 0.94) 28%, #F7F8FA 100%);
+  z-index: 90;
+  box-sizing: border-box;
+}
+
+.sticky-cta-btn {
+  width: 100%;
+  height: 96rpx;
+  border-radius: 9999rpx;
+  background: #07C160;
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 600;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.24);
+}
+
+.sticky-cta-btn:active {
+  opacity: 0.88;
+}
+
+.sticky-cta-btn.unlock {
+  background: #1A1A1A;
+  box-shadow: 0 8rpx 24rpx rgba(26, 26, 26, 0.2);
 }
 
 .meta-chip {

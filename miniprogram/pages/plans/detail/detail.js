@@ -250,23 +250,23 @@ Page({
   noop() {},
 
   /**
-   * 激活计划（支持首页多计划并行，不再强行归档其他计划）
+   * 恢复计划（支持首页多计划并行，不再强行暂停其他计划）
    */
   onActivatePlan() {
     const { plan } = this.data;
     update('plans', plan.id, { status: 'active', updated_at: Date.now() });
-    wx.showToast({ title: '计划已激活', icon: 'success' });
+    wx.showToast({ title: '已恢复，加入首页训练', icon: 'success' });
     this.loadPlan(plan.id);
     this._triggerSilentSync();
   },
 
   /**
-   * 归档计划（移出首页训练切换栏，保留记录可随时重新激活）
+   * 暂停计划（从首页移出，保留记录可随时恢复）
    */
   onArchivePlan() {
     const { plan } = this.data;
     update('plans', plan.id, { status: 'archived', updated_at: Date.now() });
-    wx.showToast({ title: '已归档，移出首页', icon: 'success' });
+    wx.showToast({ title: '已暂停，已从首页移出', icon: 'success' });
     this.loadPlan(plan.id);
     this._triggerSilentSync();
   },

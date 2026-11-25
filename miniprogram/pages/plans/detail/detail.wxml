@@ -14,7 +14,7 @@
       <view class="plan-title-row">
         <text class="plan-name">{{plan.name}}</text>
         <text wx:if="{{plan.status === 'active'}}" class="badge badge-success">进行中</text>
-        <text wx:elif="{{plan.status === 'archived'}}" class="badge badge-secondary">已归档</text>
+        <text wx:elif="{{plan.status === 'archived'}}" class="badge badge-secondary">已暂停</text>
         <text wx:elif="{{plan.status === 'template'}}" class="badge badge-info">经典计划</text>
         <text wx:else class="badge badge-warning">草稿</text>
       </view>
@@ -102,7 +102,7 @@
       <button wx:if="{{!isTemplate && plan.status !== 'active'}}"
               class="btn btn-primary btn-block"
               bindtap="onActivatePlan">
-        激活此计划
+        恢复计划
       </button>
       <button wx:if="{{!isTemplate}}" class="btn btn-secondary btn-block"
               bindtap="onEditPlan">
@@ -111,7 +111,7 @@
       <button wx:if="{{!isTemplate && plan.status === 'active'}}"
               class="btn btn-outline btn-block"
               bindtap="onArchivePlan">
-        归档（移出首页）
+        暂停计划
       </button>
       <button wx:if="{{!isTemplate}}" class="btn btn-outline btn-block"
               bindtap="onDeletePlan">

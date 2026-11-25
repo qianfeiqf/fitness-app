@@ -41,7 +41,7 @@
         <view class="plan-info">
           <view class="plan-title-line">
             <text class="plan-name">{{item.name}}</text>
-            <view class="plan-status-pill {{item.status === 'active' ? 'active' : 'archived'}}">{{item.status === 'active' ? '进行中' : item.status === 'archived' ? '已归档' : '草稿'}}</view>
+            <view class="plan-status-pill {{item.status === 'active' ? 'active' : 'archived'}}">{{item.status === 'active' ? '进行中' : item.status === 'archived' ? '已暂停' : '草稿'}}</view>
           </view>
           <text class="plan-meta">{{item.summaryText}}</text>
         </view>

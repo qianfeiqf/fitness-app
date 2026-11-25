@@ -33,8 +33,8 @@ Page({
       deadline: ''
     },
 
-    // 隐私与协议半屏抽屉
-    showLegalSheet: false,
+    // 账号管理半屏抽屉
+    showAccountSheet: false,
 
     // 训练悬浮窗 & 从训练页引导填写体重的返回入口
     trainingFloat: null,
@@ -470,19 +470,18 @@ Page({
 
 
 
-  onOpenLegalSheet() {
-    this.setData({ showLegalSheet: true });
+  onOpenAccountSheet() {
+    this.setData({ showAccountSheet: true });
   },
 
-  onCloseLegalSheet() {
-    this.setData({ showLegalSheet: false });
+  onCloseAccountSheet() {
+    this.setData({ showAccountSheet: false });
   },
 
   /**
    * 查看隐私保护指引
    */
   onOpenPrivacyPolicy() {
-    this.setData({ showLegalSheet: false });
     if (typeof wx.openPrivacyContract === 'function') {
       wx.openPrivacyContract({
         fail: () => {
@@ -507,7 +506,6 @@ Page({
    * 查看用户服务协议
    */
   onOpenUserAgreement() {
-    this.setData({ showLegalSheet: false });
     wx.showModal({
       title: '用户服务协议',
       content: '1. 本小程序提供的训练计划、1RM估算与重量演进建议仅作健身参考，不构成医疗或专业康复建议。\n2. 请根据自身身体状况合理安排负荷，训练前充分热身，如有不适请立即停止。\n3. 您的训练数据归您本人所有，可随时导出或通过「注销账号」永久删除。',
@@ -520,6 +518,7 @@ Page({
    * 退出登录（仅清除登录凭证，保留本地训练数据与计划）
    */
   onLogout() {
+    this.setData({ showAccountSheet: false });
     wx.showModal({
       title: '确认退出',
       content: '退出登录后将暂停云端同步，本地训练记录和计划仍会保留。确定退出吗？',
@@ -549,6 +548,7 @@ Page({
    * 注销账号（永久删除云端与本地数据）
    */
   onDeleteAccount() {
+    this.setData({ showAccountSheet: false });
     wx.showModal({
       title: '确认注销账号',
       content: '注销后将永久删除您的云端及本地全部训练计划、训练记录与个人档案，且无法恢复。确定要注销吗？',

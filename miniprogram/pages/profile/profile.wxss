@@ -574,7 +574,31 @@
   border-radius: 9999rpx;
 }
 
-/* 隐私与协议半屏抽屉 */
+/* 底部协议文字链 */
+.legal-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.legal-link-item {
+  font-size: 24rpx;
+  color: #666666;
+  padding: 6rpx 8rpx;
+}
+
+.legal-link-item:active {
+  color: #1A1A1A;
+}
+
+.legal-link-sep {
+  font-size: 24rpx;
+  color: #CCCCCC;
+}
+
+/* 账号管理半屏抽屉 */
 .legal-sheet-list {
   display: flex;
   flex-direction: column;
@@ -596,6 +620,10 @@
   background: #EFEFF2;
 }
 
+.legal-sheet-item.danger {
+  background: #FFF6F6;
+}
+
 .legal-sheet-info {
   flex: 1;
   min-width: 0;
@@ -608,6 +636,10 @@
   font-size: 28rpx;
   font-weight: 600;
   color: #1A1A1A;
+}
+
+.legal-sheet-title.danger {
+  color: #FA5151;
 }
 
 .legal-sheet-desc {

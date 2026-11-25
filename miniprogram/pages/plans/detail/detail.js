@@ -17,7 +17,8 @@ Page({
     loading: true,
     showIntro: false,
     showExerciseDetail: false,
-    detailExercise: null
+    detailExercise: null,
+    gifLoadError: false
   },
 
   onLoad(options) {
@@ -202,14 +203,20 @@ Page({
     if (!ex) return;
     this.setData({
       showExerciseDetail: true,
-      detailExercise: ex
+      detailExercise: ex,
+      gifLoadError: false
     });
+  },
+
+  onGifLoadError() {
+    this.setData({ gifLoadError: true });
   },
 
   onCloseExerciseDetail() {
     this.setData({
       showExerciseDetail: false,
-      detailExercise: null
+      detailExercise: null,
+      gifLoadError: false
     });
   },
 

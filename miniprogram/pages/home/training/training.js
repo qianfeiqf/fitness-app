@@ -91,6 +91,7 @@ Page({
     showFinishModal: false,
     showExerciseDetail: false,
     detailExercise: null,
+    gifLoadError: false,
 
     // 更多操作面板
     showMoreActions: false,
@@ -2329,7 +2330,8 @@ Page({
     const detail = findOne('exercises', { id: cur.exercise_id }) || cur;
     this.setData({
       showExerciseDetail: true,
-      detailExercise: detail
+      detailExercise: detail,
+      gifLoadError: false
     });
   },
 
@@ -2343,14 +2345,20 @@ Page({
     if (!detail) return;
     this.setData({
       showExerciseDetail: true,
-      detailExercise: detail
+      detailExercise: detail,
+      gifLoadError: false
     });
+  },
+
+  onGifLoadError() {
+    this.setData({ gifLoadError: true });
   },
 
   onCloseExerciseDetail() {
     this.setData({
       showExerciseDetail: false,
-      detailExercise: null
+      detailExercise: null,
+      gifLoadError: false
     });
   },
 

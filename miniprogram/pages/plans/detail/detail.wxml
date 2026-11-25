@@ -129,6 +129,15 @@
     bind:close="onCloseExerciseDetail"
   >
     <view wx:if="{{detailExercise}}" class="ex-detail-body">
+      <view wx:if="{{detailExercise.gif_url && !gifLoadError}}" class="ex-detail-gif-wrap">
+        <image
+          class="ex-detail-gif"
+          src="{{detailExercise.gif_url}}"
+          mode="aspectFit"
+          lazy-load="{{true}}"
+          binderror="onGifLoadError"
+        />
+      </view>
       <view class="ex-detail-tags">
         <text wx:if="{{detailExercise.muscle_group}}" class="ex-detail-tag">{{detailExercise.muscle_group}}</text>
         <text wx:if="{{detailExercise.equipment}}" class="ex-detail-tag tag-equip">{{detailExercise.equipment}}</text>

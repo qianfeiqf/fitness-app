@@ -5,6 +5,7 @@
 
 const { getExercisesSeedData } = require('./seed-exercises.js');
 const { getPlanTemplatesSeedData } = require('./seed-templates.js');
+const EXERCISE_GIFS = require('./exercise-gifs.js');
 
 let db = null;
 const DB_NAME = 'fitness_app_db';
@@ -114,9 +115,10 @@ function initSeedData() {
   });
 
   seedExercises.forEach(seed => {
+    const resolvedGifUrl = EXERCISE_GIFS[seed.id] || seed.gif_url || '';
     const existing = exerciseMap[seed.id];
     if (!existing) {
-      exercises.push({ ...seed });
+      exercises.push({ ...seed, gif_url: resolvedGifUrl });
       changed = true;
     } else if (existing.is_system !== false) {
       const fieldsToBackfill = ['equipment', 'target_muscles', 'description', 'tips', 'name_en'];
@@ -126,6 +128,10 @@ function initSeedData() {
           changed = true;
         }
       });
+      if (resolvedGifUrl && existing.gif_url !== resolvedGifUrl) {
+        existing.gif_url = resolvedGifUrl;
+        changed = true;
+      }
       if ((!Array.isArray(existing.alternatives) || existing.alternatives.length === 0) && Array.isArray(seed.alternatives) && seed.alternatives.length > 0) {
         existing.alternatives = [...seed.alternatives];
         changed = true;

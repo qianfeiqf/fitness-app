@@ -647,7 +647,7 @@ mp-tabs {
 
 .calendar-weekdays {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   margin-bottom: 10rpx;
 }
 
@@ -660,11 +660,12 @@ mp-tabs {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 8rpx 4rpx;
 }
 
 .calendar-cell {
+  min-width: 0;
   min-height: 92rpx;
   border-radius: 14rpx;
   padding: 8rpx 4rpx 6rpx;
@@ -674,6 +675,7 @@ mp-tabs {
   justify-content: flex-start;
   box-sizing: border-box;
   border: 2rpx solid transparent;
+  overflow: hidden;
 }
 
 .calendar-cell.empty {

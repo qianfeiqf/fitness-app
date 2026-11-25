@@ -14,10 +14,11 @@
   <!-- 顶部进度条 -->
   <view class="progress-header">
     <view class="progress-info">
-      <view class="progress-counter">
+      <view class="progress-counter" bindtap="onOpenExerciseListModal">
         <text class="counter-num">{{exercises.length > 0 ? (currentExerciseIndex < exercises.length ? currentExerciseIndex + 1 : exercises.length) : 0}}</text>
         <text class="counter-sep">/</text>
         <text class="counter-total">{{exercises.length}}</text>
+        <text class="counter-arrow">▾</text>
       </view>
       <view class="progress-right">
         <text class="training-duration">{{wxs.formatTime(trainingDuration)}}</text>
@@ -29,12 +30,19 @@
     </view>
   </view>
 
-  <!-- 动作列表 - 横向滚动 -->
-  <scroll-view scroll-x class="exercise-scroll" scroll-left="{{scrollLeft}}">
+  <!-- 动作列表 - 横向滚动（独立浅灰底槽 + 自动滚动定位） -->
+  <scroll-view
+    scroll-x
+    class="exercise-scroll"
+    scroll-into-view="{{exerciseScrollIntoView}}"
+    scroll-with-animation="{{true}}"
+    show-scrollbar="{{false}}"
+  >
     <view class="exercise-list">
       <view
         wx:for="{{exercises}}"
         wx:key="index"
+        id="ex-chip-{{index}}"
         class="exercise-chip {{item.completed_sets >= item.target_sets ? 'completed' : ''}} {{index === currentExerciseIndex ? 'current' : ''}}"
         bindtap="onTapExercise"
         bindlongpress="onLongPressExercise"
@@ -47,11 +55,11 @@
         <text wx:if="{{item.completed_sets >= item.target_sets}}" class="chip-check done">✓</text>
         <text wx:elif="{{item.skipped}}" class="chip-check skip">跳过</text>
       </view>
-    </view>
-    <view class="exercise-chip add-chip" bindtap="onAddExercise">
-      <view class="chip-content">
-        <text class="chip-name add-icon">+</text>
-        <text class="chip-sets">添加</text>
+      <view class="exercise-chip add-chip" bindtap="onAddExercise">
+        <view class="chip-content">
+          <text class="chip-name add-icon">+ 添加</text>
+          <text class="chip-sets">新动作</text>
+        </view>
       </view>
     </view>
   </scroll-view>
@@ -311,6 +319,40 @@
       <text class="bottom-label">完成</text>
     </view>
   </view>
+
+  <!-- 全部动作快捷切换抽屉 -->
+  <modal-sheet
+    visible="{{showExerciseListModal}}"
+    title="本次训练动作"
+    description="点击动作快速切换"
+    confirmText="+ 添加动作"
+    cancelText="关闭"
+    bind:confirm="onAddExerciseFromList"
+    bind:cancel="onCloseExerciseListModal"
+    bind:close="onCloseExerciseListModal"
+  >
+    <scroll-view scroll-y class="exercise-drawer-list">
+      <view
+        wx:for="{{exercises}}"
+        wx:key="index"
+        class="exercise-drawer-item {{index === currentExerciseIndex ? 'current' : ''}} {{item.completed_sets >= item.target_sets ? 'completed' : ''}}"
+        bindtap="onSelectExerciseFromDrawer"
+        data-index="{{index}}"
+      >
+        <view class="drawer-item-index">{{index + 1}}</view>
+        <view class="drawer-item-info">
+          <text class="drawer-item-name">{{item.exercise_name || item.name}}</text>
+          <text class="drawer-item-meta">{{item.completed_sets || 0}}/{{item.target_sets || 0}} 组{{item.skipped ? ' · 已跳过' : (item.completed_sets >= item.target_sets ? ' · 已完成' : '')}}</text>
+        </view>
+        <view class="drawer-item-actions">
+          <text wx:if="{{index === currentExerciseIndex}}" class="drawer-current-tag">当前</text>
+          <view class="drawer-remove-btn" catchtap="onRemoveExerciseFromDrawer" data-index="{{index}}">
+            <mp-icon icon="delete" color="#999999" size="{{16}}" />
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </modal-sheet>
 
   <!-- 跳过动作弹窗 -->
   <modal-sheet

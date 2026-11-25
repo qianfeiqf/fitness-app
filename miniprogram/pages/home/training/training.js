@@ -85,6 +85,10 @@ Page({
     isFreeWorkout: false,
     freeAllDone: false,
 
+    // 横向动作栏自动滚动与全部动作抽屉
+    exerciseScrollIntoView: '',
+    showExerciseListModal: false,
+
     // 更多操作面板
     showMoreActions: false,
 
@@ -407,7 +411,8 @@ Page({
       currentSetIndex: activeIdx,
       selectedRPE: defaultRPE,
       setNote: '',
-      freeAllDone: false
+      freeAllDone: false,
+      exerciseScrollIntoView: 'ex-chip-' + currentExerciseIndex
     });
 
     this.calculateOverallProgress();
@@ -2046,6 +2051,34 @@ Page({
   /**
    * 点击状态列表中的动作（支持切回已完成的动作继续加组/减组）
    */
+  onOpenExerciseListModal() {
+    if (!this.data.exercises || this.data.exercises.length === 0) {
+      this.onAddExercise();
+      return;
+    }
+    this.setData({ showExerciseListModal: true });
+  },
+
+  onCloseExerciseListModal() {
+    this.setData({ showExerciseListModal: false });
+  },
+
+  onAddExerciseFromList() {
+    this.setData({ showExerciseListModal: false });
+    this.onAddExercise();
+  },
+
+  onSelectExerciseFromDrawer(e) {
+    this.setData({ showExerciseListModal: false });
+    this.onTapExercise(e);
+  },
+
+  onRemoveExerciseFromDrawer(e) {
+    const idx = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(idx)) return;
+    this._removeExerciseAt(idx);
+  },
+
   onTapExercise(e) {
     const { index } = e.currentTarget.dataset;
     const { exercises, isResting } = this.data;

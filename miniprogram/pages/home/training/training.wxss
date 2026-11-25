@@ -106,12 +106,20 @@
 }
 
 .progress-counter {
-  display: flex;
+  display: inline-flex;
   align-items: baseline;
+  padding: 6rpx 18rpx;
+  border-radius: 9999rpx;
+  background: #F5F6F8;
+  transition: background 0.15s ease;
+}
+
+.progress-counter:active {
+  background: #EAECEF;
 }
 
 .counter-num {
-  font-size: 40rpx;
+  font-size: 38rpx;
   font-weight: 700;
   color: #1A1A1A;
   font-family: 'DIN Alternate', system-ui, sans-serif;
@@ -119,15 +127,21 @@
 }
 
 .counter-sep {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #999999;
   margin: 0 4rpx;
 }
 
 .counter-total {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #666666;
   font-variant-numeric: tabular-nums;
+}
+
+.counter-arrow {
+  font-size: 22rpx;
+  color: #666666;
+  margin-left: 8rpx;
 }
 
 .progress-right {
@@ -154,27 +168,34 @@
 }
 
 /* =====================
-   动作列表 - 横向滚动
+   动作列表 - 横向滚动（独立浅灰底槽）
    ===================== */
 .exercise-scroll {
-  background: #FFFFFF;
-  padding: 16rpx 40rpx;
+  flex-shrink: 0;
+  background: #F5F6F8;
+  border-top: 1rpx solid #EFEFEF;
+  border-bottom: 1rpx solid #EAEAEA;
+  padding: 16rpx 0;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .exercise-list {
   display: inline-flex;
-  gap: 12rpx;
+  align-items: stretch;
+  gap: 14rpx;
+  padding: 0 32rpx;
 }
 
 .exercise-chip {
   display: inline-flex;
   align-items: center;
   gap: 12rpx;
-  padding: 12rpx 20rpx;
+  padding: 14rpx 24rpx;
   background: #FFFFFF;
   border-radius: 16rpx;
-  border: 1rpx solid #E5E5E5;
+  border: 1rpx solid #E5E7EB;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.03);
   flex-shrink: 0;
 }
 
@@ -182,24 +203,29 @@
   background-color: #07C160;
   color: #FFFFFF;
   border-color: #07C160;
+  box-shadow: 0 4rpx 12rpx rgba(7, 193, 96, 0.24);
 }
 
 .exercise-chip.completed {
-  opacity: 0.5;
+  opacity: 0.65;
+}
+
+.exercise-chip.completed.current {
+  opacity: 1;
 }
 
 .chip-content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2rpx;
+  gap: 4rpx;
 }
 
 .chip-name {
   font-size: 28rpx;
   font-weight: 600;
   color: #1A1A1A;
-  max-width: 160rpx;
+  max-width: 240rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -207,7 +233,8 @@
 
 .chip-sets {
   font-size: 22rpx;
-  color: #999999;
+  color: #888888;
+  font-variant-numeric: tabular-nums;
 }
 
 .chip-check {
@@ -216,7 +243,7 @@
 }
 
 .chip-check.done {
-  color: #1A1A1A;
+  color: #07C160;
 }
 
 .chip-check.skip {
@@ -232,22 +259,131 @@
   font-weight: 700;
 }
 
+.exercise-chip.current .chip-sets {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.exercise-chip.current .chip-check.done {
+  color: #FFFFFF;
+}
+
+.exercise-chip.current .chip-check.skip {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.22);
+}
+
 .exercise-chip:active {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .exercise-chip.add-chip {
-  border: 2rpx dashed rgba(0, 0, 0, 0.2);
-  background: #F5F5F5;
+  border: 2rpx dashed #D0D5DD;
+  background: #FFFFFF;
   box-shadow: none;
-  padding: 12rpx 24rpx;
-  margin-left: 8rpx;
+  padding: 14rpx 24rpx;
 }
 
 .exercise-chip.add-chip .add-icon {
-  font-size: 28rpx;
-  font-weight: 700;
+  font-size: 26rpx;
+  font-weight: 600;
   color: #1A1A1A;
+}
+
+/* 全部动作快捷切换抽屉 */
+.exercise-drawer-list {
+  max-height: 520rpx;
+  margin-bottom: 24rpx;
+}
+
+.exercise-drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  padding: 20rpx 22rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  margin-bottom: 12rpx;
+  border: 1rpx solid transparent;
+}
+
+.exercise-drawer-item.current {
+  background: #F2FBF6;
+  border-color: #07C160;
+}
+
+.exercise-drawer-item.completed:not(.current) {
+  opacity: 0.65;
+}
+
+.drawer-item-index {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: #EAECEF;
+  color: #555555;
+  font-size: 24rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+.exercise-drawer-item.current .drawer-item-index {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.drawer-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.drawer-item-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drawer-item-meta {
+  font-size: 22rpx;
+  color: #888888;
+}
+
+.drawer-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
+.drawer-current-tag {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: #07C160;
+  background: rgba(7, 193, 96, 0.12);
+  padding: 4rpx 14rpx;
+  border-radius: 9999rpx;
+}
+
+.drawer-remove-btn {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawer-remove-btn:active {
+  background: rgba(0, 0, 0, 0.06);
 }
 
 /* =====================

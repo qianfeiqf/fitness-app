@@ -1,11 +1,22 @@
-<!-- 计划管理页面 -->
+<!-- 训练库页面（计划库 + 动作库） -->
 
-<view class="page-plans" style="padding-top: {{navHeight}}px;" catchtouchmove="{{showRecommendModal || showTemplateDetailModal || showTemplateIntroModal || showCloneModal ? 'preventTouchMove' : ''}}">
-  <!-- 页面标题 -->
+<view class="page-plans" style="padding-top: {{navHeight}}px;" catchtouchmove="{{showRecommendModal || showTemplateDetailModal || showTemplateIntroModal || showCloneModal || showExerciseDetail || showAddCustomModal ? 'preventTouchMove' : ''}}">
+  <!-- 顶部双大字分段 Tab -->
   <view class="page-header">
-    <text class="page-title">训练计划</text>
+    <view class="main-tabs">
+      <view class="main-tab {{activeMainTab === 'plans' ? 'active' : ''}}" data-tab="plans" bindtap="onSwitchMainTab">
+        <text class="main-tab-text">计划库</text>
+        <view wx:if="{{activeMainTab === 'plans'}}" class="main-tab-bar"></view>
+      </view>
+      <view class="main-tab {{activeMainTab === 'exercises' ? 'active' : ''}}" data-tab="exercises" bindtap="onSwitchMainTab">
+        <text class="main-tab-text">动作库</text>
+        <view wx:if="{{activeMainTab === 'exercises'}}" class="main-tab-bar"></view>
+      </view>
+    </view>
   </view>
 
+  <!-- ========== 计划库视图 ========== -->
+  <block wx:if="{{activeMainTab === 'plans'}}">
   <!-- 训练计划列表 -->
   <view class="section first-section">
     <view class="section-header">
@@ -105,6 +116,150 @@
       </view>
     </view>
   </view>
+  </block>
+
+  <!-- ========== 动作库视图 ========== -->
+  <block wx:else>
+    <view class="section first-section">
+      <!-- 搜索栏 + 自定义动作入口 -->
+      <view class="ex-toolbar">
+        <view class="ex-search-box">
+          <input
+            class="ex-search-input"
+            type="text"
+            placeholder="搜索动作、肌群或器械"
+            value="{{exerciseSearch}}"
+            bindinput="onExerciseSearchInput"
+          />
+          <view wx:if="{{exerciseSearch}}" class="ex-search-clear" bindtap="onClearExerciseSearch">×</view>
+        </view>
+        <view class="btn-new" bindtap="onShowAddCustomModal">
+          <text class="btn-new-plus">+</text>
+          <text>自定义</text>
+        </view>
+      </view>
+
+      <!-- 单排肌群筛选胶囊 -->
+      <scroll-view scroll-x class="filter-pill-row ex-muscle-row" show-scrollbar="{{false}}">
+        <view class="filter-pill-list">
+          <view
+            wx:for="{{exerciseMuscleGroups}}"
+            wx:key="*this"
+            class="filter-pill {{selectedExerciseMuscle === item ? 'active' : ''}}"
+            data-muscle="{{item}}"
+            bindtap="onSelectExerciseMuscle"
+          >{{item}}</view>
+        </view>
+      </scroll-view>
+
+      <!-- 动作统计行 -->
+      <view class="ex-count-row">
+        <text class="section-count">共 {{filteredExercises.length}} 个动作 · 点击查看动图与要领</text>
+      </view>
+
+      <!-- 动作无边框白卡列表 -->
+      <view wx:if="{{filteredExercises.length > 0}}" class="ex-lib-list">
+        <view
+          wx:for="{{filteredExercises}}"
+          wx:key="id"
+          class="ex-lib-card"
+          bindtap="onTapExerciseCard"
+          data-exercise-id="{{item.id}}"
+        >
+          <view class="ex-lib-main">
+            <view class="ex-lib-title-row">
+              <text class="ex-lib-name">{{item.name}}</text>
+              <text wx:if="{{item.equipment}}" class="ex-lib-equip">{{item.equipment}}</text>
+              <text wx:if="{{item.is_system === false}}" class="ex-lib-custom">自定义</text>
+            </view>
+            <text class="ex-lib-sub">{{item.target_muscles || item.muscle_group}}</text>
+          </view>
+          <text class="arrow-icon">›</text>
+        </view>
+      </view>
+
+      <!-- 无匹配结果 -->
+      <view wx:else class="empty-state">
+        <text class="empty-title">未找到匹配的动作</text>
+        <text class="empty-desc">可以换个关键词，或点右上角添加自定义动作</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 动作要领与动图半屏抽屉 -->
+  <modal-sheet
+    visible="{{showExerciseDetail}}"
+    title="{{detailExercise ? detailExercise.name : ''}}"
+    description="{{detailExercise && detailExercise.name_en ? detailExercise.name_en : ''}}"
+    showConfirm="{{false}}"
+    cancelText="知道了"
+    bind:cancel="onCloseExerciseDetail"
+    bind:close="onCloseExerciseDetail"
+  >
+    <view wx:if="{{detailExercise}}" class="ex-detail-body">
+      <view wx:if="{{detailExercise.gif_url && !gifLoadError}}" class="ex-detail-gif-wrap">
+        <image
+          class="ex-detail-gif"
+          src="{{detailExercise.gif_url}}"
+          mode="aspectFit"
+          lazy-load="{{true}}"
+          binderror="onGifLoadError"
+        />
+      </view>
+      <view class="ex-detail-tags">
+        <text wx:if="{{detailExercise.muscle_group}}" class="ex-detail-tag">{{detailExercise.muscle_group}}</text>
+        <text wx:if="{{detailExercise.equipment}}" class="ex-detail-tag tag-equip">{{detailExercise.equipment}}</text>
+        <text wx:if="{{detailExercise.is_system === false}}" class="ex-detail-tag">自定义动作</text>
+      </view>
+      <view wx:if="{{detailExercise.target_muscles}}" class="ex-detail-block">
+        <text class="ex-detail-label">目标肌群</text>
+        <text class="ex-detail-text">{{detailExercise.target_muscles}}</text>
+      </view>
+      <view wx:if="{{detailExercise.description}}" class="ex-detail-block">
+        <text class="ex-detail-label">动作要领</text>
+        <text class="ex-detail-text">{{detailExercise.description}}</text>
+      </view>
+      <view wx:if="{{detailExercise.tips}}" class="ex-detail-block ex-detail-tips">
+        <text class="ex-detail-label">呼吸与避坑</text>
+        <text class="ex-detail-text">{{detailExercise.tips}}</text>
+      </view>
+      <view wx:if="{{!detailExercise.description}}" class="ex-detail-block">
+        <text class="ex-detail-text">自定义动作暂无说明，可在新建计划或自由训练时直接使用。</text>
+      </view>
+      <view wx:if="{{detailExercise.is_system === false}}" class="ex-delete-link" bindtap="onDeleteCustomExercise">
+        <text>删除此自定义动作</text>
+      </view>
+    </view>
+  </modal-sheet>
+
+  <!-- 新建自定义动作弹窗 -->
+  <modal-sheet
+    visible="{{showAddCustomModal}}"
+    title="添加自定义动作"
+    confirmText="保存"
+    cancelText="取消"
+    bind:confirm="onConfirmAddCustom"
+    bind:cancel="onCloseAddCustomModal"
+    bind:close="onCloseAddCustomModal"
+  >
+    <view class="input-wrapper">
+      <text class="input-label">动作名称</text>
+      <input class="input" placeholder="例如：绳索面拉 / 壶铃摇摆" value="{{customExercise.name}}" bindinput="onInputCustomName" />
+    </view>
+    <view class="input-wrapper">
+      <text class="input-label">所属肌群</text>
+      <picker mode="selector" range="{{customMuscleGroups}}" value="{{customExercise.muscleGroupIndex}}" bindchange="onSelectCustomMuscle">
+        <view class="custom-picker-box">
+          <text>{{customExercise.muscle_group}}</text>
+          <text class="arrow-icon">›</text>
+        </view>
+      </picker>
+    </view>
+    <view class="input-wrapper">
+      <text class="input-label">常用器械（可选）</text>
+      <input class="input" placeholder="例如：哑铃、龙门架、徒手" value="{{customExercise.equipment}}" bindinput="onInputCustomEquipment" />
+    </view>
+  </modal-sheet>
 
   <!-- 经典计划详情弹窗 -->
   <modal-sheet

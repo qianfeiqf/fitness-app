@@ -6,11 +6,30 @@ const { find, findOne, insert, update, remove, getCollection, getPlanTemplatesSe
 
 Page({
   data: {
+    activeMainTab: 'plans',
     plans: [],
     activePlan: null,
     templates: [],
     filteredTemplates: [],
     loading: true,
+
+    // 动作库浏览与自定义动作
+    allExercises: [],
+    filteredExercises: [],
+    exerciseSearch: '',
+    exerciseMuscleGroups: ['全部', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
+    selectedExerciseMuscle: '全部',
+    showExerciseDetail: false,
+    detailExercise: null,
+    gifLoadError: false,
+    showAddCustomModal: false,
+    customMuscleGroups: ['胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
+    customExercise: {
+      name: '',
+      muscle_group: '胸部',
+      muscleGroupIndex: 0,
+      equipment: ''
+    },
     showCloneModal: false,
     showTemplateDetailModal: false,
     selectedTemplate: null,
@@ -74,6 +93,7 @@ Page({
     this.calcNavBarHeight();
     this.loadPlans();
     this.loadTemplates();
+    this.loadExercises();
   },
 
   calcNavBarHeight() {
@@ -85,7 +105,162 @@ Page({
 
   onShow() {
     this.loadPlans();
+    this.loadExercises();
     this.checkTrainingFloat();
+  },
+
+  /**
+   * 切换顶部 计划库 / 动作库 Tab
+   */
+  onSwitchMainTab(e) {
+    const tab = e.currentTarget.dataset.tab;
+    if (!tab || tab === this.data.activeMainTab) return;
+    this.setData({ activeMainTab: tab });
+  },
+
+  /**
+   * 加载动作库数据
+   */
+  loadExercises() {
+    const allExercises = find('exercises') || [];
+    this.setData({ allExercises }, () => {
+      this._applyExerciseFilters();
+    });
+  },
+
+  onExerciseSearchInput(e) {
+    this.setData({ exerciseSearch: e.detail.value || '' }, () => {
+      this._applyExerciseFilters();
+    });
+  },
+
+  onClearExerciseSearch() {
+    this.setData({ exerciseSearch: '' }, () => {
+      this._applyExerciseFilters();
+    });
+  },
+
+  onSelectExerciseMuscle(e) {
+    const muscle = e.currentTarget.dataset.muscle || '全部';
+    this.setData({ selectedExerciseMuscle: muscle }, () => {
+      this._applyExerciseFilters();
+    });
+  },
+
+  _applyExerciseFilters() {
+    const { allExercises, exerciseSearch, selectedExerciseMuscle } = this.data;
+    const kw = (exerciseSearch || '').trim().toLowerCase();
+    const filtered = allExercises.filter(ex => {
+      const matchMuscle = !selectedExerciseMuscle || selectedExerciseMuscle === '全部' || ex.muscle_group === selectedExerciseMuscle;
+      if (!matchMuscle) return false;
+      if (!kw) return true;
+      return (
+        (ex.name && ex.name.toLowerCase().includes(kw)) ||
+        (ex.name_en && ex.name_en.toLowerCase().includes(kw)) ||
+        (ex.equipment && ex.equipment.toLowerCase().includes(kw)) ||
+        (ex.target_muscles && ex.target_muscles.toLowerCase().includes(kw)) ||
+        (ex.muscle_group && ex.muscle_group.toLowerCase().includes(kw))
+      );
+    });
+    this.setData({ filteredExercises: filtered });
+  },
+
+  onTapExerciseCard(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId) return;
+    const ex = this.data.allExercises.find(item => item.id === exerciseId);
+    if (!ex) return;
+    this.setData({
+      showExerciseDetail: true,
+      detailExercise: ex,
+      gifLoadError: false
+    });
+  },
+
+  onGifLoadError() {
+    this.setData({ gifLoadError: true });
+  },
+
+  onCloseExerciseDetail() {
+    this.setData({
+      showExerciseDetail: false,
+      detailExercise: null,
+      gifLoadError: false
+    });
+  },
+
+  onShowAddCustomModal() {
+    const defaultMuscle = this.data.selectedExerciseMuscle !== '全部' ? this.data.selectedExerciseMuscle : '胸部';
+    const idx = Math.max(0, this.data.customMuscleGroups.indexOf(defaultMuscle));
+    this.setData({
+      showAddCustomModal: true,
+      customExercise: {
+        name: '',
+        muscle_group: this.data.customMuscleGroups[idx],
+        muscleGroupIndex: idx,
+        equipment: ''
+      }
+    });
+  },
+
+  onCloseAddCustomModal() {
+    this.setData({ showAddCustomModal: false });
+  },
+
+  onInputCustomName(e) {
+    this.setData({ 'customExercise.name': e.detail.value });
+  },
+
+  onInputCustomEquipment(e) {
+    this.setData({ 'customExercise.equipment': e.detail.value });
+  },
+
+  onSelectCustomMuscle(e) {
+    const index = parseInt(e.detail.value, 10) || 0;
+    this.setData({
+      'customExercise.muscle_group': this.data.customMuscleGroups[index],
+      'customExercise.muscleGroupIndex': index
+    });
+  },
+
+  onConfirmAddCustom() {
+    const { name, muscle_group, equipment } = this.data.customExercise;
+    const trimmedName = (name || '').trim();
+    if (!trimmedName) {
+      wx.showToast({ title: '请输入动作名称', icon: 'none' });
+      return;
+    }
+    const exercise = {
+      id: 'cust_' + Date.now(),
+      name: trimmedName,
+      muscle_group: muscle_group || '胸部',
+      equipment: (equipment || '').trim(),
+      is_system: false,
+      alternatives: [],
+      created_at: Date.now()
+    };
+    insert('exercises', exercise);
+    this.setData({ showAddCustomModal: false });
+    this.loadExercises();
+    wx.showToast({ title: '自定义动作已添加', icon: 'success' });
+  },
+
+  onDeleteCustomExercise() {
+    const ex = this.data.detailExercise;
+    if (!ex || ex.is_system !== false) return;
+    wx.showModal({
+      title: '删除自定义动作',
+      content: `确定要删除「${ex.name}」吗？`,
+      confirmColor: '#FA5151',
+      success: (res) => {
+        if (res.confirm) {
+          remove('exercises', ex.id);
+          this.setData({ showExerciseDetail: false, detailExercise: null });
+          this.loadExercises();
+          wx.showToast({ title: '已删除', icon: 'success' });
+        }
+      }
+    });
   },
 
   /**

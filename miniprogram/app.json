@@ -34,7 +34,7 @@
       },
       {
         "pagePath": "pages/plans/plans",
-        "text": "计划",
+        "text": "训练库",
         "iconPath": "assets/icons/plans.png",
         "selectedIconPath": "assets/icons/plans-active.png"
       },

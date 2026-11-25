@@ -305,10 +305,16 @@
 
 .plan-status-pill {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36rpx;
+  padding: 0 14rpx;
+  border-radius: 9999rpx;
   font-size: 20rpx;
   font-weight: 600;
-  padding: 4rpx 14rpx;
-  border-radius: 9999rpx;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 .plan-status-pill.active {

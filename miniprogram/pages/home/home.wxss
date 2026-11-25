@@ -190,63 +190,106 @@
 }
 
 /* =====================
-   空状态（方案A：深炭黑主卡 + 轻白自由训练条 + 新手热门直选）
+   空状态（深炭黑主卡带矢量图标与暗纹 + 轻白自由训练图标卡）
    ===================== */
 .empty-section {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
-  padding-top: 8rpx;
+  gap: 28rpx;
+  padding-top: 24rpx;
 }
 
 .empty-hero-card {
+  position: relative;
+  overflow: hidden;
   background: #1A1A1A;
-  border-radius: 28rpx;
-  padding: 40rpx 36rpx 36rpx;
-  box-shadow: 0 12rpx 32rpx rgba(26, 26, 26, 0.14);
+  border-radius: 32rpx;
+  padding: 44rpx 36rpx 40rpx;
+  box-shadow: 0 14rpx 36rpx rgba(26, 26, 26, 0.16);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   box-sizing: border-box;
 }
 
+/* 右上角极淡几何哑铃水印 */
+.empty-hero-watermark {
+  position: absolute;
+  top: -12rpx;
+  right: -18rpx;
+  width: 240rpx;
+  height: 240rpx;
+  pointer-events: none;
+  opacity: 0.07;
+  transform: rotate(-18deg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='%23FFFFFF' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 20v24M48 20v24M10 25v14M54 25v14M16 32h32'/%3E%3C/svg%3E");
+}
+
+.empty-hero-top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-hero-icon-badge {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 20rpx;
+  background: rgba(7, 193, 96, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .empty-hero-eyebrow {
-  font-size: 22rpx;
+  font-size: 24rpx;
   font-weight: 600;
   color: #07C160;
   letter-spacing: 1rpx;
-  margin-bottom: 12rpx;
 }
 
 .empty-hero-title {
-  font-size: 40rpx;
+  position: relative;
+  z-index: 1;
+  font-size: 42rpx;
   font-weight: 700;
   color: #FFFFFF;
   line-height: 1.25;
-  margin-bottom: 12rpx;
+  margin-bottom: 14rpx;
 }
 
 .empty-hero-desc {
+  position: relative;
+  z-index: 1;
   font-size: 26rpx;
   color: rgba(255, 255, 255, 0.68);
-  line-height: 1.5;
-  margin-bottom: 36rpx;
+  line-height: 1.55;
+  margin-bottom: 44rpx;
 }
 
 .empty-hero-actions {
+  position: relative;
+  z-index: 1;
   width: 100%;
   display: flex;
   gap: 18rpx;
 }
 
 .empty-hero-btn {
-  height: 84rpx;
+  height: 88rpx;
   border-radius: 9999rpx;
   font-size: 28rpx;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10rpx;
 }
 
 .empty-hero-btn.primary {
@@ -269,12 +312,50 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* 轻白单行自由训练卡 */
+/* 线性矢量图标（内联 SVG Data URI，高清无锯齿） */
+.empty-svg-icon {
+  width: 36rpx;
+  height: 36rpx;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.empty-btn-icon {
+  width: 28rpx;
+  height: 28rpx;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  flex-shrink: 0;
+}
+
+.icon-plan {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2307C160' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='17' rx='3'/%3E%3Cpath d='M8 2v4M16 2v4M3 10h18M8 14h3M8 17h6'/%3E%3C/svg%3E");
+}
+
+.icon-list {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M4 12h16M4 17h10'/%3E%3C/svg%3E");
+}
+
+.icon-plus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+}
+
+.icon-bolt {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A1A1A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 2L4 14h7l-1 8 9-12h-7l1-8z'/%3E%3C/svg%3E");
+}
+
+.icon-bolt-active {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2307C160' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 2L4 14h7l-1 8 9-12h-7l1-8z'/%3E%3C/svg%3E");
+}
+
+/* 轻白单行自由训练图标卡 */
 .empty-free-card {
   background: #FFFFFF;
-  border-radius: 24rpx;
-  padding: 28rpx 30rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+  border-radius: 26rpx;
+  padding: 28rpx 28rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -288,6 +369,21 @@
 
 .empty-free-card.active {
   border-color: #07C160;
+}
+
+.empty-free-icon-box {
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 22rpx;
+  background: #F4F5F7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.empty-free-icon-box.active {
+  background: #EAF9F0;
 }
 
 .empty-free-info {
@@ -314,7 +410,7 @@
 
 .empty-free-pill {
   flex-shrink: 0;
-  height: 60rpx;
+  height: 62rpx;
   padding: 0 26rpx;
   border-radius: 9999rpx;
   background: #F4F5F7;
@@ -329,72 +425,6 @@
 .empty-free-pill.active {
   background: #07C160;
   color: #FFFFFF;
-}
-
-/* 新手热门计划直选 */
-.empty-featured-section {
-  margin-top: 8rpx;
-}
-
-.empty-featured-list {
-  background: #FFFFFF;
-  border-radius: 24rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
-}
-
-.empty-featured-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-  padding: 26rpx 28rpx;
-  border-bottom: 1rpx solid #F4F5F7;
-}
-
-.empty-featured-item:last-child {
-  border-bottom: none;
-}
-
-.empty-featured-item:active {
-  background: #FAFAFB;
-}
-
-.empty-featured-main {
-  flex: 1;
-  min-width: 0;
-}
-
-.empty-featured-top {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  margin-bottom: 6rpx;
-}
-
-.empty-featured-name {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-}
-
-.empty-featured-tag {
-  font-size: 20rpx;
-  font-weight: 600;
-  color: #07C160;
-  background: #F0FBF4;
-  padding: 4rpx 14rpx;
-  border-radius: 9999rpx;
-  flex-shrink: 0;
-}
-
-.empty-featured-desc {
-  display: block;
-  font-size: 24rpx;
-  color: #888888;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* =====================

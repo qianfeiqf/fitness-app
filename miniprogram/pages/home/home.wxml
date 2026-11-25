@@ -34,56 +34,41 @@
     </view>
   </view>
 
-  <!-- 无训练计划（方案A：深炭黑主卡 + 轻白自由训练条 + 新手热门计划直选） -->
+  <!-- 无训练计划（深炭黑主卡带矢量徽章与暗纹 + 轻白自由训练图标卡） -->
   <view wx:elif="{{!todayPlan}}" class="empty-section">
     <!-- 1. 深炭黑主视觉卡：承接挑选经典计划 + 自建计划两条路径 -->
     <view class="empty-hero-card">
-      <text class="empty-hero-eyebrow">开始训练</text>
+      <view class="empty-hero-watermark"></view>
+      <view class="empty-hero-top">
+        <view class="empty-hero-icon-badge">
+          <view class="empty-svg-icon icon-plan"></view>
+        </view>
+        <text class="empty-hero-eyebrow">训练计划</text>
+      </view>
       <text class="empty-hero-title">制定你的训练计划</text>
       <text class="empty-hero-desc">选用经典体系，或按习惯自由编排每周课表</text>
       <view class="empty-hero-actions">
-        <view class="empty-hero-btn primary" bindtap="onGoToPlans">挑选经典计划</view>
-        <view class="empty-hero-btn secondary" bindtap="onGoToCreatePlan">自建计划</view>
+        <view class="empty-hero-btn primary" bindtap="onGoToPlans">
+          <view class="empty-btn-icon icon-list"></view>
+          <text>挑选经典计划</text>
+        </view>
+        <view class="empty-hero-btn secondary" bindtap="onGoToCreatePlan">
+          <view class="empty-btn-icon icon-plus"></view>
+          <text>自建计划</text>
+        </view>
       </view>
     </view>
 
-    <!-- 2. 轻量单行自由训练卡 -->
+    <!-- 2. 轻量单行自由训练图标卡 -->
     <view class="empty-free-card {{activeFreeSession ? 'active' : ''}}" bindtap="onStartFreeWorkout">
+      <view class="empty-free-icon-box {{activeFreeSession ? 'active' : ''}}">
+        <view class="empty-svg-icon {{activeFreeSession ? 'icon-bolt-active' : 'icon-bolt'}}"></view>
+      </view>
       <view class="empty-free-info">
         <text class="empty-free-title">{{activeFreeSession ? '继续自由训练' : '自由训练'}}</text>
         <text class="empty-free-desc">{{activeFreeSession ? activeFreeSummary : '不按固定课表，进馆随选动作边练边记'}}</text>
       </view>
       <view class="empty-free-pill {{activeFreeSession ? 'active' : ''}}">{{activeFreeSession ? '继续 ›' : '开练 ›'}}</view>
-    </view>
-
-    <!-- 3. 新手热门直选预览 -->
-    <view wx:if="{{featuredTemplates.length > 0}}" class="empty-featured-section">
-      <view class="section-header">
-        <text class="section-title">新手热门</text>
-        <view class="section-link" bindtap="onGoToPlans">
-          <text>全部 {{totalTemplateCount}} 套</text>
-          <text class="link-arrow">›</text>
-        </view>
-      </view>
-
-      <view class="empty-featured-list">
-        <view
-          wx:for="{{featuredTemplates}}"
-          wx:key="id"
-          class="empty-featured-item"
-          bindtap="onPreviewTemplate"
-          data-template-id="{{item.id}}"
-        >
-          <view class="empty-featured-main">
-            <view class="empty-featured-top">
-              <text class="empty-featured-name">{{item.name}}</text>
-              <text class="empty-featured-tag">每周{{item.training_days}}天</text>
-            </view>
-            <text class="empty-featured-desc">{{item.description}}</text>
-          </view>
-          <text class="exercise-arrow">›</text>
-        </view>
-      </view>
     </view>
   </view>
 

@@ -386,6 +386,59 @@
   background: rgba(0, 0, 0, 0.06);
 }
 
+/* 完成训练三层权重抽屉 */
+.finish-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18rpx;
+  padding: 8rpx 0 12rpx;
+}
+
+.finish-btn-primary {
+  height: 96rpx;
+  border-radius: 9999rpx;
+  background: #07C160;
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.finish-btn-primary:active {
+  opacity: 0.88;
+}
+
+.finish-btn-secondary {
+  height: 88rpx;
+  border-radius: 9999rpx;
+  background: #F5F6F8;
+  color: #333333;
+  font-size: 30rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.finish-btn-secondary:active {
+  background: #EAECEF;
+}
+
+.finish-btn-discard {
+  margin-top: 10rpx;
+  padding: 16rpx 0 8rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.finish-btn-discard:active {
+  color: #FA5151;
+}
+
 /* =====================
    PR徽章 — 黑白
    ===================== */

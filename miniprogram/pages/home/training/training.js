@@ -88,6 +88,7 @@ Page({
     // 横向动作栏自动滚动与全部动作抽屉
     exerciseScrollIntoView: '',
     showExerciseListModal: false,
+    showFinishModal: false,
 
     // 更多操作面板
     showMoreActions: false,
@@ -1928,46 +1929,38 @@ Page({
   },
 
   /**
-   * 统一完成训练入口（0组引导放弃；>=1组支持结算保存或次要放弃）
+   * 统一完成训练入口（弹出三层视觉权重的半屏确认抽屉）
    */
   onFinishTraining() {
-    const { completedSets } = this.data;
-    if (!completedSets || completedSets.length === 0) {
-      wx.showModal({
-        title: '尚未记录训练',
-        content: '还没有完成任何一组动作，确定放弃本次训练吗？',
-        confirmText: '放弃训练',
-        cancelText: '继续训练',
-        success: (res) => {
-          if (res.confirm) {
-            this._discardCurrentSession();
-          }
-        }
-      });
-      return;
-    }
+    this.setData({ showFinishModal: true });
+  },
 
-    wx.showActionSheet({
-      itemList: [
-        `完成并保存（已记录 ${completedSets.length} 组）`,
-        '不保存并放弃本次训练'
-      ],
-      success: (res) => {
-        if (res.tapIndex === 0) {
-          this.onTrainingComplete();
-        } else if (res.tapIndex === 1) {
-          wx.showModal({
-            title: '放弃本次训练',
-            content: `当前已记录 ${completedSets.length} 组，放弃后本次训练不会计入历史记录，确定放弃吗？`,
-            confirmText: '确认放弃',
-            confirmColor: '#FF4D4F',
-            cancelText: '返回',
-            success: (modalRes) => {
-              if (modalRes.confirm) {
-                this._discardCurrentSession();
-              }
-            }
-          });
+  onCancelFinishModal() {
+    this.setData({ showFinishModal: false });
+  },
+
+  onConfirmFinishAndSave() {
+    this.setData({ showFinishModal: false });
+    this.onTrainingComplete();
+  },
+
+  onConfirmDiscardEmpty() {
+    this.setData({ showFinishModal: false });
+    this._discardCurrentSession();
+  },
+
+  onRequestDiscardTraining() {
+    const count = (this.data.completedSets || []).length;
+    this.setData({ showFinishModal: false });
+    wx.showModal({
+      title: '放弃本次训练',
+      content: `当前已记录 ${count} 组，放弃后本次训练不会计入历史记录，确定放弃吗？`,
+      confirmText: '确认放弃',
+      confirmColor: '#FA5151',
+      cancelText: '返回',
+      success: (modalRes) => {
+        if (modalRes.confirm) {
+          this._discardCurrentSession();
         }
       }
     });

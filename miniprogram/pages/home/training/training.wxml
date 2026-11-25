@@ -320,6 +320,28 @@
     </view>
   </view>
 
+  <!-- 完成训练确认抽屉（三层视觉权重：主保存 / 次继续 / 弱放弃） -->
+  <modal-sheet
+    visible="{{showFinishModal}}"
+    title="{{completedSets.length > 0 ? '完成本次训练' : '尚未记录训练'}}"
+    description="{{completedSets.length > 0 ? ('已记录 ' + completedSets.length + ' 组 · 用时 ' + wxs.formatTime(trainingDuration)) : '还没有完成任何一组动作，确认要离开吗？'}}"
+    showConfirm="{{false}}"
+    showCancel="{{false}}"
+    bind:close="onCancelFinishModal"
+  >
+    <view class="finish-sheet-actions">
+      <block wx:if="{{completedSets.length > 0}}">
+        <view class="finish-btn-primary" bindtap="onConfirmFinishAndSave">完成并保存</view>
+        <view class="finish-btn-secondary" bindtap="onCancelFinishModal">继续训练</view>
+        <view class="finish-btn-discard" bindtap="onRequestDiscardTraining">不保存，放弃本次训练</view>
+      </block>
+      <block wx:else>
+        <view class="finish-btn-primary" bindtap="onCancelFinishModal">继续训练</view>
+        <view class="finish-btn-discard" bindtap="onConfirmDiscardEmpty">放弃本次训练</view>
+      </block>
+    </view>
+  </modal-sheet>
+
   <!-- 全部动作快捷切换抽屉 -->
   <modal-sheet
     visible="{{showExerciseListModal}}"

@@ -67,7 +67,11 @@ Page({
 
     // 首页动作要领抽屉
     showExerciseGuide: false,
-    guideExercise: null
+    guideExercise: null,
+
+    // 无计划空态：热门计划直选
+    featuredTemplates: [],
+    totalTemplateCount: 0
   },
 
   // 空操作函数（用于阻止事件冒泡）
@@ -269,6 +273,15 @@ Page({
         .sort((a, b) => (b.updated_at || b.created_at || 0) - (a.updated_at || a.created_at || 0));
 
       if (activePlans.length === 0) {
+        const allTemplates = getCollection('plan_templates') || [];
+        const featuredIds = ['tpl_2day_fullbody', 'tpl_5x5', 'tpl_home_dumbbell'];
+        const featuredTemplates = featuredIds
+          .map(id => allTemplates.find(t => t.id === id))
+          .filter(Boolean);
+        const finalFeatured = featuredTemplates.length > 0 ? featuredTemplates : allTemplates.slice(0, 3);
+
+        const now = new Date();
+        const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
         this.setData({
           activePlans: [],
           planDataList: [],
@@ -277,6 +290,11 @@ Page({
           todayPlan: null,
           todayExercises: [],
           todaySession: null,
+          todayMonth: now.getMonth() + 1,
+          todayDate: now.getDate(),
+          todayWeek: weekDays[now.getDay()],
+          featuredTemplates: finalFeatured,
+          totalTemplateCount: allTemplates.length,
           activeFreeSession,
           activeFreeSummary,
           loading: false,
@@ -867,11 +885,31 @@ Page({
   },
 
   /**
-   * 跳转到计划页
+   * 跳转到训练库
    */
   onGoToPlans() {
     wx.switchTab({
       url: '/pages/plans/plans'
+    });
+  },
+
+  /**
+   * 直达自建计划页
+   */
+  onGoToCreatePlan() {
+    wx.navigateTo({
+      url: '/pages/plans/create/create'
+    });
+  },
+
+  /**
+   * 空态热门计划直达详情页
+   */
+  onPreviewTemplate(e) {
+    const { templateId } = e.currentTarget.dataset;
+    if (!templateId) return;
+    wx.navigateTo({
+      url: `/pages/plans/detail/detail?templateId=${templateId}`
     });
   },
 

@@ -272,7 +272,11 @@ Page({
         this.setData({
           activePlans: [],
           planDataList: [],
+          currentPlanIndex: 0,
+          currentPlanData: null,
           todayPlan: null,
+          todayExercises: [],
+          todaySession: null,
           activeFreeSession,
           activeFreeSummary,
           loading: false,

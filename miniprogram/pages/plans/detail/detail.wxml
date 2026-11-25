@@ -71,13 +71,16 @@
         <view wx:if="{{!item.isRest}}" class="day-exercises">
           <view wx:for="{{item.exercises}}"
                 wx:for-item="ex"
-                wx:key="id"
+                wx:key="index"
                 class="exercise-card">
             <view class="exercise-main">
               <view class="exercise-name-row">
                 <text class="exercise-name">{{ex.exercise_name}}</text>
+                <view wx:if="{{ex.description}}" class="exercise-info-btn" catchtap="onViewExerciseDetail" data-exercise-id="{{ex.exercise_id}}">
+                  <text class="exercise-info-icon">i</text>
+                </view>
               </view>
-              <text wx:if="{{ex.muscle_group}}" class="exercise-muscle">{{ex.muscle_group}}</text>
+              <text wx:if="{{ex.muscle_group || ex.equipment}}" class="exercise-muscle">{{ex.muscle_group}}{{ex.equipment ? ' · ' + ex.equipment : ''}}</text>
               <text class="exercise-sets">{{ex.target_sets}}组 × {{ex.target_reps}}次 · 初始 {{ex.initial_weight}}kg · 休{{ex.rest_seconds}}秒</text>
             </view>
           </view>
@@ -114,4 +117,34 @@
       </button>
     </view>
   </view>
+
+  <!-- 动作要领半屏抽屉 -->
+  <modal-sheet
+    visible="{{showExerciseDetail}}"
+    title="{{detailExercise ? detailExercise.name : ''}}"
+    description="{{detailExercise && detailExercise.name_en ? detailExercise.name_en : ''}}"
+    showConfirm="{{false}}"
+    cancelText="知道了"
+    bind:cancel="onCloseExerciseDetail"
+    bind:close="onCloseExerciseDetail"
+  >
+    <view wx:if="{{detailExercise}}" class="ex-detail-body">
+      <view class="ex-detail-tags">
+        <text wx:if="{{detailExercise.muscle_group}}" class="ex-detail-tag">{{detailExercise.muscle_group}}</text>
+        <text wx:if="{{detailExercise.equipment}}" class="ex-detail-tag tag-equip">{{detailExercise.equipment}}</text>
+      </view>
+      <view wx:if="{{detailExercise.target_muscles}}" class="ex-detail-block">
+        <text class="ex-detail-label">目标肌群</text>
+        <text class="ex-detail-text">{{detailExercise.target_muscles}}</text>
+      </view>
+      <view wx:if="{{detailExercise.description}}" class="ex-detail-block">
+        <text class="ex-detail-label">动作要领</text>
+        <text class="ex-detail-text">{{detailExercise.description}}</text>
+      </view>
+      <view wx:if="{{detailExercise.tips}}" class="ex-detail-block ex-detail-tips">
+        <text class="ex-detail-label">呼吸与避坑</text>
+        <text class="ex-detail-text">{{detailExercise.tips}}</text>
+      </view>
+    </view>
+  </modal-sheet>
 </view>

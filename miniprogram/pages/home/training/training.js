@@ -89,6 +89,8 @@ Page({
     exerciseScrollIntoView: '',
     showExerciseListModal: false,
     showFinishModal: false,
+    showExerciseDetail: false,
+    detailExercise: null,
 
     // 更多操作面板
     showMoreActions: false,
@@ -2315,6 +2317,40 @@ Page({
       accumulated_duration_seconds: this._getCurrentTotalDurationSeconds(),
       updated_at: Date.now(),
       snapshot: true
+    });
+  },
+
+  /**
+   * 查看当前动作的要领说明（不打断训练计时）
+   */
+  onViewCurrentExerciseDetail() {
+    const cur = this.data.currentExercise;
+    if (!cur) return;
+    const detail = findOne('exercises', { id: cur.exercise_id }) || cur;
+    this.setData({
+      showExerciseDetail: true,
+      detailExercise: detail
+    });
+  },
+
+  /**
+   * 在选动作抽屉中查看任意动作要领
+   */
+  onViewExerciseDetail(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId) return;
+    const detail = findOne('exercises', { id: exerciseId });
+    if (!detail) return;
+    this.setData({
+      showExerciseDetail: true,
+      detailExercise: detail
+    });
+  },
+
+  onCloseExerciseDetail() {
+    this.setData({
+      showExerciseDetail: false,
+      detailExercise: null
     });
   },
 

@@ -24,6 +24,8 @@ Page({
       { title: '核心' }
     ],
     showAddCustom: false,
+    showExerciseDetail: false,
+    detailExercise: null,
     dayOfWeek: null,
     selectedIds: [],
     selectedMap: {},
@@ -268,6 +270,27 @@ Page({
     this.loadExercises();
 
     wx.showToast({ title: '动作已添加', icon: 'success' });
+  },
+
+  /**
+   * 查看动作要领抽屉
+   */
+  onViewExerciseDetail(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId) return;
+    const ex = this.data.allExercises.find(item => item.id === exerciseId);
+    if (!ex) return;
+    this.setData({
+      showExerciseDetail: true,
+      detailExercise: ex
+    });
+  },
+
+  onCloseExerciseDetail() {
+    this.setData({
+      showExerciseDetail: false,
+      detailExercise: null
+    });
   },
 
   /**

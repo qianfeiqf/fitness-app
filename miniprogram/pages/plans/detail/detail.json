@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "计划详情",
   "usingComponents": {
-    "mp-loading": "weui-miniprogram/loading/loading"
+    "mp-loading": "weui-miniprogram/loading/loading",
+    "modal-sheet": "../../../components/modal-sheet/modal-sheet"
   }
 }

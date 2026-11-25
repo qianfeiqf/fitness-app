@@ -101,10 +101,14 @@
 
   <!-- 主训练区域：热身组与正式组双 Tab 平级切换 -->
   <view hidden="{{!currentExercise || freeAllDone}}" class="training-main">
-    <!-- 动作肌群标签 + 移除动作入口 -->
+    <!-- 动作肌群标签 + 要领入口 + 移除动作入口 -->
     <view class="exercise-header">
       <view class="exercise-tags">
         <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
+        <view wx:if="{{currentExercise.description}}" class="exercise-guide-btn" bindtap="onViewCurrentExerciseDetail">
+          <text class="exercise-guide-icon">i</text>
+          <text class="exercise-guide-text">要领</text>
+        </view>
       </view>
       <view class="exercise-remove-btn" bindtap="onRemoveCurrentExercise">
         <mp-icon icon="delete" color="#888888" size="{{15}}" />
@@ -455,9 +459,14 @@
         >
           <view class="alt-info">
             <text class="alt-name">{{item.name}}</text>
-            <text class="alt-muscle">{{item.muscle_group}}</text>
+            <text class="alt-muscle">{{item.muscle_group}}{{item.equipment ? ' · ' + item.equipment : ''}}</text>
           </view>
-          <text class="add-check-circle {{selectedAddMap[item.id] ? 'checked' : ''}}">{{selectedAddMap[item.id] ? '✓' : ''}}</text>
+          <view class="alt-right-actions">
+            <view wx:if="{{item.description}}" class="exercise-info-btn" catchtap="onViewExerciseDetail" data-exercise-id="{{item.id}}">
+              <text class="exercise-info-icon">i</text>
+            </view>
+            <text class="add-check-circle {{selectedAddMap[item.id] ? 'checked' : ''}}">{{selectedAddMap[item.id] ? '✓' : ''}}</text>
+          </view>
         </view>
         <view wx:if="{{selectedAddMap[item.id] && selectedAddConfigs[item.id]}}" class="add-config-bar" catchtap="noop">
           <view class="add-cfg-item">
@@ -518,6 +527,36 @@
           <text class="alt-muscle">{{item.muscle_group}}</text>
         </view>
         <text class="alt-arrow">›</text>
+      </view>
+    </view>
+  </modal-sheet>
+
+  <!-- 动作要领半屏抽屉 -->
+  <modal-sheet
+    visible="{{showExerciseDetail}}"
+    title="{{detailExercise ? detailExercise.name : ''}}"
+    description="{{detailExercise && detailExercise.name_en ? detailExercise.name_en : ''}}"
+    showConfirm="{{false}}"
+    cancelText="知道了"
+    bind:cancel="onCloseExerciseDetail"
+    bind:close="onCloseExerciseDetail"
+  >
+    <view wx:if="{{detailExercise}}" class="ex-detail-body">
+      <view class="ex-detail-tags">
+        <text wx:if="{{detailExercise.muscle_group}}" class="ex-detail-tag">{{detailExercise.muscle_group}}</text>
+        <text wx:if="{{detailExercise.equipment}}" class="ex-detail-tag tag-equip">{{detailExercise.equipment}}</text>
+      </view>
+      <view wx:if="{{detailExercise.target_muscles}}" class="ex-detail-block">
+        <text class="ex-detail-label">目标肌群</text>
+        <text class="ex-detail-text">{{detailExercise.target_muscles}}</text>
+      </view>
+      <view wx:if="{{detailExercise.description}}" class="ex-detail-block">
+        <text class="ex-detail-label">动作要领</text>
+        <text class="ex-detail-text">{{detailExercise.description}}</text>
+      </view>
+      <view wx:if="{{detailExercise.tips}}" class="ex-detail-block ex-detail-tips">
+        <text class="ex-detail-label">呼吸与避坑</text>
+        <text class="ex-detail-text">{{detailExercise.tips}}</text>
       </view>
     </view>
   </modal-sheet>

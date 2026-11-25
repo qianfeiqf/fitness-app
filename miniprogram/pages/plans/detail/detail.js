@@ -15,7 +15,9 @@ Page({
     groupedExercises: {},
     weekSchedule: [],
     loading: true,
-    showIntro: false
+    showIntro: false,
+    showExerciseDetail: false,
+    detailExercise: null
   },
 
   onLoad(options) {
@@ -58,6 +60,10 @@ Page({
         ...pe,
         exercise_name: exercise ? exercise.name : '未知动作',
         muscle_group: exercise ? exercise.muscle_group : '',
+        equipment: exercise ? (exercise.equipment || '') : '',
+        target_muscles: exercise ? (exercise.target_muscles || '') : '',
+        description: exercise ? (exercise.description || '') : '',
+        tips: exercise ? (exercise.tips || '') : '',
         name_en: exercise ? exercise.name_en : '',
         video_url: exercise ? exercise.video_url : ''
       };
@@ -115,6 +121,10 @@ Page({
         ...ex,
         exercise_name: exercise ? exercise.name : (ex.name || '未知动作'),
         muscle_group: exercise ? exercise.muscle_group : '',
+        equipment: exercise ? (exercise.equipment || '') : '',
+        target_muscles: exercise ? (exercise.target_muscles || '') : '',
+        description: exercise ? (exercise.description || '') : '',
+        tips: exercise ? (exercise.tips || '') : '',
         name_en: exercise ? exercise.name_en : '',
         video_url: exercise ? exercise.video_url : ''
       };
@@ -180,6 +190,27 @@ Page({
    */
   onToggleIntro() {
     this.setData({ showIntro: !this.data.showIntro });
+  },
+
+  /**
+   * 查看动作要领抽屉
+   */
+  onViewExerciseDetail(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId) return;
+    const ex = findOne('exercises', { id: exerciseId });
+    if (!ex) return;
+    this.setData({
+      showExerciseDetail: true,
+      detailExercise: ex
+    });
+  },
+
+  onCloseExerciseDetail() {
+    this.setData({
+      showExerciseDetail: false,
+      detailExercise: null
+    });
   },
 
   /**

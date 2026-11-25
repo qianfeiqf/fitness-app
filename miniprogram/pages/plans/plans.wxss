@@ -102,7 +102,25 @@
 }
 
 .ex-muscle-row {
-  margin-bottom: 18rpx;
+  margin-bottom: 14rpx;
+}
+
+.ex-sub-muscle-row {
+  margin-bottom: 16rpx;
+}
+
+.filter-pill.sub-pill {
+  height: 48rpx;
+  padding: 0 20rpx;
+  font-size: 22rpx;
+  background: #ECEEF2;
+  color: #555555;
+}
+
+.filter-pill.sub-pill.active {
+  background: #07C160;
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
 .ex-count-row {
@@ -147,6 +165,15 @@
   font-size: 30rpx;
   font-weight: 600;
   color: #1A1A1A;
+}
+
+.ex-lib-sub-tag {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  background: #F2F3F5;
+  padding: 4rpx 14rpx;
+  border-radius: 9999rpx;
 }
 
 .ex-lib-equip {

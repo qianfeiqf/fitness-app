@@ -2,7 +2,7 @@
  * 训练中页面 - 核心跟练交互
  */
 
-const { findOne, update, getCollection, insert, remove } = require('../../../localdb/db.js');
+const { findOne, update, getCollection, insert, remove, MUSCLE_SUB_GROUPS } = require('../../../localdb/db.js');
 const { calculate1RM, calculateAndSave1RM, checkMilestone } = require('../../../services/rm.js');
 const { calculateProgression } = require('../../../services/progression.js');
 const UI = require('../../../utils/ui.js');
@@ -75,6 +75,8 @@ Page({
     addExerciseSearch: '',
     addMuscleGroups: ['全部', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
     selectedAddMuscle: '全部',
+    addSubMuscles: [],
+    selectedAddSubMuscle: '全部',
     filteredExercises: [],
     selectedAddIds: [],
     selectedAddMap: {},
@@ -1620,6 +1622,8 @@ Page({
       showAddExerciseModal: true,
       addExerciseSearch: '',
       selectedAddMuscle: '全部',
+      addSubMuscles: [],
+      selectedAddSubMuscle: '全部',
       selectedAddIds: [],
       selectedAddMap: {},
       selectedAddConfigs: {},
@@ -1628,16 +1632,19 @@ Page({
     });
   },
 
-  _filterAddExercises(keyword, muscle) {
+  _filterAddExercises(keyword, muscle, subMuscle = '全部') {
     const allExercises = getCollection('exercises') || [];
     const kw = (keyword || '').trim().toLowerCase();
     const filtered = allExercises.filter(ex => {
       const matchMuscle = !muscle || muscle === '全部' || ex.muscle_group === muscle;
+      const matchSub = !subMuscle || subMuscle === '全部' || ex.sub_muscle === subMuscle;
       const matchKw = !kw ||
         (ex.name && ex.name.toLowerCase().includes(kw)) ||
         (ex.name_en && ex.name_en.toLowerCase().includes(kw)) ||
+        (ex.sub_muscle && ex.sub_muscle.toLowerCase().includes(kw)) ||
+        (ex.equipment && ex.equipment.toLowerCase().includes(kw)) ||
         (ex.muscle_group && ex.muscle_group.toLowerCase().includes(kw));
-      return matchMuscle && matchKw;
+      return matchMuscle && matchSub && matchKw;
     });
     const exactMatch = kw && allExercises.some(ex => ex.name && ex.name.toLowerCase() === kw);
     return { filtered, canAddCustom: !!kw && !exactMatch };
@@ -1645,9 +1652,22 @@ Page({
 
   onSelectAddMuscle(e) {
     const muscle = e.currentTarget.dataset.muscle || '全部';
-    const { filtered, canAddCustom } = this._filterAddExercises(this.data.addExerciseSearch, muscle);
+    const subs = (muscle !== '全部' && MUSCLE_SUB_GROUPS[muscle]) ? ['全部', ...MUSCLE_SUB_GROUPS[muscle]] : [];
+    const { filtered, canAddCustom } = this._filterAddExercises(this.data.addExerciseSearch, muscle, '全部');
     this.setData({
       selectedAddMuscle: muscle,
+      addSubMuscles: subs,
+      selectedAddSubMuscle: '全部',
+      filteredExercises: filtered,
+      canAddCustomExercise: canAddCustom
+    });
+  },
+
+  onSelectAddSubMuscle(e) {
+    const sub = e.currentTarget.dataset.sub || '全部';
+    const { filtered, canAddCustom } = this._filterAddExercises(this.data.addExerciseSearch, this.data.selectedAddMuscle, sub);
+    this.setData({
+      selectedAddSubMuscle: sub,
       filteredExercises: filtered,
       canAddCustomExercise: canAddCustom
     });
@@ -1658,7 +1678,7 @@ Page({
    */
   onAddExerciseSearch(e) {
     const raw = e.detail.value || '';
-    const { filtered, canAddCustom } = this._filterAddExercises(raw, this.data.selectedAddMuscle);
+    const { filtered, canAddCustom } = this._filterAddExercises(raw, this.data.selectedAddMuscle, this.data.selectedAddSubMuscle);
     this.setData({
       addExerciseSearch: raw,
       filteredExercises: filtered,

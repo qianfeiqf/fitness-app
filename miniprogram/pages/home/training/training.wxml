@@ -428,7 +428,7 @@
         bindinput="onAddExerciseSearch"
       />
     </view>
-    <scroll-view scroll-x class="add-muscle-scroll">
+    <scroll-view scroll-x class="add-muscle-scroll" show-scrollbar="{{false}}">
       <view class="add-muscle-list">
         <view
           wx:for="{{addMuscleGroups}}"
@@ -436,6 +436,17 @@
           class="add-muscle-chip {{selectedAddMuscle === item ? 'active' : ''}}"
           bindtap="onSelectAddMuscle"
           data-muscle="{{item}}"
+        >{{item}}</view>
+      </view>
+    </scroll-view>
+    <scroll-view wx:if="{{addSubMuscles.length > 0}}" scroll-x class="add-muscle-scroll add-sub-scroll" show-scrollbar="{{false}}">
+      <view class="add-muscle-list">
+        <view
+          wx:for="{{addSubMuscles}}"
+          wx:key="*this"
+          class="add-muscle-chip sub-chip {{selectedAddSubMuscle === item ? 'active' : ''}}"
+          bindtap="onSelectAddSubMuscle"
+          data-sub="{{item}}"
         >{{item}}</view>
       </view>
     </scroll-view>
@@ -459,7 +470,7 @@
         >
           <view class="alt-info">
             <text class="alt-name">{{item.name}}</text>
-            <text class="alt-muscle">{{item.muscle_group}}{{item.equipment ? ' · ' + item.equipment : ''}}</text>
+            <text class="alt-muscle">{{item.sub_muscle || item.muscle_group}}{{item.equipment ? ' · ' + item.equipment : ''}}</text>
           </view>
           <view class="alt-right-actions">
             <view wx:if="{{item.description}}" class="exercise-info-btn" catchtap="onViewExerciseDetail" data-exercise-id="{{item.id}}">

@@ -14,7 +14,37 @@ mp-searchbar {
 }
 
 mp-tabs {
+  margin-bottom: 12rpx;
+}
+
+.sub-muscle-scroll {
+  white-space: nowrap;
   margin-bottom: 16rpx;
+}
+
+.sub-muscle-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.sub-muscle-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48rpx;
+  padding: 0 20rpx;
+  border-radius: 9999rpx;
+  background: #F2F3F5;
+  color: #555555;
+  font-size: 22rpx;
+  font-weight: 500;
+}
+
+.sub-muscle-pill.active {
+  background: #07C160;
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
 /* 动作列表 */

@@ -3,7 +3,7 @@
  * 实现离线优先的数据存储
  */
 
-const { getExercisesSeedData } = require('./seed-exercises.js');
+const { getExercisesSeedData, MUSCLE_SUB_GROUPS } = require('./seed-exercises.js');
 const { getPlanTemplatesSeedData } = require('./seed-templates.js');
 const EXERCISE_GIFS = require('./exercise-gifs.js');
 
@@ -121,7 +121,7 @@ function initSeedData() {
       exercises.push({ ...seed, gif_url: resolvedGifUrl });
       changed = true;
     } else if (existing.is_system !== false) {
-      const fieldsToBackfill = ['equipment', 'target_muscles', 'description', 'tips', 'name_en'];
+      const fieldsToBackfill = ['sub_muscle', 'equipment', 'target_muscles', 'description', 'tips', 'name_en'];
       fieldsToBackfill.forEach(field => {
         if (!existing[field] && seed[field]) {
           existing[field] = seed[field];
@@ -334,6 +334,7 @@ module.exports = {
   find,
   remove,
   generateId,
+  MUSCLE_SUB_GROUPS,
   getExercisesSeedData,
   getPlanTemplatesSeedData
 };

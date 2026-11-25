@@ -2,7 +2,7 @@
  * 动作库页面
  */
 
-const { find, insert } = require('../../localdb/db.js');
+const { find, insert, MUSCLE_SUB_GROUPS } = require('../../localdb/db.js');
 
 Page({
   data: {
@@ -12,6 +12,8 @@ Page({
     searchKeyword: '',
     selectedGroup: '',
     selectedGroupIndex: 0,
+    subMuscles: [],
+    selectedSubMuscle: '全部',
     muscleGroups: ['胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
     muscleGroupTabs: [
       { title: '全部' },
@@ -63,20 +65,27 @@ Page({
    */
   applyFilters() {
     let filtered = this.data.allExercises;
-    const { searchKeyword, selectedGroup } = this.data;
+    const { searchKeyword, selectedGroup, selectedSubMuscle } = this.data;
 
     // 关键词筛选
     if (searchKeyword) {
       const keyword = searchKeyword.toLowerCase();
       filtered = filtered.filter(ex =>
         ex.name.toLowerCase().includes(keyword) ||
-        (ex.name_en && ex.name_en.toLowerCase().includes(keyword))
+        (ex.name_en && ex.name_en.toLowerCase().includes(keyword)) ||
+        (ex.sub_muscle && ex.sub_muscle.toLowerCase().includes(keyword)) ||
+        (ex.equipment && ex.equipment.toLowerCase().includes(keyword))
       );
     }
 
-    // 肌群筛选
+    // 一级肌群筛选
     if (selectedGroup) {
       filtered = filtered.filter(ex => ex.muscle_group === selectedGroup);
+    }
+
+    // 二级细分筛选
+    if (selectedSubMuscle && selectedSubMuscle !== '全部') {
+      filtered = filtered.filter(ex => ex.sub_muscle === selectedSubMuscle);
     }
 
     // 按肌群分组
@@ -134,10 +143,20 @@ Page({
   onGroupTabChange(e) {
     const index = e.detail.index;
     const groups = ['', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'];
+    const group = groups[index] || '';
+    const subs = (group && MUSCLE_SUB_GROUPS[group]) ? ['全部', ...MUSCLE_SUB_GROUPS[group]] : [];
     this.setData({
       selectedGroupIndex: index,
-      selectedGroup: groups[index] || ''
+      selectedGroup: group,
+      subMuscles: subs,
+      selectedSubMuscle: '全部'
     });
+    this.applyFilters();
+  },
+
+  onSelectSubMuscle(e) {
+    const sub = e.currentTarget.dataset.sub || '全部';
+    this.setData({ selectedSubMuscle: sub });
     this.applyFilters();
   },
 

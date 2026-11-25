@@ -1,5 +1,5 @@
 /**
- * 85 个系统动作示意动图云存储 fileID 映射表
+ * 88 个系统动作示意动图云存储 fileID 映射表
  * 托管位置: cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs
  * 媒体版权声明: © Gym visual — https://gymvisual.com/
  */
@@ -89,5 +89,8 @@ module.exports = {
   "ex_100": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_100.gif",
   "ex_101": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_101.gif",
   "ex_102": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_102.gif",
-  "ex_103": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_103.gif"
+  "ex_103": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_103.gif",
+  "ex_104": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_104.gif",
+  "ex_105": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_105.gif",
+  "ex_106": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_106.gif"
 };

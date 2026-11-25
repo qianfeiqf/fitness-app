@@ -12,6 +12,19 @@
   <!-- 肌群筛选 -->
   <mp-tabs tabs="{{muscleGroupTabs}}" active-tab="{{selectedGroupIndex}}" bind:change="onGroupTabChange" />
 
+  <!-- 二级细分筛选胶囊 -->
+  <scroll-view wx:if="{{subMuscles.length > 0}}" scroll-x class="sub-muscle-scroll" show-scrollbar="{{false}}">
+    <view class="sub-muscle-list">
+      <view
+        wx:for="{{subMuscles}}"
+        wx:key="*this"
+        class="sub-muscle-pill {{selectedSubMuscle === item ? 'active' : ''}}"
+        data-sub="{{item}}"
+        bindtap="onSelectSubMuscle"
+      >{{item}}</view>
+    </view>
+  </scroll-view>
+
   <!-- 动作列表 -->
   <scroll-view class="exercise-list" scroll-y>
     <view wx:for="{{groupedExercises}}" wx:key="group" class="exercise-group">
@@ -21,7 +34,7 @@
             bindtap="onSelectExercise" data-exercise-id="{{ex.id}}">
         <view class="exercise-info">
           <text class="exercise-name">{{ex.name}}</text>
-          <text wx:if="{{ex.equipment || ex.target_muscles || ex.name_en}}" class="exercise-name-en">{{ex.equipment ? ex.equipment + ' · ' : ''}}{{ex.target_muscles || ex.name_en}}</text>
+          <text wx:if="{{ex.sub_muscle || ex.equipment || ex.target_muscles || ex.name_en}}" class="exercise-name-en">{{ex.sub_muscle ? ex.sub_muscle + ' · ' : ''}}{{ex.equipment ? ex.equipment + ' · ' : ''}}{{ex.target_muscles || ex.name_en}}</text>
         </view>
         <view class="exercise-actions">
           <view wx:if="{{ex.description}}" class="exercise-info-btn" catchtap="onViewExerciseDetail" data-exercise-id="{{ex.id}}">

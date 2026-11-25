@@ -20,7 +20,7 @@
       </view>
 
       <view class="ex-guide-tags">
-        <text wx:if="{{exercise.muscle_group}}" class="ex-guide-tag">{{exercise.muscle_group}}</text>
+        <text wx:if="{{exercise.muscle_group}}" class="ex-guide-tag">{{exercise.muscle_group}}{{exercise.sub_muscle ? ' · ' + exercise.sub_muscle : ''}}</text>
         <text wx:if="{{exercise.equipment}}" class="ex-guide-tag tag-equip">{{exercise.equipment}}</text>
         <text wx:if="{{exercise.is_system === false}}" class="ex-guide-tag">自定义动作</text>
       </view>

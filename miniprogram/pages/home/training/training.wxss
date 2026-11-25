@@ -1800,6 +1800,23 @@
   font-weight: 600;
 }
 
+.add-sub-scroll {
+  margin-top: -6rpx;
+}
+
+.add-muscle-chip.sub-chip {
+  padding: 8rpx 18rpx;
+  font-size: 22rpx;
+  background: #ECEEF2;
+  color: #555555;
+}
+
+.add-muscle-chip.sub-chip.active {
+  background: #07C160;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
 .alternative-item.selected {
   background: #F4F6F5;
   border-color: #1A1A1A;

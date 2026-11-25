@@ -2,7 +2,7 @@
  * 计划管理页面
  */
 
-const { find, findOne, insert, update, remove, getCollection, getPlanTemplatesSeedData } = require('../../localdb/db.js');
+const { find, findOne, insert, update, remove, getCollection, getPlanTemplatesSeedData, MUSCLE_SUB_GROUPS } = require('../../localdb/db.js');
 
 Page({
   data: {
@@ -19,6 +19,8 @@ Page({
     exerciseSearch: '',
     exerciseMuscleGroups: ['全部', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
     selectedExerciseMuscle: '全部',
+    exerciseSubMuscles: [],
+    selectedSubMuscle: '全部',
     showExerciseDetail: false,
     detailExercise: null,
     gifLoadError: false,
@@ -142,21 +144,36 @@ Page({
 
   onSelectExerciseMuscle(e) {
     const muscle = e.currentTarget.dataset.muscle || '全部';
-    this.setData({ selectedExerciseMuscle: muscle }, () => {
+    const subs = (muscle !== '全部' && MUSCLE_SUB_GROUPS[muscle]) ? ['全部', ...MUSCLE_SUB_GROUPS[muscle]] : [];
+    this.setData({
+      selectedExerciseMuscle: muscle,
+      exerciseSubMuscles: subs,
+      selectedSubMuscle: '全部'
+    }, () => {
+      this._applyExerciseFilters();
+    });
+  },
+
+  onSelectSubMuscle(e) {
+    const sub = e.currentTarget.dataset.sub || '全部';
+    this.setData({ selectedSubMuscle: sub }, () => {
       this._applyExerciseFilters();
     });
   },
 
   _applyExerciseFilters() {
-    const { allExercises, exerciseSearch, selectedExerciseMuscle } = this.data;
+    const { allExercises, exerciseSearch, selectedExerciseMuscle, selectedSubMuscle } = this.data;
     const kw = (exerciseSearch || '').trim().toLowerCase();
     const filtered = allExercises.filter(ex => {
       const matchMuscle = !selectedExerciseMuscle || selectedExerciseMuscle === '全部' || ex.muscle_group === selectedExerciseMuscle;
       if (!matchMuscle) return false;
+      const matchSub = !selectedSubMuscle || selectedSubMuscle === '全部' || ex.sub_muscle === selectedSubMuscle;
+      if (!matchSub) return false;
       if (!kw) return true;
       return (
         (ex.name && ex.name.toLowerCase().includes(kw)) ||
         (ex.name_en && ex.name_en.toLowerCase().includes(kw)) ||
+        (ex.sub_muscle && ex.sub_muscle.toLowerCase().includes(kw)) ||
         (ex.equipment && ex.equipment.toLowerCase().includes(kw)) ||
         (ex.target_muscles && ex.target_muscles.toLowerCase().includes(kw)) ||
         (ex.muscle_group && ex.muscle_group.toLowerCase().includes(kw))

@@ -7,12 +7,12 @@
   </view>
 
   <!-- 训练计划列表 -->
-  <view class="section">
+  <view class="section first-section">
     <view class="section-header">
       <text class="section-title">我的计划</text>
-      <view class="section-actions">
-        <text class="btn-recommend" bindtap="onShowRecommend">计划推荐</text>
-        <text wx:if="{{plans.length > 0}}" class="btn-new" bindtap="onNavigateToCreate">新建</text>
+      <view wx:if="{{plans.length > 0}}" class="btn-new" bindtap="onNavigateToCreate">
+        <text class="btn-new-plus">+</text>
+        <text>新建</text>
       </view>
     </view>
 
@@ -24,15 +24,17 @@
     <view wx:else class="plan-list">
       <view wx:for="{{plans}}"
             wx:key="id"
-            class="plan-item {{item.status === 'active' ? 'active' : ''}}"
+            class="plan-item"
             bindtap="onViewPlanDetail"
             data-plan-id="{{item.id}}">
         <view class="plan-info">
-          <text class="plan-name">{{item.name}}</text>
-          <text wx:if="{{item.description}}" class="plan-desc">{{item.description}}</text>
-          <text class="plan-meta">
-            {{item.status === 'active' ? '进行中' : item.status === 'archived' ? '已归档' : '草稿'}}
-          </text>
+          <view class="plan-title-line">
+            <text class="plan-name">{{item.name}}</text>
+            <text class="plan-status-pill {{item.status === 'active' ? 'active' : 'archived'}}">
+              {{item.status === 'active' ? '进行中' : item.status === 'archived' ? '已归档' : '草稿'}}
+            </text>
+          </view>
+          <text class="plan-meta">{{item.summaryText}}</text>
         </view>
         <view class="plan-right">
           <text class="arrow-icon">›</text>
@@ -44,18 +46,37 @@
   <!-- 经典计划 -->
   <view class="section">
     <view class="section-header">
-      <text class="section-title">经典计划</text>
+      <view class="section-title-group">
+        <text class="section-title">经典计划</text>
+        <text class="section-count">共 {{filteredTemplates.length}} 个</text>
+      </view>
+      <text class="btn-recommend" bindtap="onShowRecommend">智能推荐</text>
     </view>
 
-    <!-- 难度筛选 -->
-    <mp-tabs tabs="{{difficultyTabs}}" active-tab="{{difficultyTabIndex}}" bind:change="onDifficultyTabChange" />
-
-    <!-- 训练天数筛选 -->
-    <mp-tabs tabs="{{daysTabs}}" active-tab="{{daysTabIndex}}" bind:change="onDaysTabChange" />
-
-    <!-- 筛选结果提示 -->
-    <view wx:if="{{filterDays > 0 || filterDifficulty !== ''}}" class="filter-hint">
-      <text>共找到 {{filteredTemplates.length}} 个计划</text>
+    <!-- 紧凑双排胶囊筛选（难度 + 天数） -->
+    <view class="filter-pills-group">
+      <scroll-view scroll-x class="filter-pill-row" show-scrollbar="{{false}}">
+        <view class="filter-pill-list">
+          <view
+            wx:for="{{difficultyTabs}}"
+            wx:key="title"
+            class="filter-pill {{difficultyTabIndex === index ? 'active' : ''}}"
+            data-index="{{index}}"
+            bindtap="onSelectDifficultyPill"
+          >{{item.title}}</view>
+        </view>
+      </scroll-view>
+      <scroll-view scroll-x class="filter-pill-row" show-scrollbar="{{false}}">
+        <view class="filter-pill-list">
+          <view
+            wx:for="{{daysTabs}}"
+            wx:key="title"
+            class="filter-pill {{daysTabIndex === index ? 'active' : ''}}"
+            data-index="{{index}}"
+            bindtap="onSelectDaysPill"
+          >{{item.title}}</view>
+        </view>
+      </scroll-view>
     </view>
 
     <view class="template-list">
@@ -68,15 +89,15 @@
           <text class="template-name">{{item.name}}</text>
           <text class="template-desc">{{item.description}}</text>
           <view class="template-tags">
-            <text class="template-difficulty {{item.difficulty === '入门' ? 'tag-green' : item.difficulty === '进阶' ? 'tag-red' : 'tag-yellow'}}">{{item.difficulty}}</text>
+            <text class="template-difficulty">{{item.difficulty}}</text>
             <text class="template-days">每周{{item.training_days}}天</text>
           </view>
         </view>
-        <button class="btn btn-sm btn-primary"
-                catchtap="onShowCloneTemplateModal"
-                data-template-id="{{item.id}}">
-          使用
-        </button>
+        <view class="template-use-btn"
+              catchtap="onShowCloneTemplateModal"
+              data-template-id="{{item.id}}">
+          <text>使用</text>
+        </view>
       </view>
 
       <!-- 无筛选结果 -->

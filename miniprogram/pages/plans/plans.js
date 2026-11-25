@@ -138,7 +138,30 @@ Page({
   loadPlans() {
     this.setData({ loading: true });
 
-    const plans = [...(find('plans') || [])];
+    const rawPlans = [...(find('plans') || [])];
+    const allPlanExercises = find('plan_exercises') || [];
+
+    const plans = rawPlans.map(p => {
+      const exList = allPlanExercises.filter(pe => pe.plan_id === p.id);
+      const exerciseCount = exList.length;
+      let daysCount = 0;
+      if ((p.cycle_type || 'natural_week') === 'natural_week') {
+        daysCount = new Set(exList.map(pe => pe.day_of_week).filter(Boolean)).size;
+      } else {
+        daysCount = new Set(exList.map(pe => pe.cycle_label).filter(Boolean)).size;
+      }
+      let summaryText = '';
+      if (daysCount > 0 && exerciseCount > 0) {
+        summaryText = `每周 ${daysCount} 天 · ${exerciseCount} 个动作`;
+      } else if (exerciseCount > 0) {
+        summaryText = `共 ${exerciseCount} 个动作`;
+      } else if (p.description) {
+        summaryText = p.description;
+      } else {
+        summaryText = '尚未添加训练动作';
+      }
+      return { ...p, daysCount, exerciseCount, summaryText };
+    });
 
     // 进行中的计划排在前面
     plans.sort((a, b) => {
@@ -477,7 +500,29 @@ Page({
   },
 
   /**
-   * 切换难度 Tab
+   * 点击难度胶囊筛选
+   */
+  onSelectDifficultyPill(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(index)) return;
+    const difficulty = this.data.filterDifficultyOptions[index];
+    this.setData({ difficultyTabIndex: index });
+    this.applyFilters({ filterDifficulty: difficulty });
+  },
+
+  /**
+   * 点击训练天数胶囊筛选
+   */
+  onSelectDaysPill(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(index)) return;
+    const days = this.data.filterOptions[index];
+    this.setData({ daysTabIndex: index });
+    this.applyFilters({ filterDays: days });
+  },
+
+  /**
+   * 切换难度 Tab（兼容）
    */
   onDifficultyTabChange(e) {
     const index = e.detail.index;
@@ -487,7 +532,7 @@ Page({
   },
 
   /**
-   * 切换训练天数 Tab
+   * 切换训练天数 Tab（兼容）
    */
   onDaysTabChange(e) {
     const index = e.detail.index;

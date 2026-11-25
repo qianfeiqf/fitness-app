@@ -942,19 +942,19 @@ mp-tabs {
 }
 
 .wizard-header {
-  margin-bottom: 48rpx;
+  margin-bottom: 32rpx;
 }
 
 .wizard-title {
-  font-size: 44rpx;
+  font-size: 42rpx;
   font-weight: 700;
   color: #1A1A1A;
   display: block;
-  margin-bottom: 12rpx;
+  margin-bottom: 10rpx;
 }
 
 .wizard-subtitle {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #666666;
   display: block;
 }
@@ -966,9 +966,6 @@ mp-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20rpx;
-  max-height: 400rpx;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .wizard-goal-card {
@@ -1030,9 +1027,6 @@ mp-tabs {
   gap: 20rpx;
   flex-wrap: wrap;
   justify-content: center;
-  max-height: 400rpx;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .wizard-day-card {
@@ -1076,33 +1070,34 @@ mp-tabs {
 /* =====================
    经验选项 (Step 3)
    ===================== */
+.wizard-exp-scroll {
+  max-height: 540rpx;
+}
+
 .wizard-exp-options {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
-  max-height: 400rpx;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  gap: 16rpx;
 }
 
 .wizard-exp-card {
-  padding: 32rpx;
+  padding: 24rpx 28rpx;
   background: #FFFFFF;
-  border-radius: 24rpx;
-  border: 1rpx solid #E5E5E5;
+  border-radius: 20rpx;
+  border: 2rpx solid #ECEEF2;
   transition: all 0.2s ease;
 }
 
 .wizard-exp-card.selected {
   border-color: #07C160;
-  background-color: #F8F8F8;
+  background-color: #F4FBF7;
 }
 
 .wizard-exp-header {
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  margin-bottom: 12rpx;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
 }
 
 .wizard-exp-card .wizard-option-icon {
@@ -1111,41 +1106,42 @@ mp-tabs {
 
 .wizard-exp-card .wizard-option-info {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  gap: 12rpx;
 }
 
 .wizard-exp-card .wizard-option-name {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 600;
   color: #1A1A1A;
 }
 
 .wizard-exp-tag {
-  font-size: 22rpx;
-  color: #1A1A1A;
-  background: #F0F0F0;
-  padding: 2rpx 12rpx;
+  font-size: 20rpx;
+  color: #666666;
+  background: #F2F3F5;
+  padding: 4rpx 14rpx;
   border-radius: 9999rpx;
-  margin-top: 4rpx;
-  align-self: flex-start;
 }
 
 .wizard-exp-card .wizard-option-desc {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #666666;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 /* =====================
    推荐结果 (Step 4)
    ===================== */
+.wizard-recommend-scroll {
+  max-height: 540rpx;
+}
+
 .wizard-recommend-list {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
-  max-height: 400rpx;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  gap: 18rpx;
 }
 
 .wizard-recommend-card {

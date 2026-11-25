@@ -33,6 +33,9 @@ Page({
       deadline: ''
     },
 
+    // 隐私与协议半屏抽屉
+    showLegalSheet: false,
+
     // 训练悬浮窗 & 从训练页引导填写体重的返回入口
     trainingFloat: null,
     returnTrainingSessionId: null
@@ -467,10 +470,19 @@ Page({
 
 
 
+  onOpenLegalSheet() {
+    this.setData({ showLegalSheet: true });
+  },
+
+  onCloseLegalSheet() {
+    this.setData({ showLegalSheet: false });
+  },
+
   /**
    * 查看隐私保护指引
    */
   onOpenPrivacyPolicy() {
+    this.setData({ showLegalSheet: false });
     if (typeof wx.openPrivacyContract === 'function') {
       wx.openPrivacyContract({
         fail: () => {
@@ -495,6 +507,7 @@ Page({
    * 查看用户服务协议
    */
   onOpenUserAgreement() {
+    this.setData({ showLegalSheet: false });
     wx.showModal({
       title: '用户服务协议',
       content: '1. 本小程序提供的训练计划、1RM估算与重量演进建议仅作健身参考，不构成医疗或专业康复建议。\n2. 请根据自身身体状况合理安排负荷，训练前充分热身，如有不适请立即停止。\n3. 您的训练数据归您本人所有，可随时导出或通过「注销账号」永久删除。',

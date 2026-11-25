@@ -573,3 +573,44 @@
   padding: 12rpx 24rpx;
   border-radius: 9999rpx;
 }
+
+/* 隐私与协议半屏抽屉 */
+.legal-sheet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  margin-bottom: 16rpx;
+}
+
+.legal-sheet-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 24rpx 24rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+}
+
+.legal-sheet-item:active {
+  background: #EFEFF2;
+}
+
+.legal-sheet-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.legal-sheet-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.legal-sheet-desc {
+  font-size: 22rpx;
+  color: #888888;
+}

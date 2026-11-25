@@ -120,24 +120,13 @@
         <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
 
-      <view class="menu-item" bindtap="onOpenPrivacyPolicy">
+      <view class="menu-item" bindtap="onOpenLegalSheet">
         <view class="menu-icon-wrap">
           <mp-icon icon="lock" color="#1A1A1A" size="{{22}}" />
         </view>
         <view class="menu-content">
-          <text class="menu-title">隐私保护指引</text>
-          <text class="menu-desc">了解我们如何保护你的个人信息</text>
-        </view>
-        <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
-      </view>
-
-      <view class="menu-item" bindtap="onOpenUserAgreement">
-        <view class="menu-icon-wrap">
-          <mp-icon icon="note" color="#1A1A1A" size="{{22}}" />
-        </view>
-        <view class="menu-content">
-          <text class="menu-title">用户服务协议</text>
-          <text class="menu-desc">查看使用条款与免责声明</text>
+          <text class="menu-title">隐私与协议</text>
+          <text class="menu-desc">隐私保护指引、用户服务协议</text>
         </view>
         <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
@@ -211,6 +200,33 @@
             <text class="picker-arrow">›</text>
           </view>
         </picker>
+      </view>
+    </view>
+  </modal-sheet>
+
+  <!-- 隐私与协议半屏抽屉 -->
+  <modal-sheet
+    visible="{{showLegalSheet}}"
+    title="隐私与协议"
+    showConfirm="{{false}}"
+    cancelText="关闭"
+    bind:cancel="onCloseLegalSheet"
+    bind:close="onCloseLegalSheet"
+  >
+    <view class="legal-sheet-list">
+      <view class="legal-sheet-item" bindtap="onOpenPrivacyPolicy">
+        <view class="legal-sheet-info">
+          <text class="legal-sheet-title">隐私保护指引</text>
+          <text class="legal-sheet-desc">了解我们如何保护你的个人信息</text>
+        </view>
+        <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
+      </view>
+      <view class="legal-sheet-item" bindtap="onOpenUserAgreement">
+        <view class="legal-sheet-info">
+          <text class="legal-sheet-title">用户服务协议</text>
+          <text class="legal-sheet-desc">查看使用条款与免责声明</text>
+        </view>
+        <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
     </view>
   </modal-sheet>

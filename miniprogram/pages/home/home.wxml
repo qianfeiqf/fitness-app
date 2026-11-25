@@ -1,15 +1,15 @@
-<!-- 训练中心首页 - 浅色简约 -->
+<!-- 训练中心首页 - 浅色极简 -->
 
 <view class="page-home" style="padding-top: {{navHeight}}px;">
-  <!-- 顶部欢迎区 -->
+  <!-- 顶部轻头部 -->
   <view class="welcome-section">
     <view class="welcome-content">
-      <text class="welcome-greeting">{{isLoggedIn ? '今日' : '欢迎'}}</text>
-      <text class="welcome-title">{{isLoggedIn ? '开始训练' : '开启硬核之旅'}}</text>
+      <text class="welcome-greeting">{{isLoggedIn && todayMonth ? (todayMonth + '月' + todayDate + '日 · ' + todayWeek) : '欢迎使用'}}</text>
+      <text class="welcome-title">{{isLoggedIn ? '今日训练' : '训练记一记'}}</text>
     </view>
-    <view class="date-widget">
-      <text class="date-day">{{todayDate}}</text>
-      <text class="date-week">{{todayWeek}}</text>
+    <view wx:if="{{isLoggedIn && todayPlan && !activeFreeSession}}" class="header-free-pill" bindtap="onStartFreeWorkout">
+      <text class="header-free-plus">+</text>
+      <text class="header-free-text">自由训练</text>
     </view>
   </view>
 
@@ -70,20 +70,16 @@
       </view>
     </view>
 
-    <!-- 自由训练快捷入口（有进行中会话时高亮提示直接续练） -->
-    <view class="free-workout-bar {{activeFreeSession ? 'active' : ''}}" bindtap="onStartFreeWorkout">
+    <!-- 仅在存在进行中的自由训练时置顶展示续练条，平时收在顶部胶囊 -->
+    <view wx:if="{{activeFreeSession}}" class="free-workout-bar active" bindtap="onStartFreeWorkout">
       <view class="free-workout-left">
-        <mp-icon
-          icon="{{activeFreeSession ? 'play2' : 'add2'}}"
-          color="{{activeFreeSession ? '#07C160' : '#1A1A1A'}}"
-          size="{{24}}"
-        />
+        <mp-icon icon="play2" color="#07C160" size="{{22}}" />
         <view class="free-workout-info">
-          <text class="free-workout-title">{{activeFreeSession ? '进行中的自由训练' : '自由训练'}}</text>
-          <text class="free-workout-desc">{{activeFreeSession ? activeFreeSummary : '随练随记，不按计划'}}</text>
+          <text class="free-workout-title">进行中的自由训练</text>
+          <text class="free-workout-desc">{{activeFreeSummary}}</text>
         </view>
       </view>
-      <text class="free-workout-btn">{{activeFreeSession ? '继续 ›' : '开始 ›'}}</text>
+      <text class="free-workout-btn">继续 ›</text>
     </view>
     <!-- Deload 提醒横幅 -->
     <view wx:if="{{showDeloadReminder}}" class="deload-banner" bindtap="onDismissDeloadReminder">
@@ -124,83 +120,65 @@
     >
       <swiper-item wx:for="{{planDataList}}" wx:key="id" wx:for-item="pd">
         <scroll-view scroll-y class="plan-scroll-view" style="height: {{swiperHeight}}rpx;" show-scrollbar="{{false}}">
-        <!-- 本周概览：进度与Streak -->
-        <view class="week-overview">
-          <view class="progress-ring-wrap">
-            <view class="progress-ring-bg">
-              <view class="progress-ring-fill" style="background: conic-gradient(#1A1A1A {{pd.weekProgress.percent * 3.6}}deg, #F0F0F0 0deg);"></view>
-              <view class="progress-ring-center">
-                <text class="progress-ring-num">{{pd.weekProgress.completedDays}}</text>
-                <text class="progress-ring-total">/ {{pd.weekProgress.plannedDays}} 天</text>
-              </view>
-            </view>
-            <text class="progress-ring-label">本周训练</text>
-          </view>
-          <view class="streak-wrap" wx:if="{{streak > 0}}">
-            <text class="streak-num">{{streak}}</text>
-            <text class="streak-label">连续训练天</text>
-          </view>
-        </view>
-
-        <!-- 训练卡片 -->
+        <!-- 今日训练主卡片（首屏核心） -->
         <view class="training-card">
-          <view class="card-accent"></view>
-
-          <!-- 休息日提示（单计划时轻量带出计划名，多计划时由顶部页签承载避免重复） -->
+          <!-- 休息日提示 -->
           <view wx:if="{{pd.isRestDay}}" class="rest-day-inline">
-            <mp-icon icon="time" color="#666666" size="{{26}}" />
+            <mp-icon icon="time" color="#888888" size="{{26}}" />
             <view class="rest-day-inline-content">
-              <text class="rest-day-inline-title">今日是休息日</text>
-              <text class="rest-day-inline-desc">{{planDataList.length === 1 ? pd.plan.name + ' · ' : ''}}适当放松，让身体恢复，明天继续加油</text>
+              <text class="rest-day-inline-title">今日休息日</text>
+              <text class="rest-day-inline-desc">{{planDataList.length === 1 ? pd.plan.name + ' · ' : ''}}充分恢复，下一次训练更稳</text>
             </view>
           </view>
 
-          <view wx:else>
+          <view wx:else class="card-body-clean">
             <view class="card-header-modern">
-              <view class="card-meta">
-                <text class="card-label">TODAY</text>
-                <text class="card-title">{{pd.plan.name}}</text>
-              </view>
-              <view class="card-badge">
-                <text class="badge-pill">{{pd.exercises.length}} 个动作</text>
-              </view>
+              <text class="card-title">{{pd.plan.name}}</text>
+              <text wx:if="{{pd.muscleGroups}}" class="badge-pill">{{pd.muscleGroups}}</text>
             </view>
 
-            <!-- 训练数据网格 -->
-            <view class="stats-grid">
-              <view class="stat-item">
-                <text class="stat-value">{{pd.estimatedMinutes}}</text>
-                <text class="stat-label">分钟</text>
-              </view>
-              <view class="stat-divider"></view>
-              <view class="stat-item">
-                <text class="stat-value">{{pd.totalSets}}</text>
-                <text class="stat-label">组数</text>
-              </view>
-              <view class="stat-divider"></view>
-              <view class="stat-item">
-                <text class="stat-value-sm">{{pd.muscleGroups}}</text>
-                <text class="stat-label">肌群</text>
-              </view>
+            <view class="card-meta-line">
+              <text class="meta-chip">{{pd.exercises.length}} 个动作</text>
+              <text class="meta-dot">·</text>
+              <text class="meta-chip">{{pd.totalSets}} 组</text>
+              <text class="meta-dot">·</text>
+              <text class="meta-chip">约 {{pd.estimatedMinutes}} 分钟</text>
             </view>
 
-            <!-- 主按钮 -->
             <view class="card-action">
               <button wx:if="{{!pd.session || pd.session.status === 'completed' || pd.session.status === 'aborted'}}"
                       class="btn-start"
                       data-plan-id="{{pd.plan.id}}"
                       bindtap="onStartTrainingForPlan">
-                <text class="btn-start-icon">▶</text>
                 <text class="btn-start-text">开始训练</text>
               </button>
               <button wx:else
                       class="btn-resume"
                       data-session-id="{{pd.session.id}}"
                       bindtap="onResumeTrainingForPlan">
-                <text class="btn-start-icon">▶</text>
                 <text class="btn-start-text">继续训练</text>
               </button>
             </view>
+          </view>
+        </view>
+
+        <!-- 本周训练轻量进度条（保留小圆环，合并连续天数，紧凑不占位） -->
+        <view class="week-summary-card">
+          <view class="week-summary-left">
+            <view class="progress-ring-bg">
+              <view class="progress-ring-fill" style="background: conic-gradient(#07C160 {{pd.weekProgress.percent * 3.6}}deg, #EFEFEF 0deg);"></view>
+              <view class="progress-ring-center">
+                <text class="progress-ring-num">{{pd.weekProgress.completedDays}}</text>
+                <text class="progress-ring-total">/{{pd.weekProgress.plannedDays}}</text>
+              </view>
+            </view>
+            <view class="week-summary-info">
+              <text class="week-summary-title">本周训练</text>
+              <text class="week-summary-sub">已完成 {{pd.weekProgress.completedDays}} 天 · 目标 {{pd.weekProgress.plannedDays}} 天</text>
+            </view>
+          </view>
+          <view wx:if="{{streak > 0}}" class="streak-pill">
+            <text>连续 {{streak}} 天</text>
           </view>
         </view>
 

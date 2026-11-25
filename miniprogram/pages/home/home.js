@@ -23,6 +23,7 @@ Page({
     todayExercises: [],
 
     // 计算属性（需初始化）
+    todayMonth: '',
     todayDate: '',
     todayWeek: '',
     estimatedMinutes: 0,
@@ -285,6 +286,7 @@ Page({
 
       // 当前日期
       const now = new Date();
+      const todayMonth = now.getMonth() + 1;
       const todayDate = now.getDate();
       const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
       const todayWeek = weekDays[now.getDay()];
@@ -300,6 +302,7 @@ Page({
         todayPlan: currentData.plan || null,
         todayExercises: currentData.exercises || [],
         todaySession: currentData.session || null,
+        todayMonth,
         todayDate,
         todayWeek,
         estimatedMinutes: currentData.estimatedMinutes,
@@ -384,11 +387,11 @@ Page({
    * 计算 Swiper 高度（基于动作数量）
    */
   calcSwiperHeight(exercisesCount) {
-    // 基础高度：周概览(172) + 卡片(520) + 间距(32)
-    let h = 724;
+    // 基础高度：今日主卡片 + 轻量本周圆环卡 + 间距
+    let h = 470;
     if (exercisesCount > 0) {
-      // 动作预览 header(60) + 每个动作项(88)
-      h += 60 + exercisesCount * 88;
+      // 动作预览 header(64) + 每个动作项(104) + 底部缓冲
+      h += 80 + exercisesCount * 104;
     }
     return h;
   },

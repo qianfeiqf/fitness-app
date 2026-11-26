@@ -589,8 +589,10 @@ Page({
 
   onToggleWarmupSet(e) {
     const idx = Number(e.currentTarget.dataset.index);
-    const sets = this.data.warmupSets;
+    const { warmupSets: sets, currentWarmupIndex } = this.data;
     if (Number.isNaN(idx) || !sets[idx]) return;
+    // 仅允许取消已完成组或勾选当前高亮的下一组，其余未轮到的组静默忽略
+    if (!sets[idx].completed && idx !== currentWarmupIndex) return;
     const nextSets = sets.map((s, i) => i === idx ? { ...s, completed: !s.completed } : s);
     this._syncWarmupSets(nextSets);
     if (nextSets[idx].completed) {
@@ -737,11 +739,11 @@ Page({
 
   onToggleFormalSet(e) {
     const idx = Number(e.currentTarget.dataset.index);
-    const { formalSets } = this.data;
+    const { formalSets, currentSetIndex } = this.data;
     if (Number.isNaN(idx) || !formalSets[idx]) return;
     if (formalSets[idx].completed) {
       this._uncompleteFormalSetAt(idx);
-    } else {
+    } else if (idx === currentSetIndex) {
       this._completeFormalSetAt(idx);
     }
   },

@@ -929,17 +929,18 @@
 }
 
 .warmup-add-btn {
-  height: 76rpx;
+  height: 64rpx;
   margin-bottom: 28rpx;
   border-radius: 16rpx;
-  border: 2rpx dashed #D8D8D8;
+  border: 2rpx dashed #E2E4E8;
   background: #FAFAFA;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26rpx;
-  font-weight: 500;
-  color: #555555;
+  font-size: 36rpx;
+  font-weight: 400;
+  line-height: 1;
+  color: #888888;
 }
 
 .warmup-add-btn:active {
@@ -1285,17 +1286,18 @@
 }
 
 .formal-add-btn {
-  height: 76rpx;
+  height: 64rpx;
   margin-bottom: 20rpx;
   border-radius: 16rpx;
-  border: 2rpx dashed #D8D8D8;
+  border: 2rpx dashed #E2E4E8;
   background: #FAFAFA;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26rpx;
-  font-weight: 500;
-  color: #555555;
+  font-size: 36rpx;
+  font-weight: 400;
+  line-height: 1;
+  color: #888888;
 }
 
 .formal-add-btn:active {

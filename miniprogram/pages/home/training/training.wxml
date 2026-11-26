@@ -182,7 +182,7 @@
         </view>
 
         <view class="warmup-add-btn" bindtap="onAddWarmupSet">
-          <text>+ 添加热身组</text>
+          <text>+</text>
         </view>
       </block>
 
@@ -231,7 +231,7 @@
         </view>
 
         <view class="formal-add-btn" bindtap="onAddFormalSet">
-          <text>+ 添加正式组</text>
+          <text>+</text>
         </view>
 
         <!-- 更多操作折叠面板 -->

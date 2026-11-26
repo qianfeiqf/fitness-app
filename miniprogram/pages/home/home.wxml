@@ -169,13 +169,33 @@
       ></view>
     </view>
 
+    <!-- 本周课表自由切换胶囊条（支持调序开练 + 本周已练打钩） -->
+    <view wx:if="{{currentPlanData && currentPlanData.dayOptions && currentPlanData.dayOptions.length > 0}}" class="week-day-section">
+      <scroll-view scroll-x class="week-day-scroll" show-scrollbar="{{false}}">
+        <view class="week-day-list">
+          <view
+            wx:for="{{currentPlanData.dayOptions}}"
+            wx:key="key"
+            wx:for-item="day"
+            class="week-day-pill {{day.key === currentPlanData.selectedDayKey ? 'active' : ''}} {{day.completedThisWeek ? 'done' : ''}}"
+            data-day-key="{{day.key}}"
+            bindtap="onSelectPlanDay"
+          >
+            <text wx:if="{{day.completedThisWeek}}" class="week-day-check">✓</text>
+            <text class="week-day-label">{{day.label}}</text>
+            <text wx:if="{{day.shortMuscle}}" class="week-day-muscle">{{day.shortMuscle}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
     <!-- 动作预览列表（正常页面流渲染，完整展示绝不截断） -->
     <view
       class="exercises-section"
-      wx:if="{{currentPlanData && ((!currentPlanData.isRestDay && currentPlanData.exercises.length > 0) || (currentPlanData.isRestDay && currentPlanData.nextExercises.length > 0))}}"
+      wx:if="{{currentPlanData && currentPlanData.exercises && currentPlanData.exercises.length > 0}}"
     >
       <view class="section-header">
-        <text class="section-title">{{currentPlanData.isRestDay ? ('下次预告 · ' + currentPlanData.nextDayLabel) : '今日动作'}}</text>
+        <text class="section-title">{{currentPlanData.selectedDayIsToday ? '今日动作' : (currentPlanData.selectedDayLabel ? (currentPlanData.selectedDayLabel + '课表') : '训练动作')}}</text>
         <view class="section-link" data-plan-id="{{currentPlanData.plan.id}}" bindtap="onPreviewPlanById">
           <text>计划详情</text>
           <text class="link-arrow">›</text>
@@ -183,7 +203,7 @@
       </view>
 
       <view class="exercise-list">
-        <view wx:for="{{currentPlanData.isRestDay ? currentPlanData.nextExercises : currentPlanData.exercises}}"
+        <view wx:for="{{currentPlanData.exercises}}"
               wx:key="id"
               class="exercise-item"
               bindtap="onTapTodayExercise"
@@ -230,18 +250,11 @@
       <text>继续训练</text>
     </button>
     <button
-      wx:elif="{{!currentPlanData.isRestDay}}"
+      wx:elif="{{currentPlanData.exercises && currentPlanData.exercises.length > 0}}"
       class="sticky-cta-btn"
       bindtap="onPrimaryAction"
     >
-      <text>开始训练</text>
-    </button>
-    <button
-      wx:else
-      class="sticky-cta-btn unlock"
-      bindtap="onPrimaryAction"
-    >
-      <text>提前解锁{{currentPlanData.nextDayLabel ? ' · 练' + currentPlanData.nextDayLabel : ''}}</text>
+      <text>{{currentPlanData.selectedDayCompleted ? ('再练一次 · ' + currentPlanData.selectedDayLabel) : (currentPlanData.selectedDayIsToday ? '开始训练' : ('开始训练 · 练' + currentPlanData.selectedDayLabel))}}</text>
     </button>
   </view>
 

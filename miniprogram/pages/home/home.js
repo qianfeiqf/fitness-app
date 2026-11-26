@@ -368,47 +368,122 @@ Page({
     }).filter(Boolean);
   },
 
+  _shortMuscleLabel(exercises) {
+    const shortMap = {
+      '胸部': '胸',
+      '背部': '背',
+      '下肢': '腿',
+      '硬拉': '硬拉',
+      '肩部': '肩',
+      '手臂': '臂',
+      '核心': '核心'
+    };
+    const list = [];
+    (exercises || []).forEach(e => {
+      const label = shortMap[e.muscle_group] || e.muscle_group;
+      if (label && !list.includes(label)) list.push(label);
+    });
+    return list.slice(0, 2).join('/');
+  },
+
+  _getWeekRange() {
+    const now = new Date();
+    const dow = now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+    return { monday, sunday };
+  },
+
+  _getCompletedDayKeysThisWeek(plan, dayGroups) {
+    const { monday, sunday } = this._getWeekRange();
+    const sessions = find('sessions', s =>
+      s.status === 'completed' &&
+      s.plan_id === plan.id &&
+      s.completed_at >= monday.getTime() &&
+      s.completed_at <= sunday.getTime()
+    ) || [];
+    const completedKeys = new Set();
+    const cycleType = plan.cycle_type || 'natural_week';
+    sessions.forEach(s => {
+      if (s.plan_day_key) {
+        completedKeys.add(String(s.plan_day_key));
+        return;
+      }
+      if (cycleType === 'natural_week' && s.completed_at) {
+        const d = new Date(s.completed_at).getDay();
+        const dowKey = String(d === 0 ? 7 : d);
+        if (dayGroups.some(g => g.key === dowKey)) {
+          completedKeys.add(dowKey);
+          return;
+        }
+      }
+      const doneExIds = new Set((s.completed_sets || []).map(x => x.exercise_id));
+      if (doneExIds.size > 0) {
+        let bestKey = null;
+        let bestHit = 0;
+        dayGroups.forEach(g => {
+          const hit = g.exercises.filter(e => doneExIds.has(e.id)).length;
+          if (hit > bestHit) { bestHit = hit; bestKey = g.key; }
+        });
+        if (bestKey) completedKeys.add(bestKey);
+      }
+    });
+    return completedKeys;
+  },
+
   _buildPlanData(plan) {
     const today = new Date().getDay();
     const dayOfWeek = today === 0 ? 7 : today;
     const weekDayNames = ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];
     const planExercises = find('plan_exercises', { plan_id: plan.id }) || [];
-
-    let todayExercises = [];
     const cycleType = plan.cycle_type || 'natural_week';
+    const todayCycleLabel = cycleType !== 'natural_week' ? this.calculateCycleDay(plan, planExercises) : '';
+
+    const dayGroups = [];
     if (cycleType === 'natural_week') {
-      todayExercises = planExercises.filter(pe => Number(pe.day_of_week) === dayOfWeek);
+      const dows = [...new Set(planExercises.map(pe => Number(pe.day_of_week)).filter(Boolean))].sort((a, b) => a - b);
+      dows.forEach(dow => {
+        const list = this._hydratePlanExercises(planExercises.filter(pe => Number(pe.day_of_week) === dow));
+        if (list.length === 0) return;
+        dayGroups.push({
+          key: String(dow),
+          label: weekDayNames[dow] || `第${dow}天`,
+          isToday: dow === dayOfWeek,
+          exercises: list
+        });
+      });
     } else {
-      const cycleDay = this.calculateCycleDay(plan, planExercises);
-      todayExercises = planExercises.filter(pe => pe.cycle_label === cycleDay);
+      const labels = [...new Set(planExercises.map(pe => pe.cycle_label).filter(Boolean))];
+      labels.forEach(lbl => {
+        const list = this._hydratePlanExercises(planExercises.filter(pe => pe.cycle_label === lbl));
+        if (list.length === 0) return;
+        dayGroups.push({
+          key: String(lbl),
+          label: lbl.length <= 2 ? `${lbl}日` : lbl,
+          isToday: lbl === todayCycleLabel,
+          exercises: list
+        });
+      });
     }
 
-    const exercisesWithDetails = this._hydratePlanExercises(todayExercises);
-    const isRestDay = exercisesWithDetails.length === 0;
-
-    // 休息日时自动向后查找最近一次有动作的训练日（供「提前解锁」与下次预告使用）
-    let nextDayLabel = '';
-    let nextExercises = [];
-    if (isRestDay && planExercises.length > 0) {
-      if (cycleType === 'natural_week') {
-        for (let offset = 1; offset <= 7; offset++) {
-          const nextDow = ((dayOfWeek - 1 + offset) % 7) + 1;
-          const matched = planExercises.filter(pe => Number(pe.day_of_week) === nextDow);
-          if (matched.length > 0) {
-            nextDayLabel = weekDayNames[nextDow];
-            nextExercises = this._hydratePlanExercises(matched);
-            break;
-          }
-        }
-      } else {
-        const labels = [...new Set(planExercises.map(pe => pe.cycle_label).filter(Boolean))];
-        const firstLabel = labels[0];
-        if (firstLabel) {
-          nextDayLabel = `${firstLabel}日`;
-          nextExercises = this._hydratePlanExercises(planExercises.filter(pe => pe.cycle_label === firstLabel));
-        }
-      }
-    }
+    const completedKeys = this._getCompletedDayKeysThisWeek(plan, dayGroups);
+    const dayOptions = dayGroups.map(g => {
+      const totalSets = g.exercises.reduce((sum, e) => sum + (e.target_sets || 0), 0);
+      const estimatedMinutes = g.exercises.length * 8;
+      const muscleGroups = Array.from(new Set(g.exercises.map(e => e.muscle_group).filter(Boolean))).join('/');
+      return {
+        ...g,
+        shortMuscle: this._shortMuscleLabel(g.exercises),
+        muscleGroups,
+        totalSets,
+        estimatedMinutes,
+        completedThisWeek: completedKeys.has(g.key)
+      };
+    });
 
     const todayStr = this.formatDate(new Date());
     const session = findOne('sessions', {
@@ -417,18 +492,46 @@ Page({
       status: { $in: ['in_progress', 'paused'] }
     });
 
-    const totalSets = exercisesWithDetails.reduce((sum, e) => sum + (e.target_sets || 0), 0);
-    const estimatedMinutes = exercisesWithDetails.length * 8;
-    const muscleSet = new Set(exercisesWithDetails.map(e => e.muscle_group));
-    const muscleGroups = Array.from(muscleSet).join('/');
-    const weekProgress = this.calcWeekProgress(plan, planExercises);
+    if (!this._selectedDayByPlan) this._selectedDayByPlan = {};
+    let selectedDay = null;
+    if (session && session.plan_day_key) {
+      selectedDay = dayOptions.find(d => d.key === String(session.plan_day_key)) || null;
+    }
+    if (!selectedDay && this._selectedDayByPlan[plan.id]) {
+      selectedDay = dayOptions.find(d => d.key === this._selectedDayByPlan[plan.id]) || null;
+    }
+    if (!selectedDay) {
+      selectedDay = dayOptions.find(d => d.isToday && !d.completedThisWeek)
+        || dayOptions.find(d => !d.completedThisWeek)
+        || dayOptions.find(d => d.isToday)
+        || dayOptions[0]
+        || null;
+    }
+
+    const exercisesWithDetails = selectedDay ? selectedDay.exercises : [];
+    const isRestDay = !selectedDay;
+    const totalSets = selectedDay ? selectedDay.totalSets : 0;
+    const estimatedMinutes = selectedDay ? selectedDay.estimatedMinutes : 0;
+    const muscleGroups = selectedDay ? selectedDay.muscleGroups : '';
+    const plannedDays = Math.max(dayOptions.length, 1);
+    const completedDays = Math.min(completedKeys.size, plannedDays);
+    const weekProgress = {
+      plannedDays: dayOptions.length || 3,
+      completedDays: completedKeys.size,
+      percent: dayOptions.length > 0 ? Math.min(Math.round((completedDays / plannedDays) * 100), 100) : 0
+    };
 
     return {
       id: plan.id,
       plan,
+      dayOptions,
+      selectedDayKey: selectedDay ? selectedDay.key : '',
+      selectedDayLabel: selectedDay ? selectedDay.label : '',
+      selectedDayIsToday: selectedDay ? selectedDay.isToday : false,
+      selectedDayCompleted: selectedDay ? selectedDay.completedThisWeek : false,
       exercises: exercisesWithDetails,
-      nextDayLabel,
-      nextExercises,
+      nextDayLabel: selectedDay ? selectedDay.label : '',
+      nextExercises: exercisesWithDetails,
       session,
       totalSets,
       estimatedMinutes,
@@ -439,13 +542,48 @@ Page({
   },
 
   /**
+   * 首页点选本周任意训练日（支持临时调序开练）
+   */
+  onSelectPlanDay(e) {
+    const dayKey = String(e.currentTarget.dataset.dayKey || '');
+    const { planDataList, currentPlanIndex } = this.data;
+    const pd = planDataList[currentPlanIndex];
+    if (!pd || !dayKey || pd.selectedDayKey === dayKey) return;
+    const picked = (pd.dayOptions || []).find(d => d.key === dayKey);
+    if (!picked) return;
+
+    if (!this._selectedDayByPlan) this._selectedDayByPlan = {};
+    this._selectedDayByPlan[pd.plan.id] = dayKey;
+
+    const updatedPd = {
+      ...pd,
+      selectedDayKey: picked.key,
+      selectedDayLabel: picked.label,
+      selectedDayIsToday: picked.isToday,
+      selectedDayCompleted: picked.completedThisWeek,
+      exercises: picked.exercises,
+      totalSets: picked.totalSets,
+      estimatedMinutes: picked.estimatedMinutes,
+      muscleGroups: picked.muscleGroups,
+      isRestDay: false
+    };
+    const nextList = planDataList.map((item, idx) => idx === currentPlanIndex ? updatedPd : item);
+    this.setData({
+      planDataList: nextList,
+      currentPlanData: updatedPd,
+      todayExercises: updatedPd.exercises,
+      estimatedMinutes: updatedPd.estimatedMinutes,
+      totalSets: updatedPd.totalSets,
+      muscleGroups: updatedPd.muscleGroups,
+      isRestDay: false
+    });
+  },
+
+  /**
    * 计算 Swiper 高度（基于当前展示的动作数量）
    */
   calcSwiperHeight(planData, isMulti = false) {
-    const count = planData
-      ? (planData.isRestDay ? (planData.nextExercises || []).length : (planData.exercises || []).length)
-      : 0;
-    // 基础高度：无按钮主卡片(165) + 圆点(26) + 本周圆环卡(145) + 间距
+    const count = planData ? (planData.exercises || []).length : 0;
     let h = isMulti ? 360 : 330;
     if (count > 0) {
       h += 80 + count * 104;
@@ -462,7 +600,7 @@ Page({
   },
 
   /**
-   * 底部吸屏主按钮统一入口（继续训练 / 开始训练 / 休息日提前解锁下一次训练）
+   * 底部吸屏主按钮统一入口（继续训练 / 开始训练当前选中课表）
    */
   onPrimaryAction() {
     const pd = this.data.currentPlanData || this.data.planDataList[this.data.currentPlanIndex];
@@ -479,25 +617,12 @@ Page({
       return;
     }
 
-    if (!pd.isRestDay) {
-      this.onStartTrainingForPlan({ currentTarget: { dataset: { planId: pd.plan.id } } });
-      return;
-    }
-
-    // 休息日：提前解锁最近下一次训练
-    if (!pd.nextExercises || pd.nextExercises.length === 0) {
+    if (!pd.exercises || pd.exercises.length === 0) {
       wx.showToast({ title: '该计划尚未配置训练动作', icon: 'none' });
       return;
     }
 
-    const session = this._createSessionForPlan({
-      plan: pd.plan,
-      exercises: pd.nextExercises
-    });
-    this.setData({ currentSession: session, isTraining: true });
-    wx.navigateTo({
-      url: '/pages/home/training/training?sessionId=' + session.id
-    });
+    this.onStartTrainingForPlan({ currentTarget: { dataset: { planId: pd.plan.id } } });
   },
 
   /**
@@ -763,6 +888,8 @@ Page({
       id: 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
       plan_id: planData.plan.id,
       plan_name: planData.plan.name,
+      plan_day_key: planData.selectedDayKey || '',
+      plan_day_label: planData.selectedDayLabel || '',
       scheduled_date: todayStr,
       status: 'in_progress',
       started_at: Date.now(),

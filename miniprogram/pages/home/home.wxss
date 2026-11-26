@@ -1005,10 +1005,75 @@
 }
 
 /* =====================
+   本周课表自由切换胶囊条
+   ===================== */
+.week-day-section {
+  margin-top: 12rpx;
+  margin-bottom: 4rpx;
+}
+
+.week-day-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.week-day-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 4rpx 4rpx 8rpx;
+}
+
+.week-day-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 9999rpx;
+  background: #FFFFFF;
+  color: #444444;
+  font-size: 24rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease;
+}
+
+.week-day-pill.done {
+  background: #F0FBF4;
+  color: #07C160;
+}
+
+.week-day-pill.active {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  box-shadow: 0 6rpx 16rpx rgba(26, 26, 26, 0.16);
+}
+
+.week-day-check {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #07C160;
+}
+
+.week-day-pill.active .week-day-check {
+  color: #07C160;
+}
+
+.week-day-label {
+  font-weight: 600;
+}
+
+.week-day-muscle {
+  font-size: 22rpx;
+  opacity: 0.72;
+}
+
+/* =====================
    动作预览
    ===================== */
 .exercises-section {
-  margin-top: 28rpx;
+  margin-top: 20rpx;
   padding: 0 4rpx;
 }
 

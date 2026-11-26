@@ -7,9 +7,9 @@ const EXTRA_EXERCISES = [
   // ==================== 胸部 (+16) ====================
   {
     id: 'ex_107',
-    name: '悍马机平板卧推',
+    name: '悍马机坐姿推胸',
     name_en: 'Hammer Strength Chest Press',
-    aliases: '悍马卧推 挂片推胸 坐姿推胸机 ISO-Lateral Chest Press',
+    aliases: '悍马机平板卧推 悍马卧推 挂片推胸 坐姿推胸机 ISO-Lateral Chest Press',
     muscle_group: '胸部',
     sub_muscle: '中胸',
     equipment: '挂片器械',

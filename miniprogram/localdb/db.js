@@ -124,7 +124,13 @@ function initSeedData() {
       exercises.push({ ...seed, gif_url: resolvedGifUrl, thumb_url: resolvedThumbUrl });
       changed = true;
     } else if (existing.is_system !== false) {
-      const fieldsToBackfill = ['sub_muscle', 'equipment', 'target_muscles', 'description', 'tips', 'name_en', 'aliases'];
+      ['name', 'aliases'].forEach(field => {
+        if (seed[field] && existing[field] !== seed[field]) {
+          existing[field] = seed[field];
+          changed = true;
+        }
+      });
+      const fieldsToBackfill = ['sub_muscle', 'equipment', 'target_muscles', 'description', 'tips', 'name_en'];
       fieldsToBackfill.forEach(field => {
         if (!existing[field] && seed[field]) {
           existing[field] = seed[field];

@@ -354,16 +354,18 @@ Page({
    * 构建单个计划的今日数据
    */
   _hydratePlanExercises(list) {
+    const restPrefs = wx.getStorageSync('exercise_rest_prefs') || {};
     return (list || []).map(pe => {
       const exercise = findOne('exercises', { id: pe.exercise_id });
       if (!exercise) return null;
+      const savedRest = restPrefs[pe.exercise_id];
       return {
         ...exercise,
         plan_exercise_id: pe.id,
         target_sets: pe.target_sets,
         target_reps: pe.target_reps,
         target_weight: pe.initial_weight,
-        rest_seconds: pe.rest_seconds || 120
+        rest_seconds: savedRest || pe.rest_seconds || 120
       };
     }).filter(Boolean);
   },
@@ -896,6 +898,7 @@ Page({
       completed_sets: [],
       pending_exercises: planData.exercises.map(e => ({
         exercise_id: e.id,
+        plan_exercise_id: e.plan_exercise_id || null,
         exercise_name: e.name,
         target_sets: e.target_sets,
         target_reps: e.target_reps,

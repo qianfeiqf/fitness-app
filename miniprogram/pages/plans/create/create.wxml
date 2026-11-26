@@ -1,5 +1,7 @@
 <!-- 新建计划页面 -->
 <view class="page-create">
+  <scroll-view scroll-y class="create-scroll" show-scrollbar="{{false}}">
+    <view class="create-scroll-inner">
   <!-- 计划名称 -->
   <view class="form-section">
     <text class="section-title">计划名称</text>
@@ -122,7 +124,10 @@
     </view>
   </view>
 
-  <!-- 底部按钮 -->
+    </view>
+  </scroll-view>
+
+  <!-- 底部固定操作栏（独立于滚动区域外，彻底避免原生输入框文字透出按钮） -->
   <view class="bottom-actions">
     <view class="btn-save {{isEditMode ? 'edit' : ''}}" bindtap="onSavePlan">
       <text>{{isEditMode ? '保存修改' : '创建计划'}}</text>

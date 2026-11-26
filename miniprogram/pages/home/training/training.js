@@ -914,7 +914,8 @@ Page({
       updated_at: Date.now()
     });
 
-    const restSeconds = currentExercise.rest_seconds || 120;
+    const restPrefs = wx.getStorageSync('exercise_rest_prefs') || {};
+    const restSeconds = currentExercise.rest_seconds || restPrefs[currentExercise.exercise_id] || 120;
     let completedCount = 0;
     const statusList = newExercises.map((ex, i) => {
       const isCompleted = ex.completed_sets >= ex.target_sets;
@@ -926,6 +927,41 @@ Page({
     });
     const totalAngle = newExercises.length > 0 ? (completedCount / newExercises.length) * 360 : 0;
 
+    const isWorkoutAllDone = newExerciseIndex >= newExercises.length;
+    if (isWorkoutAllDone) {
+      this.clearRestTimer();
+      this.restEndTime = null;
+      this._clearGlobalRestState();
+      this.setData({
+        completedSets: newCompletedSets,
+        exercises: newExercises,
+        formalSets: nextFormalSets,
+        currentExerciseIndex: newExerciseIndex,
+        currentSetIndex: newSetIndex,
+        isResting: false,
+        restTimeLeft: 0,
+        restMinimized: false,
+        completedExerciseCount: completedCount,
+        overallProgressAngle: totalAngle,
+        exerciseStatusList: statusList,
+        freeAllDone: this.data.isFreeWorkout ? true : false,
+        currentExercise: this.data.isFreeWorkout ? null : this.data.currentExercise
+      });
+      this.saveSnapshot();
+      this.checkAndSave1RM(setRecord);
+      UI.vibrateSuccess();
+      if (!this.data.isFreeWorkout) {
+        setTimeout(() => {
+          this.onTrainingComplete();
+        }, 260);
+      }
+      return;
+    }
+
+    // 记录当前组间休息归属的动作，用于调整时长后按动作记忆
+    this.restingExerciseId = currentExercise.exercise_id;
+    this.restingPlanExerciseId = currentExercise.plan_exercise_id || null;
+
     // 生成休息弹窗中的「下一组预告」
     let nextSetPreview = '';
     const nextEx = newExercises[newExerciseIndex];
@@ -936,8 +972,6 @@ Page({
       const r = nextRow ? nextRow.reps : (nextEx.target_reps || 10);
       const totalS = nextExSets ? nextExSets.length : (nextEx.target_sets || 1);
       nextSetPreview = `${nextEx.exercise_name || nextEx.name} 第 ${Math.min(newSetIndex + 1, totalS)}/${totalS} 组 · ${w}kg × ${r}次`;
-    } else {
-      nextSetPreview = '全部动作已完成';
     }
 
     this.setData({
@@ -1353,25 +1387,78 @@ Page({
   },
 
   /**
-   * 增加休息时间
+   * 按动作持久化记忆最新调整的组间休息总时长（当前会话下一组及未来训练均生效）
    */
-  onAddRestTime() {
-    const { restTimeLeft } = this.data;
-    const newTime = Math.min(restTimeLeft + 30, 300); // 最多5分钟
-    this.restEndTime = Date.now() + newTime * 1000;
-    this.setData({ restTimeLeft: newTime, restTimeTotal: newTime });
-    this._syncGlobalRestState({ restTimeTotal: newTime });
+  _saveExerciseRestPreference(newTotalSeconds) {
+    const exId = this.restingExerciseId || (this.data.currentExercise && this.data.currentExercise.exercise_id);
+    if (!exId || !newTotalSeconds) return;
+
+    try {
+      const prefs = wx.getStorageSync('exercise_rest_prefs') || {};
+      prefs[exId] = newTotalSeconds;
+      wx.setStorageSync('exercise_rest_prefs', prefs);
+    } catch (e) {
+      console.warn('保存动作休息偏好失败:', e);
+    }
+
+    const { exercises, session, currentExercise } = this.data;
+    const nextExercises = (exercises || []).map(ex =>
+      ex.exercise_id === exId ? { ...ex, rest_seconds: newTotalSeconds } : ex
+    );
+    const updatePayload = { exercises: nextExercises };
+    if (currentExercise && currentExercise.exercise_id === exId) {
+      updatePayload['currentExercise.rest_seconds'] = newTotalSeconds;
+    }
+    this.setData(updatePayload);
+
+    if (session) {
+      update('sessions', session.id, {
+        pending_exercises: nextExercises,
+        updated_at: Date.now()
+      });
+    }
+    if (this.restingPlanExerciseId) {
+      update('plan_exercises', this.restingPlanExerciseId, {
+        rest_seconds: newTotalSeconds
+      });
+    }
   },
 
   /**
-   * 减少休息时间
+   * 增加休息时间（直接基于总时间 +30s，剩余时间同步 +30s）
+   */
+  onAddRestTime() {
+    const { restTimeLeft, restTimeTotal } = this.data;
+    const baseTotal = restTimeTotal || restTimeLeft || 90;
+    const newTotal = Math.min(baseTotal + 30, 300); // 最多5分钟
+    const delta = newTotal - baseTotal;
+    if (delta <= 0) return;
+    const newLeft = restTimeLeft + delta;
+    this.restEndTime = Date.now() + newLeft * 1000;
+    this.setData({ restTimeLeft: newLeft, restTimeTotal: newTotal });
+    this._syncGlobalRestState({ restTimeTotal: newTotal });
+    this._saveExerciseRestPreference(newTotal);
+  },
+
+  /**
+   * 减少休息时间（直接基于总时间 -30s，剩余时间同步 -30s）
    */
   onReduceRestTime() {
-    const { restTimeLeft } = this.data;
-    const newTime = Math.max(restTimeLeft - 30, 30); // 最少30秒
-    this.restEndTime = Date.now() + newTime * 1000;
-    this.setData({ restTimeLeft: newTime, restTimeTotal: newTime });
-    this._syncGlobalRestState({ restTimeTotal: newTime });
+    const { restTimeLeft, restTimeTotal } = this.data;
+    const baseTotal = restTimeTotal || restTimeLeft || 90;
+    const newTotal = Math.max(baseTotal - 30, 30); // 最少30秒
+    const delta = baseTotal - newTotal;
+    if (delta <= 0) return;
+    const newLeft = Math.max(0, restTimeLeft - delta);
+    this._saveExerciseRestPreference(newTotal);
+    if (newLeft <= 0) {
+      this.setData({ restTimeLeft: 0, restTimeTotal: newTotal, restCompleting: true });
+      this.onRestComplete();
+      return;
+    }
+    this.restEndTime = Date.now() + newLeft * 1000;
+    this.setData({ restTimeLeft: newLeft, restTimeTotal: newTotal });
+    this._syncGlobalRestState({ restTimeTotal: newTotal });
   },
 
   /**
@@ -1785,6 +1872,7 @@ Page({
    */
   _appendExercisesToSession(exerciseList) {
     const { exercises, session, currentExerciseIndex, freeAllDone, selectedAddConfigs } = this.data;
+    const restPrefs = wx.getStorageSync('exercise_rest_prefs') || {};
     const prevLen = exercises.length;
     const nextExercises = [...exercises];
 
@@ -1803,7 +1891,7 @@ Page({
         target_sets: targetSets,
         target_reps: targetReps,
         target_weight: targetWeight,
-        rest_seconds: 90,
+        rest_seconds: restPrefs[exercise.id] || 90,
         completed_sets: 0,
         warmup_completed: true,
         muscle_group: exercise.muscle_group || '自由训练',

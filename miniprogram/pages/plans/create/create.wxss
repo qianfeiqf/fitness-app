@@ -1,10 +1,26 @@
 /* 新建计划页面样式 — WeUI 扁平风格 */
 
 .page-create {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: #FFFFFF;
-  padding: 30rpx;
-  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.create-scroll {
+  flex: 1;
+  min-height: 0;
+  height: 0;
+  width: 100%;
+}
+
+.create-scroll-inner {
+  padding: 30rpx 30rpx 48rpx;
+  box-sizing: border-box;
 }
 
 /* =====================
@@ -403,14 +419,13 @@
    底部操作按钮
    ===================== */
 .bottom-actions {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 30rpx;
-  padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
+  flex-shrink: 0;
+  padding: 24rpx 30rpx calc(28rpx + env(safe-area-inset-bottom));
   background: #FFFFFF;
-  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  border-top: 1rpx solid #F0F0F0;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.04);
+  position: relative;
+  z-index: 20;
 }
 
 .btn-save {

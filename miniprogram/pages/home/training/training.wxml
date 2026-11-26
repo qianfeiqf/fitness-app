@@ -312,14 +312,14 @@
     </view>
   </view>
 
-  <!-- 底部操作栏（单行紧凑图文 + 微信官方 WeUI 矢量图标） -->
+  <!-- 底部操作栏（统一圆润线性 SVG 图标 + 像素居中对齐） -->
   <view class="bottom-bar">
     <view class="bottom-btn" bindtap="{{isPaused ? 'onResumeTraining' : 'onPauseTraining'}}">
-      <mp-icon icon="{{isPaused ? 'play2' : 'pause'}}" color="#666666" size="{{18}}" />
+      <view class="bottom-svg-icon {{isPaused ? 'icon-play' : 'icon-pause'}}"></view>
       <text class="bottom-label">{{isPaused ? '继续' : '暂停'}}</text>
     </view>
     <view class="bottom-btn finish" bindtap="onFinishTraining">
-      <mp-icon icon="done" color="#07C160" size="{{18}}" />
+      <view class="bottom-svg-icon icon-done"></view>
       <text class="bottom-label">完成</text>
     </view>
   </view>

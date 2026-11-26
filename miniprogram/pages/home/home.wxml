@@ -224,19 +224,27 @@
     </view>
 </view>
 
-  <!-- 恢复训练弹窗 -->
+  <!-- 恢复训练弹窗（三层药丸权重 + 具体进度摘要，点遮罩仅收起不放弃） -->
   <modal-sheet
     visible="{{showRecoveryModal}}"
     title="发现未完成的训练"
-    description="你有一项训练进行中，继续完成还是放弃？"
-    confirmText="继续"
-    cancelText="放弃"
-    bind:confirm="onRecoverTraining"
-    bind:cancel="onAbandonTraining"
-    bind:close="onAbandonTraining"
+    showConfirm="{{false}}"
+    showCancel="{{false}}"
+    bind:close="onDismissRecoveryModal"
   >
-    <view class="modal-icon-wrap" style="text-align:center;margin-bottom:16rpx;">
-      <icon type="info" size="40" color="#07C160" />
+    <view wx:if="{{unfinishedSummary}}" class="recovery-summary-card">
+      <text class="recovery-summary-text">{{unfinishedSummary}}</text>
+    </view>
+    <view class="recovery-sheet-actions">
+      <view class="recovery-btn-primary" bindtap="onRecoverTraining">
+        <text>继续训练</text>
+      </view>
+      <view class="recovery-btn-secondary" bindtap="onDismissRecoveryModal">
+        <text>暂不处理</text>
+      </view>
+      <view class="recovery-btn-abandon" bindtap="onAbandonTraining">
+        <text>放弃本次训练</text>
+      </view>
     </view>
   </modal-sheet>
 

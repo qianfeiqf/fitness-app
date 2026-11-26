@@ -45,6 +45,7 @@ Page({
     loading: true,
     showRecoveryModal: false,
     unfinishedSession: null,
+    unfinishedSummary: '',
 
     // Deload 提醒
     showDeloadReminder: false,
@@ -798,10 +799,21 @@ Page({
    */
   onUnfinishedSessionFound(session) {
     console.log('发现未完成会话:', session);
+    const name = (session && session.plan_name) || (session && session.is_free_workout ? '自由训练' : '未完成训练');
+    const doneSets = session && Array.isArray(session.completed_sets) ? session.completed_sets.length : 0;
+    const summary = doneSets > 0 ? `${name} · 已完成 ${doneSets} 组` : `${name} · 尚未记录组数`;
     this.setData({
       showRecoveryModal: true,
-      unfinishedSession: session
+      unfinishedSession: session,
+      unfinishedSummary: summary
     });
+  },
+
+  /**
+   * 暂不处理（仅收起弹窗，保留训练进度不放弃）
+   */
+  onDismissRecoveryModal() {
+    this.setData({ showRecoveryModal: false });
   },
 
   /**

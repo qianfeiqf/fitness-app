@@ -1196,6 +1196,73 @@
   flex-shrink: 0;
 }
 
+/* 恢复训练弹窗样式 */
+.recovery-summary-card {
+  background: #F4F5F7;
+  border-radius: 18rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 28rpx;
+  text-align: center;
+}
+
+.recovery-summary-text {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #555555;
+}
+
+.recovery-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16rpx;
+  padding-bottom: 8rpx;
+}
+
+.recovery-btn-primary {
+  height: 92rpx;
+  border-radius: 9999rpx;
+  background: #07C160;
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recovery-btn-primary:active {
+  opacity: 0.88;
+}
+
+.recovery-btn-secondary {
+  height: 88rpx;
+  border-radius: 9999rpx;
+  background: #F4F5F7;
+  color: #333333;
+  font-size: 28rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recovery-btn-secondary:active {
+  background: #E8EAEE;
+}
+
+.recovery-btn-abandon {
+  margin-top: 8rpx;
+  padding: 14rpx 0 4rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.recovery-btn-abandon:active {
+  color: #FA5151;
+}
+
 /* 弹窗内图标容器（纯居中，不额外套方框） */
 .modal-icon-wrap {
   display: flex;

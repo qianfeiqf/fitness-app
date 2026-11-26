@@ -547,4 +547,17 @@
 
   <!-- 训练悬浮窗（含全局组间休息倒计时） -->
   <training-float />
+
+  <!-- 页面实战高亮引导 -->
+  <coach-tour
+    visible="{{coachTour.visible}}"
+    rect="{{coachTour.rect}}"
+    title="{{coachTour.title}}"
+    desc="{{coachTour.desc}}"
+    stepText="{{coachTour.stepText}}"
+    nextText="{{coachTour.nextText}}"
+    isLast="{{coachTour.isLast}}"
+    bind:next="onCoachTourNext"
+    bind:skip="onCoachTourSkip"
+  />
 </view>

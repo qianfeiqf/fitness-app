@@ -2,6 +2,7 @@
   "usingComponents": {
     "modal-sheet": "../../../components/modal-sheet/modal-sheet",
     "exercise-guide-sheet": "../../../components/exercise-guide-sheet/exercise-guide-sheet",
+    "coach-tour": "../../../components/coach-tour/coach-tour",
     "mp-icon": "weui-miniprogram/icon/icon"
   },
   "navigationBarTitleText": "训练中心",

@@ -1,0 +1,124 @@
+.coach-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  overflow: hidden;
+}
+
+.coach-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.64);
+}
+
+.coach-spotlight {
+  position: fixed;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.64);
+  border: 2px solid rgba(255, 255, 255, 0.88);
+  box-sizing: border-box;
+  transition: all 0.22s ease;
+  z-index: 2001;
+}
+
+.coach-card {
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  z-index: 2002;
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 32rpx 32rpx 28rpx;
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.22);
+  box-sizing: border-box;
+  animation: coachPop 0.2s ease-out;
+}
+
+@keyframes coachPop {
+  from {
+    opacity: 0;
+    transform: translateY(12rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.coach-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.coach-step-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 42rpx;
+  padding: 0 18rpx;
+  border-radius: 9999rpx;
+  background: #F0FBF4;
+  color: #07C160;
+  font-size: 22rpx;
+  font-weight: 600;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+}
+
+.coach-skip {
+  font-size: 24rpx;
+  color: #999999;
+  padding: 6rpx 8rpx;
+}
+
+.coach-skip:active {
+  color: #333333;
+}
+
+.coach-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-bottom: 10rpx;
+  line-height: 1.35;
+}
+
+.coach-desc {
+  display: block;
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.6;
+  margin-bottom: 28rpx;
+}
+
+.coach-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.coach-next-btn {
+  width: 100%;
+  height: 84rpx;
+  border-radius: 9999rpx;
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coach-next-btn.primary {
+  background: #07C160;
+}
+
+.coach-next-btn:active {
+  opacity: 0.88;
+}

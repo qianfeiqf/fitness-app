@@ -1,0 +1,31 @@
+<view wx:if="{{visible}}" class="coach-overlay" catchtouchmove="noop">
+  <!-- 无高亮框时的纯暗幕兜底 -->
+  <view wx:if="{{!hasRect}}" class="coach-backdrop" bindtap="onNext"></view>
+
+  <!-- 精准镂空高亮框（利用超大 box-shadow 生成四周半透明暗幕） -->
+  <view
+    wx:if="{{hasRect}}"
+    class="coach-spotlight"
+    style="top: {{spotTop}}px; left: {{spotLeft}}px; width: {{spotWidth}}px; height: {{spotHeight}}px; border-radius: {{spotRadius}}px;"
+    bindtap="onNext"
+  ></view>
+
+  <!-- 极简白色讲解气泡卡 -->
+  <view
+    class="coach-card {{cardAlign}}"
+    style="{{cardStyle}}"
+    catchtap="noop"
+  >
+    <view class="coach-card-top">
+      <text wx:if="{{stepText}}" class="coach-step-pill">{{stepText}}</text>
+      <text wx:if="{{showSkip}}" class="coach-skip" bindtap="onSkip">跳过引导</text>
+    </view>
+    <text class="coach-title">{{title}}</text>
+    <text class="coach-desc">{{desc}}</text>
+    <view class="coach-actions">
+      <view class="coach-next-btn {{isLast ? 'primary' : ''}}" bindtap="onNext">
+        <text>{{nextText || '下一步'}}</text>
+      </view>
+    </view>
+  </view>
+</view>

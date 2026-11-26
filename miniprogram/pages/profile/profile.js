@@ -586,7 +586,11 @@ Page({
 
 
   onOpenGuideSheet() {
-    this.setData({ showGuideSheet: true });
+    const app = getApp();
+    if (app && app.globalData) {
+      app.globalData.fullTourStage = 'home';
+    }
+    wx.switchTab({ url: '/pages/home/home' });
   },
 
   onCloseGuideSheet() {

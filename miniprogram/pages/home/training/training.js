@@ -7,6 +7,7 @@ const { calculate1RM, calculateAndSave1RM, checkMilestone } = require('../../../
 const { calculateProgression } = require('../../../services/progression.js');
 const UI = require('../../../utils/ui.js');
 const audio = require('../../../utils/audio.js');
+const { startPageTour, advancePageTour, skipPageTour } = require('../../../utils/tour.js');
 
 Page({
   data: {
@@ -110,8 +111,8 @@ Page({
     playingExerciseId: '',
     thumbErrorMap: {},
 
-    // 首次训练操作轻提示条
-    showTrainingTip: false,
+    // 首次训练高亮引导
+    coachTour: { visible: false },
 
     // 更多操作面板
     showMoreActions: false,
@@ -132,9 +133,6 @@ Page({
   onLoad(options) {
     this.calcNavBarHeight();
     this._initRestFloatBounds();
-    if (!wx.getStorageSync('training_tips_dismissed')) {
-      this.setData({ showTrainingTip: true });
-    }
     console.log('=== 训练中页面加载 ===', options);
 
     if (options.sessionId) {
@@ -239,9 +237,42 @@ Page({
   // 空操作函数（用于阻止事件冒泡）
   noop() {},
 
-  onDismissTrainingTip() {
-    wx.setStorageSync('training_tips_dismissed', true);
-    this.setData({ showTrainingTip: false });
+  _maybeStartTrainingTour() {
+    if (this._trainingTourStarted || wx.getStorageSync('training_tour_done')) return;
+    if (!this.data.currentExercise || this.data.freeAllDone) return;
+    this._trainingTourStarted = true;
+    setTimeout(() => {
+      const checkSelector = this.data.activeStage === 'warmup' ? '.warmup-check' : '.formal-check';
+      startPageTour(this, [
+        {
+          selector: checkSelector,
+          title: '一键完成当前组',
+          desc: '点左侧圆圈可快速打钩当前组，点已完成圆圈可取消；也可以点底部大按钮推进。',
+          radius: 20,
+          pad: 8
+        },
+        {
+          selector: '.stage-tabs',
+          title: '热身与正式自由切换',
+          desc: '这里可随时切换热身组与正式组；组间休息收起后，黑色悬浮条支持自由上下拖动。',
+          radius: 14
+        }
+      ], {
+        startOffset: 0,
+        totalCount: 2,
+        lastNextText: '开始开练',
+        onFinish: () => { wx.setStorageSync('training_tour_done', true); },
+        onSkip: () => { wx.setStorageSync('training_tour_done', true); }
+      });
+    }, 380);
+  },
+
+  onCoachTourNext() {
+    advancePageTour(this);
+  },
+
+  onCoachTourSkip() {
+    skipPageTour(this);
   },
 
   /**
@@ -469,6 +500,8 @@ Page({
       setNote: '',
       freeAllDone: false,
       exerciseScrollIntoView: 'ex-chip-' + currentExerciseIndex
+    }, () => {
+      this._maybeStartTrainingTour();
     });
 
     this.calculateOverallProgress();

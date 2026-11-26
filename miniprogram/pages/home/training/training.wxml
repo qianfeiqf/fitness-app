@@ -116,14 +116,6 @@
       </view>
     </view>
 
-    <!-- 首次进入训练页的可关闭轻提示条（非阻塞） -->
-    <view wx:if="{{showTrainingTip}}" class="training-tip-bar">
-      <text class="training-tip-text">小贴士：点左侧圆圈可快速打钩，收起休息条可上下拖动</text>
-      <view class="training-tip-close" bindtap="onDismissTrainingTip">
-        <mp-icon icon="close" color="#888888" size="{{12}}" />
-      </view>
-    </view>
-
     <!-- 热身组 / 正式组 分段切换 Tab -->
     <view class="stage-tabs">
       <view
@@ -666,6 +658,19 @@
     visible="{{showExerciseDetail}}"
     exercise="{{detailExercise}}"
     bind:close="onCloseExerciseDetail"
+  />
+
+  <!-- 首次训练高亮引导 -->
+  <coach-tour
+    visible="{{coachTour.visible}}"
+    rect="{{coachTour.rect}}"
+    title="{{coachTour.title}}"
+    desc="{{coachTour.desc}}"
+    stepText="{{coachTour.stepText}}"
+    nextText="{{coachTour.nextText}}"
+    isLast="{{coachTour.isLast}}"
+    bind:next="onCoachTourNext"
+    bind:skip="onCoachTourSkip"
   />
 </view>
 

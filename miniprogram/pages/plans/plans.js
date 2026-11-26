@@ -3,6 +3,7 @@
  */
 
 const { find, findOne, insert, update, remove, getCollection, getPlanTemplatesSeedData, MUSCLE_SUB_GROUPS } = require('../../localdb/db.js');
+const { startPageTour, advancePageTour, skipPageTour } = require('../../utils/tour.js');
 
 Page({
   data: {
@@ -101,7 +102,10 @@ Page({
 
     // 训练悬浮窗
     trainingFloat: null,
-    navHeight: 0
+    navHeight: 0,
+
+    // 页面实战高亮引导
+    coachTour: { visible: false }
   },
 
   onLoad() {
@@ -127,7 +131,47 @@ Page({
       delete app.globalData.openPlanRecommend;
       this.setData({ activeMainTab: 'plans', activeMainTabIndex: 0 });
       this.onShowRecommend();
+      return;
     }
+    if (app && app.globalData && app.globalData.fullTourStage === 'plans') {
+      this.setData({ activeMainTab: 'exercises', activeMainTabIndex: 1, playingExerciseId: '' });
+      if (this._plansTourTimer) clearTimeout(this._plansTourTimer);
+      this._plansTourTimer = setTimeout(() => {
+        const offset = app.globalData.fullTourOffset || 3;
+        const total = app.globalData.fullTourTotal || (offset + 4);
+        startPageTour(this, [
+          {
+            selector: '.ex-thumb-box',
+            title: '点缩略图直接播动图',
+            desc: '轻点左侧缩略图即可原地播放示范动图，点右侧卡片查看完整动作要领。',
+            radius: 14
+          },
+          {
+            selector: '.ex-toolbar',
+            title: '搜索与自建动作',
+            desc: '支持按俗称或器械搜索；找不到器械时点「+ 自定义」存入动作库，点「自定义」胶囊一键筛选。',
+            radius: 18
+          }
+        ], {
+          startOffset: offset,
+          totalCount: total,
+          lastNextText: '下一站：统计 ›',
+          onFinish: () => {
+            app.globalData.fullTourStage = 'stats';
+            app.globalData.fullTourOffset = offset + 2;
+            wx.switchTab({ url: '/pages/stats/stats' });
+          }
+        });
+      }, 360);
+    }
+  },
+
+  onCoachTourNext() {
+    advancePageTour(this);
+  },
+
+  onCoachTourSkip() {
+    skipPageTour(this);
   },
 
   /**

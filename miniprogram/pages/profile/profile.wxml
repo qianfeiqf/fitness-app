@@ -273,55 +273,6 @@
     </view>
   </modal-sheet>
 
-  <!-- 使用小贴士半屏抽屉 -->
-  <modal-sheet
-    visible="{{showGuideSheet}}"
-    title="使用小贴士"
-    description="几招让日常训练记录更顺手"
-    showConfirm="{{false}}"
-    cancelText="知道了"
-    bind:cancel="onCloseGuideSheet"
-    bind:close="onCloseGuideSheet"
-  >
-    <view class="guide-tip-list">
-      <view class="guide-tip-item">
-        <view class="guide-tip-num">1</view>
-        <view class="guide-tip-body">
-          <text class="guide-tip-title">课表自由调序</text>
-          <text class="guide-tip-desc">首页点击每周课表胶囊，可随时切换今天先练哪一天，本周已练会自动打钩。</text>
-        </view>
-      </view>
-      <view class="guide-tip-item">
-        <view class="guide-tip-num">2</view>
-        <view class="guide-tip-body">
-          <text class="guide-tip-title">一键做组与热身切换</text>
-          <text class="guide-tip-desc">训练中点击左侧圆圈可快速完成当前组或取消已完成组；顶部可随时切换热身组与正式组。</text>
-        </view>
-      </view>
-      <view class="guide-tip-item">
-        <view class="guide-tip-num">3</view>
-        <view class="guide-tip-body">
-          <text class="guide-tip-title">悬浮条自由上下拖动</text>
-          <text class="guide-tip-desc">收起训练或组间休息后，按住黑色悬浮条可自由上下拖动并记住位置，避免遮挡内容。</text>
-        </view>
-      </view>
-      <view class="guide-tip-item">
-        <view class="guide-tip-num">4</view>
-        <view class="guide-tip-body">
-          <text class="guide-tip-title">动作库即时看动图与自建</text>
-          <text class="guide-tip-desc">点动作左侧缩略图直接播动图，点卡片看要领；找不到器械动作可随时新建并存入「自定义」。</text>
-        </view>
-      </view>
-      <view class="guide-tip-item">
-        <view class="guide-tip-num">5</view>
-        <view class="guide-tip-body">
-          <text class="guide-tip-title">当天补练与数据备份</text>
-          <text class="guide-tip-desc">统计 → 训练历史中，当天记录支持继续补练或追加动作；在「数据导出」可随时备份。</text>
-        </view>
-      </view>
-    </view>
-  </modal-sheet>
-
   <!-- 统一确认/说明半屏弹窗 -->
   <modal-sheet
     visible="{{confirmModal.visible}}"

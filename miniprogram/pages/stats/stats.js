@@ -4,6 +4,7 @@
 
 const { find, findOne, insert, getCollection } = require('../../localdb/db.js');
 const { getBigThreeOverview, get1RMHistory } = require('../../services/rm.js');
+const { startPageTour, advancePageTour, skipPageTour } = require('../../utils/tour.js');
 
 Page({
   data: {
@@ -64,7 +65,10 @@ Page({
     loading: true,
 
     // 训练悬浮窗
-    trainingFloat: null
+    trainingFloat: null,
+
+    // 页面实战高亮引导
+    coachTour: { visible: false }
   },
 
   onLoad() {
@@ -82,6 +86,44 @@ Page({
   onShow() {
     this.loadStats();
     this.checkTrainingFloat();
+    const app = getApp();
+    if (app && app.globalData && app.globalData.fullTourStage === 'stats') {
+      if (this._statsTourTimer) clearTimeout(this._statsTourTimer);
+      this._statsTourTimer = setTimeout(() => {
+        const offset = app.globalData.fullTourOffset || 5;
+        const total = app.globalData.fullTourTotal || (offset + 2);
+        startPageTour(this, [
+          {
+            selector: '.calendar-card',
+            title: '训练日历一目了然',
+            desc: '绿色标记打卡日期，点击任意一天即可查看当天的训练摘要。',
+            radius: 18
+          },
+          {
+            selector: '.history-entry',
+            title: '训练历史与当天补练',
+            desc: '点这里查看全部历史记录，当天完成的训练点进详情还支持继续补练或追加动作。',
+            radius: 20
+          }
+        ], {
+          startOffset: offset,
+          totalCount: total,
+          lastNextText: '完成引导',
+          onFinish: () => {
+            app.globalData.fullTourStage = null;
+            wx.showToast({ title: '引导完成，祝训练顺利', icon: 'none' });
+          }
+        });
+      }, 360);
+    }
+  },
+
+  onCoachTourNext() {
+    advancePageTour(this);
+  },
+
+  onCoachTourSkip() {
+    skipPageTour(this);
   },
 
   /**

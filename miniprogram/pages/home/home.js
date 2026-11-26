@@ -5,6 +5,7 @@
 const { getCollection, findOne, find, insert, update, getDatabase } = require('../../localdb/db.js');
 const { calculateAndSave1RM, checkMilestone } = require('../../services/rm.js');
 const { calculateProgression } = require('../../services/progression.js');
+const { startPageTour, advancePageTour, skipPageTour } = require('../../utils/tour.js');
 
 Page({
   data: {
@@ -68,7 +69,10 @@ Page({
 
     // 首页动作要领抽屉
     showExerciseGuide: false,
-    guideExercise: null
+    guideExercise: null,
+
+    // 页面实战高亮引导
+    coachTour: { visible: false }
   },
 
   // 空操作函数（用于阻止事件冒泡）
@@ -287,6 +291,8 @@ Page({
           activeFreeSummary,
           loading: false,
           showDeloadReminder: false
+        }, () => {
+          this._maybeStartHomeTour();
         });
         return;
       }
@@ -339,6 +345,8 @@ Page({
         activeFreeSummary,
         swiperHeight: this.calcSwiperHeight(currentData, activePlans.length > 1),
         loading: false
+      }, () => {
+        this._maybeStartHomeTour();
       });
 
     } catch (err) {
@@ -1040,6 +1048,91 @@ Page({
     wx.switchTab({
       url: '/pages/plans/plans'
     });
+  },
+
+  _maybeStartHomeTour() {
+    if (this._homeTourTimer) { clearTimeout(this._homeTourTimer); }
+    this._homeTourTimer = setTimeout(() => {
+      const app = getApp();
+      const isFullTour = !!(app && app.globalData && app.globalData.fullTourStage === 'home');
+      const isFirstAuto = !isFullTour
+        && this.data.isLoggedIn
+        && !(app && app.globalData && app.globalData.needsOnboarding)
+        && !this.data.showRecoveryModal
+        && !wx.getStorageSync('home_tour_done');
+      if (!isFullTour && !isFirstAuto) return;
+
+      const steps = this.data.todayPlan
+        ? [
+            {
+              selector: '.week-day-section',
+              title: '课表自由调序',
+              desc: '点击任意一天，可随时调换今天先练哪节课表，本周已练会自动打钩。',
+              radius: 18
+            },
+            {
+              selector: '.exercise-list',
+              title: '动作动图与要领',
+              desc: '点击任意动作，随时查看高清动图示范与发力避坑要点。',
+              radius: 16
+            },
+            {
+              selector: '.header-free-pill',
+              title: '随时自由训练',
+              desc: '不按固定计划时，点这里进馆随选动作边练边记。',
+              radius: 20
+            }
+          ]
+        : [
+            {
+              selector: '.empty-hero-card',
+              title: '制定你的训练计划',
+              desc: '可挑选经典计划、自建课表，或点底部「智能推荐」10 秒匹配。',
+              radius: 20
+            },
+            {
+              selector: '.empty-free-card',
+              title: '自由训练模式',
+              desc: '不按固定课表时，随时点这里边练边记。',
+              radius: 18
+            }
+          ];
+
+      if (isFullTour) {
+        const total = steps.length + 4;
+        startPageTour(this, steps, {
+          startOffset: 0,
+          totalCount: total,
+          lastNextText: '下一站：动作库 ›',
+          onFinish: () => {
+            wx.setStorageSync('home_tour_done', true);
+            app.globalData.fullTourStage = 'plans';
+            app.globalData.fullTourOffset = steps.length;
+            app.globalData.fullTourTotal = total;
+            wx.switchTab({ url: '/pages/plans/plans' });
+          },
+          onSkip: () => {
+            wx.setStorageSync('home_tour_done', true);
+          }
+        });
+      } else {
+        startPageTour(this, steps, {
+          startOffset: 0,
+          totalCount: steps.length,
+          lastNextText: '知道了',
+          onFinish: () => { wx.setStorageSync('home_tour_done', true); },
+          onSkip: () => { wx.setStorageSync('home_tour_done', true); }
+        });
+      }
+    }, 320);
+  },
+
+  onCoachTourNext() {
+    advancePageTour(this);
+  },
+
+  onCoachTourSkip() {
+    skipPageTour(this);
   },
 
   /**

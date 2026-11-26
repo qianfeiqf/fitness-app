@@ -263,7 +263,7 @@ Page({
     const isFreeWorkout = !!session.is_free_workout;
     const existingSets = session.completed_sets || [];
     const startIdx = session.current_exercise_index || 0;
-    const freeAllDone = isFreeWorkout && exercises.length > 0 && startIdx >= exercises.length;
+    const freeAllDone = exercises.length > 0 && startIdx >= exercises.length;
 
     // 分段累计时长初始化：恢复/补练时沿用原累计时长，不把离开间隔算进去
     this.baseDurationSeconds = Number(session.accumulated_duration_seconds || session.total_duration_seconds || 0);
@@ -359,11 +359,7 @@ Page({
     const exercise = exercises[currentExerciseIndex];
 
     if (!exercise) {
-      if (isFreeWorkout) {
-        this.setData({ freeAllDone: exercises.length > 0, currentExercise: null, formalSets: [] });
-        return;
-      }
-      this.onTrainingComplete();
+      this.setData({ freeAllDone: exercises.length > 0, currentExercise: null, formalSets: [] });
       return;
     }
 
@@ -944,17 +940,12 @@ Page({
         completedExerciseCount: completedCount,
         overallProgressAngle: totalAngle,
         exerciseStatusList: statusList,
-        freeAllDone: this.data.isFreeWorkout ? true : false,
-        currentExercise: this.data.isFreeWorkout ? null : this.data.currentExercise
+        freeAllDone: true,
+        currentExercise: null
       });
       this.saveSnapshot();
       this.checkAndSave1RM(setRecord);
       UI.vibrateSuccess();
-      if (!this.data.isFreeWorkout) {
-        setTimeout(() => {
-          this.onTrainingComplete();
-        }, 260);
-      }
       return;
     }
 
@@ -971,7 +962,7 @@ Page({
       const w = nextRow ? nextRow.weight : (nextEx.target_weight || 0);
       const r = nextRow ? nextRow.reps : (nextEx.target_reps || 10);
       const totalS = nextExSets ? nextExSets.length : (nextEx.target_sets || 1);
-      nextSetPreview = `${nextEx.exercise_name || nextEx.name} 第 ${Math.min(newSetIndex + 1, totalS)}/${totalS} 组 · ${w}kg × ${r}次`;
+      nextSetPreview = `${nextEx.exercise_name || nextEx.name} 第${Math.min(newSetIndex + 1, totalS)}/${totalS}组 · ${w}kg×${r}`;
     }
 
     this.setData({
@@ -1328,14 +1319,10 @@ Page({
       this.setData({
         isResting: false,
         restTimeLeft: 0,
-        restMinimized: false
+        restMinimized: false,
+        freeAllDone: true,
+        currentExercise: null
       });
-      if (this.data.isFreeWorkout) {
-        // 自由训练做完当前列表不强制结束，让用户选继续加动作/加组或完成训练
-        this.setData({ freeAllDone: true, currentExercise: null });
-      } else {
-        this.onTrainingComplete();
-      }
     } else {
       this._restoreFromRest();
     }

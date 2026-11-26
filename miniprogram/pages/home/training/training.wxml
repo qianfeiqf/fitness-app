@@ -82,20 +82,20 @@
     </view>
   </view>
 
-  <!-- 自由训练：当前列表全部完成后的流转引导 -->
-  <view wx:elif="{{isFreeWorkout && freeAllDone}}" class="free-empty-state">
-    <icon type="success" size="48" color="#07C160" />
-    <text class="free-empty-title">已完成 {{completedSets.length}} 组训练</text>
-    <view class="free-done-actions">
-      <view class="btn btn-finish btn-md btn-block" bindtap="onFinishTraining">
-        <text>完成本次训练并保存</text>
-      </view>
-      <view class="btn btn-secondary btn-md btn-block" bindtap="onAddExercise">
-        <text>+ 继续添加下一个动作</text>
-      </view>
-      <view class="btn btn-secondary btn-md btn-block" bindtap="onAddExtraSet">
-        <text>+ 上个动作再加一组</text>
-      </view>
+  <!-- 全部组数完成后的极简过渡态（固定计划与自由训练统一） -->
+  <view wx:elif="{{freeAllDone}}" class="done-stage-state">
+    <view class="done-stage-icon">
+      <icon type="success" size="52" color="#07C160" />
+    </view>
+    <text class="done-stage-title">已完成 {{completedSets.length}} 组</text>
+    <text class="done-stage-meta">{{exercises.length}} 个动作 · 用时 {{wxs.formatTime(trainingDuration)}}</text>
+    <view class="done-stage-primary" bindtap="onFinishTraining">
+      <text>完成并保存</text>
+    </view>
+    <view class="done-stage-links">
+      <text class="done-stage-link" bindtap="onAddExercise">+ 添加动作</text>
+      <text class="done-stage-sep">|</text>
+      <text class="done-stage-link" bindtap="onAddExtraSet">+ 再加一组</text>
     </view>
   </view>
 
@@ -111,7 +111,7 @@
         </view>
       </view>
       <view class="exercise-remove-btn" bindtap="onRemoveCurrentExercise">
-        <mp-icon icon="delete" color="#888888" size="{{15}}" />
+        <view class="exercise-remove-icon"></view>
         <text class="exercise-remove-text">移除</text>
       </view>
     </view>
@@ -624,15 +624,15 @@
     </view>
 
     <view wx:if="{{nextSetPreview}}" class="rest-overlay-body">
-      <text class="rest-next-preview">下一组：{{nextSetPreview}}</text>
+      <text class="rest-next-preview">下一组 · {{nextSetPreview}}</text>
     </view>
     <view class="rest-overlay-actions">
       <view class="rest-overlay-btn" bindtap="onReduceRestTime">-30s</view>
-      <view class="rest-overlay-btn primary" bindtap="onReadyToGo">我准备好了</view>
+      <view class="rest-overlay-btn primary" bindtap="onReadyToGo">跳过休息</view>
       <view class="rest-overlay-btn" bindtap="onAddRestTime">+30s</view>
     </view>
     <view wx:if="{{completedSets.length > 0}}" class="rest-undo-link" bindtap="onUndoLastSet">
-      <text>手滑点错了？撤回上一组</text>
+      <text>撤回上一组</text>
     </view>
   </view>
 </view>

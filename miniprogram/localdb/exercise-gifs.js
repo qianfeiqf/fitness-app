@@ -204,5 +204,6 @@ module.exports = {
   "ex_215": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_215.gif",
   "ex_216": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_216.gif",
   "ex_217": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_217.gif",
-  "ex_218": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_218.gif"
+  "ex_218": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_218.gif",
+  "ex_219": "cloud://cloud1-1g20tdh446a011c5.636c-cloud1-1g20tdh446a011c5-1422019515/exercise-gifs/ex_071.gif"
 };

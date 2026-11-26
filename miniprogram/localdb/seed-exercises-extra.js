@@ -9,7 +9,7 @@ const EXTRA_EXERCISES = [
     id: 'ex_107',
     name: '悍马机坐姿推胸',
     name_en: 'Hammer Strength Chest Press',
-    aliases: '悍马机平板卧推 悍马卧推 挂片推胸 坐姿推胸机 ISO-Lateral Chest Press',
+    aliases: '悍马坐姿推胸 悍马推胸 挂片推胸 坐姿推胸机 ISO-Lateral Chest Press',
     muscle_group: '胸部',
     sub_muscle: '中胸',
     equipment: '挂片器械',
@@ -17,7 +17,21 @@ const EXTRA_EXERCISES = [
     description: '调节座椅使握把正对胸中部，背部紧贴靠垫、沉肩挺胸。双手（可双侧同时或单臂交替）沿向内汇聚的弧形轨迹向前推出，顶峰挤压胸肌1秒后慢放。',
     tips: '挂片式悍马机左右独立发力，能有效纠正左右胸发力不均；全程肩胛骨压紧靠背不前伸。',
     is_system: true,
-    alternatives: ['ex_001', 'ex_003', 'ex_108']
+    alternatives: ['ex_219', 'ex_001', 'ex_003', 'ex_108']
+  },
+  {
+    id: 'ex_219',
+    name: '悍马机平板卧推',
+    name_en: 'Hammer Strength Horizontal Bench Press',
+    aliases: '仰卧悍马卧推 挂片平板卧推 仰卧挂片推胸 平躺悍马推胸 ISO-Lateral Horizontal Bench Press',
+    muscle_group: '胸部',
+    sub_muscle: '中胸',
+    equipment: '挂片器械',
+    target_muscles: '胸大肌中束 · 三角肌前束、肱三头肌',
+    description: '平躺于仰卧挂片卧推凳，双脚踩实地面、肩胛骨后缩下沉贴紧靠垫并微起胸桥。双手握住左右独立握把，吸气控制下放至胸肌充分拉伸，呼气沿微汇聚弧线垂直向上推起，顶峰挤压胸肌1秒。',
+    tips: '平躺挂片式左右独立发力，既保留传统平板卧推的发力感又更安全，冲大重量或做递减组无需保护者。',
+    is_system: true,
+    alternatives: ['ex_001', 'ex_071', 'ex_107']
   },
   {
     id: 'ex_108',

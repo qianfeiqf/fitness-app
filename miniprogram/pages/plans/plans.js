@@ -258,14 +258,14 @@ Page({
   },
 
   onShowAddCustomModal() {
-    const defaultMuscle = this.data.selectedExerciseMuscle !== '全部' ? this.data.selectedExerciseMuscle : '胸部';
-    const idx = Math.max(0, this.data.customMuscleGroups.indexOf(defaultMuscle));
+    const preselected = this.data.customMuscleGroups.includes(this.data.selectedExerciseMuscle)
+      ? this.data.selectedExerciseMuscle
+      : '';
     this.setData({
       showAddCustomModal: true,
       customExercise: {
         name: '',
-        muscle_group: this.data.customMuscleGroups[idx],
-        muscleGroupIndex: idx,
+        muscle_group: preselected,
         equipment: ''
       }
     });
@@ -284,10 +284,9 @@ Page({
   },
 
   onSelectCustomMuscle(e) {
-    const index = parseInt(e.detail.value, 10) || 0;
+    const muscle = e.currentTarget.dataset.muscle || '';
     this.setData({
-      'customExercise.muscle_group': this.data.customMuscleGroups[index],
-      'customExercise.muscleGroupIndex': index
+      'customExercise.muscle_group': muscle
     });
   },
 
@@ -298,16 +297,31 @@ Page({
       wx.showToast({ title: '请输入动作名称', icon: 'none' });
       return;
     }
+    if (!muscle_group) {
+      wx.showToast({ title: '请选择所属肌群', icon: 'none' });
+      return;
+    }
+    const existing = (this.data.allExercises || []).find(
+      ex => ex && ex.name && ex.name.trim().toLowerCase() === trimmedName.toLowerCase()
+    );
+    if (existing) {
+      wx.showToast({ title: '动作库中已有同名动作', icon: 'none' });
+      return;
+    }
     const exercise = {
       id: 'cust_' + Date.now(),
       name: trimmedName,
-      muscle_group: muscle_group || '胸部',
+      muscle_group,
       equipment: (equipment || '').trim(),
       is_system: false,
       alternatives: [],
       created_at: Date.now()
     };
     insert('exercises', exercise);
+    const app = getApp();
+    if (app && typeof app.startSync === 'function') {
+      app.startSync();
+    }
     this.setData({ showAddCustomModal: false });
     this.loadExercises();
     wx.showToast({ title: '自定义动作已添加', icon: 'success' });

@@ -90,34 +90,38 @@
   <!-- 添加自定义动作弹窗 -->
   <modal-sheet
     visible="{{showAddCustom}}"
-    title="添加自定义动作"
-    confirmText="添加"
+    title="新建自定义动作"
+    description="保存后将加入动作库，下次可直接选用"
+    confirmText="保存"
     cancelText="取消"
+    confirmDisabled="{{!customExercise.name || !customExercise.muscle_group}}"
     bind:confirm="onConfirmAddCustom"
     bind:cancel="onCloseAddCustom"
     bind:close="onCloseAddCustom"
   >
     <view class="form-item">
       <text class="form-label">动作名称</text>
-      <input class="form-input" placeholder="输入动作名称"
+      <input class="form-input" placeholder="例如：绳索面拉 / 壶铃摇摆"
              value="{{customExercise.name}}" bindinput="onInputCustomName" />
     </view>
 
     <view class="form-item">
-      <text class="form-label">英文名称（可选）</text>
-      <input class="form-input" placeholder="输入英文名称"
-             value="{{customExercise.name_en}}" bindinput="onInputCustomNameEn" />
+      <text class="form-label">所属肌群（必选）</text>
+      <view class="custom-muscle-grid">
+        <view
+          wx:for="{{muscleGroups}}"
+          wx:key="*this"
+          class="custom-muscle-pill {{customExercise.muscle_group === item ? 'active' : ''}}"
+          data-muscle="{{item}}"
+          bindtap="onSelectMuscleGroup"
+        >{{item}}</view>
+      </view>
     </view>
 
     <view class="form-item">
-      <text class="form-label">肌群</text>
-      <picker class="form-picker" mode="selector" range="{{muscleGroups}}"
-              value="{{customExercise.muscleGroupIndex}}"
-              bindchange="onSelectMuscleGroup">
-        <view class="picker-value">
-          {{customExercise.muscle_group || '选择肌群'}}
-        </view>
-      </picker>
+      <text class="form-label">常用器械（可选）</text>
+      <input class="form-input" placeholder="例如：哑铃、龙门架、固定器械"
+             value="{{customExercise.equipment}}" bindinput="onInputCustomEquipment" />
     </view>
   </modal-sheet>
 

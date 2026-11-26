@@ -37,9 +37,8 @@ Page({
     selectedMap: {},
     customExercise: {
       name: '',
-      name_en: '',
       muscle_group: '',
-      muscleGroupIndex: 0
+      equipment: ''
     }
   },
 
@@ -221,13 +220,15 @@ Page({
    * 显示添加自定义动作弹窗
    */
   onShowAddCustom() {
+    const preselected = this.data.muscleGroups.includes(this.data.selectedGroup)
+      ? this.data.selectedGroup
+      : '';
     this.setData({
       showAddCustom: true,
       customExercise: {
         name: '',
-        name_en: '',
-        muscle_group: '',
-        muscleGroupIndex: 0
+        muscle_group: preselected,
+        equipment: ''
       }
     });
   },
@@ -249,58 +250,69 @@ Page({
   },
 
   /**
-   * 输入自定义动作英文名
+   * 输入常用器械（可选）
    */
-  onInputCustomNameEn(e) {
+  onInputCustomEquipment(e) {
     this.setData({
-      'customExercise.name_en': e.detail.value
+      'customExercise.equipment': e.detail.value
     });
   },
 
   /**
-   * 选择肌群
+   * 选择肌群胶囊
    */
   onSelectMuscleGroup(e) {
-    const index = parseInt(e.detail.value);
-    const muscleGroups = this.data.muscleGroups;
+    const muscle = e.currentTarget.dataset.muscle || '';
     this.setData({
-      'customExercise.muscle_group': muscleGroups[index],
-      'customExercise.muscleGroupIndex': index
+      'customExercise.muscle_group': muscle
     });
   },
 
   /**
-   * 确认添加自定义动作
+   * 确认添加自定义动作（同名去重 + 静默云同步）
    */
   onConfirmAddCustom() {
-    const { name, name_en, muscle_group } = this.data.customExercise;
+    const { name, muscle_group, equipment } = this.data.customExercise;
+    const trimmedName = (name || '').trim();
 
-    if (!name.trim()) {
+    if (!trimmedName) {
       wx.showToast({ title: '请输入动作名称', icon: 'none' });
       return;
     }
 
     if (!muscle_group) {
-      wx.showToast({ title: '请选择肌群', icon: 'none' });
+      wx.showToast({ title: '请选择所属肌群', icon: 'none' });
+      return;
+    }
+
+    const existing = (this.data.allExercises || []).find(
+      ex => ex && ex.name && ex.name.trim().toLowerCase() === trimmedName.toLowerCase()
+    );
+    if (existing) {
+      wx.showToast({ title: '动作库中已有同名动作', icon: 'none' });
       return;
     }
 
     const exercise = {
       id: 'cust_' + Date.now(),
-      name: name.trim(),
-      name_en: name_en ? name_en.trim() : '',
-      muscle_group: muscle_group,
+      name: trimmedName,
+      muscle_group,
+      equipment: (equipment || '').trim(),
       is_system: false,
       alternatives: [],
       created_at: Date.now()
     };
 
     insert('exercises', exercise);
+    const app = getApp();
+    if (app && typeof app.startSync === 'function') {
+      app.startSync();
+    }
 
     this.setData({ showAddCustom: false });
     this.loadExercises();
 
-    wx.showToast({ title: '动作已添加', icon: 'success' });
+    wx.showToast({ title: '自定义动作已添加', icon: 'success' });
   },
 
   onTogglePreviewGif(e) {

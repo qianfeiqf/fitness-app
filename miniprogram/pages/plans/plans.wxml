@@ -252,9 +252,11 @@
   <!-- 新建自定义动作弹窗 -->
   <modal-sheet
     visible="{{showAddCustomModal}}"
-    title="添加自定义动作"
+    title="新建自定义动作"
+    description="保存后将加入动作库，下次可直接选用"
     confirmText="保存"
     cancelText="取消"
+    confirmDisabled="{{!customExercise.name || !customExercise.muscle_group}}"
     bind:confirm="onConfirmAddCustom"
     bind:cancel="onCloseAddCustomModal"
     bind:close="onCloseAddCustomModal"
@@ -264,17 +266,20 @@
       <input class="input" placeholder="例如：绳索面拉 / 壶铃摇摆" value="{{customExercise.name}}" bindinput="onInputCustomName" />
     </view>
     <view class="input-wrapper">
-      <text class="input-label">所属肌群</text>
-      <picker mode="selector" range="{{customMuscleGroups}}" value="{{customExercise.muscleGroupIndex}}" bindchange="onSelectCustomMuscle">
-        <view class="custom-picker-box">
-          <text>{{customExercise.muscle_group}}</text>
-          <text class="arrow-icon">›</text>
-        </view>
-      </picker>
+      <text class="input-label">所属肌群（必选）</text>
+      <view class="custom-muscle-grid">
+        <view
+          wx:for="{{customMuscleGroups}}"
+          wx:key="*this"
+          class="custom-muscle-pill {{customExercise.muscle_group === item ? 'active' : ''}}"
+          data-muscle="{{item}}"
+          bindtap="onSelectCustomMuscle"
+        >{{item}}</view>
+      </view>
     </view>
     <view class="input-wrapper">
       <text class="input-label">常用器械（可选）</text>
-      <input class="input" placeholder="例如：哑铃、龙门架、徒手" value="{{customExercise.equipment}}" bindinput="onInputCustomEquipment" />
+      <input class="input" placeholder="例如：哑铃、龙门架、固定器械" value="{{customExercise.equipment}}" bindinput="onInputCustomEquipment" />
     </view>
   </modal-sheet>
 

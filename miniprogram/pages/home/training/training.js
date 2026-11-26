@@ -59,6 +59,8 @@ Page({
     // 休息计时器状态
     restCompleting: false,
     restMinimized: false,
+    restFloatTop: null,
+    restFloatDragging: false,
 
     // 热身组
     showWarmup: false,
@@ -126,6 +128,7 @@ Page({
 
   onLoad(options) {
     this.calcNavBarHeight();
+    this._initRestFloatBounds();
     console.log('=== 训练中页面加载 ===', options);
 
     if (options.sessionId) {
@@ -1405,10 +1408,57 @@ Page({
     this._syncGlobalRestState({ restMinimized: true });
   },
 
+  _initRestFloatBounds() {
+    const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const winH = info.windowHeight || 667;
+    const statusH = info.statusBarHeight || 20;
+    this._restMinTop = statusH + 56;
+    this._restMaxTop = Math.max(this._restMinTop + 80, winH - 130);
+    this._restDefaultTop = Math.max(this._restMinTop, winH - 150);
+    const app = getApp();
+    const saved = app && app.globalData ? app.globalData.restFloatTop : null;
+    if (typeof saved === 'number' && !Number.isNaN(saved)) {
+      const clamped = Math.min(this._restMaxTop, Math.max(this._restMinTop, saved));
+      this.setData({ restFloatTop: clamped });
+    }
+  },
+
+  onRestFloatTouchStart(e) {
+    if (!e.touches || !e.touches.length) return;
+    if (this._restMinTop === undefined) this._initRestFloatBounds();
+    this._restTouchStartY = e.touches[0].clientY;
+    this._restStartTop = this.data.restFloatTop !== null ? this.data.restFloatTop : this._restDefaultTop;
+    this._restMoved = false;
+  },
+
+  onRestFloatTouchMove(e) {
+    if (!e.touches || !e.touches.length || this._restTouchStartY === undefined) return;
+    const deltaY = e.touches[0].clientY - this._restTouchStartY;
+    if (!this._restMoved && Math.abs(deltaY) < 8) return;
+    this._restMoved = true;
+    const nextTop = Math.min(this._restMaxTop, Math.max(this._restMinTop, Math.round(this._restStartTop + deltaY)));
+    this.setData({ restFloatTop: nextTop, restFloatDragging: true });
+  },
+
+  onRestFloatTouchEnd() {
+    if (this._restMoved) {
+      this._restFloatJustDragged = true;
+      const app = getApp();
+      if (app && app.globalData) {
+        app.globalData.restFloatTop = this.data.restFloatTop;
+      }
+      this.setData({ restFloatDragging: false });
+      setTimeout(() => { this._restFloatJustDragged = false; }, 120);
+    }
+    this._restTouchStartY = undefined;
+    this._restMoved = false;
+  },
+
   /**
    * 展开悬浮倒计时为休息弹窗
    */
   onExpandRest() {
+    if (this._restFloatJustDragged) return;
     this.setData({ restMinimized: false });
     this._syncGlobalRestState({ restMinimized: false });
   },

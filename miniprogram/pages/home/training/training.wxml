@@ -695,9 +695,18 @@
   </view>
 </view>
 
-<!-- 休息悬浮倒计时（点击弹窗外区域后显示） -->
-<view hidden="{{!isResting || !restMinimized}}" class="rest-float" bindtap="onExpandRest">
+<!-- 休息悬浮倒计时（点击弹窗外区域后显示，支持自由上下拖动） -->
+<view
+  hidden="{{!isResting || !restMinimized}}"
+  class="rest-float {{restFloatDragging ? 'dragging' : ''}}"
+  style="{{restFloatTop !== null ? ('top: ' + restFloatTop + 'px; bottom: auto;') : ''}}"
+  bindtap="onExpandRest"
+  bindtouchstart="onRestFloatTouchStart"
+  catchtouchmove="onRestFloatTouchMove"
+  bindtouchend="onRestFloatTouchEnd"
+>
   <view class="rest-float-content">
+    <view class="rest-float-grip"></view>
     <mp-icon icon="time" color="#FFFFFF" size="{{18}}" />
     <text class="rest-float-time">{{wxs.formatTime(restTimeLeft)}}</text>
     <text class="rest-float-label">组间休息</text>

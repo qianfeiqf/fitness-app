@@ -425,58 +425,96 @@
     </view>
   </modal-sheet>
 
-  <!-- 添加动作弹窗（85vh 大抽屉：支持按肌群筛选、多选批量添加与自定义动作） -->
+  <!-- 添加动作弹窗（85vh 大抽屉：支持按肌群筛选、多选批量添加与自定义动作入库） -->
   <modal-sheet
     visible="{{showAddExerciseModal}}"
-    tall="{{true}}"
-    title="添加训练动作"
-    description="支持多选或自定义"
-    confirmText="{{selectedAddIds.length > 0 ? '添加已选 (' + selectedAddIds.length + ')' : '确定添加'}}"
-    confirmDisabled="{{selectedAddIds.length === 0 && !canAddCustomExercise}}"
-    cancelText="取消"
-    bind:confirm="onConfirmAddExercises"
-    bind:cancel="onCancelAddExercise"
+    tall="{{!customAddMode}}"
+    title="{{customAddMode ? '新建自定义动作' : '添加训练动作'}}"
+    description="{{customAddMode ? '选择所属肌群后将自动存入动作库，下次可直接选用' : '支持多选或自定义'}}"
+    confirmText="{{customAddMode ? '保存并添加' : (selectedAddIds.length > 0 ? '添加已选 (' + selectedAddIds.length + ')' : '确定添加')}}"
+    confirmDisabled="{{customAddMode ? (!customAddName || !customAddMuscle) : (selectedAddIds.length === 0 && !canAddCustomExercise)}}"
+    cancelText="{{customAddMode ? '返回' : '取消'}}"
+    bind:confirm="{{customAddMode ? 'onConfirmCustomAdd' : 'onConfirmAddExercises'}}"
+    bind:cancel="{{customAddMode ? 'onBackFromCustomAdd' : 'onCancelAddExercise'}}"
     bind:close="onCancelAddExercise"
   >
-    <view class="add-exercise-search">
-      <input
-        class="add-search-input"
-        type="text"
-        placeholder="搜索动作库，或输入自定义动作名..."
-        value="{{addExerciseSearch}}"
-        bindinput="onAddExerciseSearch"
-      />
-    </view>
-    <scroll-view scroll-x class="add-muscle-scroll" show-scrollbar="{{false}}">
-      <view class="add-muscle-list">
-        <view
-          wx:for="{{addMuscleGroups}}"
-          wx:key="*this"
-          class="add-muscle-chip {{selectedAddMuscle === item ? 'active' : ''}}"
-          bindtap="onSelectAddMuscle"
-          data-muscle="{{item}}"
-        >{{item}}</view>
+    <!-- 自定义动作：填写名称并选择所属肌群 -->
+    <view wx:if="{{customAddMode}}" class="custom-add-form">
+      <view class="custom-form-group">
+        <text class="custom-form-label">动作名称</text>
+        <input
+          class="add-search-input"
+          type="text"
+          placeholder="请输入动作名称"
+          value="{{customAddName}}"
+          bindinput="onCustomAddNameInput"
+        />
       </view>
-    </scroll-view>
-    <scroll-view wx:if="{{addSubMuscles.length > 0}}" scroll-x class="add-muscle-scroll add-sub-scroll" show-scrollbar="{{false}}">
-      <view class="add-muscle-list">
-        <view
-          wx:for="{{addSubMuscles}}"
-          wx:key="*this"
-          class="add-muscle-chip sub-chip {{selectedAddSubMuscle === item ? 'active' : ''}}"
-          bindtap="onSelectAddSubMuscle"
-          data-sub="{{item}}"
-        >{{item}}</view>
-      </view>
-    </scroll-view>
-    <scroll-view scroll-y class="add-exercise-list">
-      <view wx:if="{{canAddCustomExercise}}" class="alternative-item custom-add-row" bindtap="onAddCustomExercise">
-        <view class="alt-info">
-          <text class="alt-name">+ 添加自定义动作「{{addExerciseSearch}}」</text>
-          <text class="alt-muscle">直接加入本次训练</text>
+      <view class="custom-form-group">
+        <text class="custom-form-label">所属肌群（必选）</text>
+        <view class="custom-muscle-grid">
+          <view
+            wx:for="{{customMuscleOptions}}"
+            wx:key="*this"
+            class="custom-muscle-pill {{customAddMuscle === item ? 'active' : ''}}"
+            data-muscle="{{item}}"
+            bindtap="onSelectCustomAddMuscle"
+          >{{item}}</view>
         </view>
-        <text class="alt-arrow">+</text>
       </view>
+      <view class="custom-form-group">
+        <text class="custom-form-label">常用器械（可选）</text>
+        <input
+          class="add-search-input"
+          type="text"
+          placeholder="例如：哑铃、龙门架、固定器械"
+          value="{{customAddEquipment}}"
+          bindinput="onCustomAddEquipmentInput"
+        />
+      </view>
+    </view>
+
+    <!-- 动作库搜索与多选视图 -->
+    <block wx:else>
+      <view class="add-exercise-search">
+        <input
+          class="add-search-input"
+          type="text"
+          placeholder="搜索动作库，或输入自定义动作名..."
+          value="{{addExerciseSearch}}"
+          bindinput="onAddExerciseSearch"
+        />
+      </view>
+      <scroll-view scroll-x class="add-muscle-scroll" show-scrollbar="{{false}}">
+        <view class="add-muscle-list">
+          <view
+            wx:for="{{addMuscleGroups}}"
+            wx:key="*this"
+            class="add-muscle-chip {{selectedAddMuscle === item ? 'active' : ''}}"
+            bindtap="onSelectAddMuscle"
+            data-muscle="{{item}}"
+          >{{item}}</view>
+        </view>
+      </scroll-view>
+      <scroll-view wx:if="{{addSubMuscles.length > 0}}" scroll-x class="add-muscle-scroll add-sub-scroll" show-scrollbar="{{false}}">
+        <view class="add-muscle-list">
+          <view
+            wx:for="{{addSubMuscles}}"
+            wx:key="*this"
+            class="add-muscle-chip sub-chip {{selectedAddSubMuscle === item ? 'active' : ''}}"
+            bindtap="onSelectAddSubMuscle"
+            data-sub="{{item}}"
+          >{{item}}</view>
+        </view>
+      </scroll-view>
+      <scroll-view scroll-y class="add-exercise-list">
+        <view wx:if="{{canAddCustomExercise}}" class="alternative-item custom-add-row" bindtap="onOpenCustomAddStep">
+          <view class="alt-info">
+            <text class="alt-name">+ 新建自定义动作「{{addExerciseSearch}}」</text>
+            <text class="alt-muscle">选择肌群后存入动作库并加入训练</text>
+          </view>
+          <text class="alt-arrow">›</text>
+        </view>
       <view
         wx:for="{{filteredExercises}}"
         wx:key="id"
@@ -556,6 +594,7 @@
         </view>
       </view>
     </scroll-view>
+    </block>
   </modal-sheet>
 
   <!-- 动作替换弹窗 -->

@@ -2045,6 +2045,51 @@
   background: #FAFAFA;
 }
 
+.custom-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding: 4rpx 0 8rpx;
+}
+
+.custom-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.custom-form-label {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #555555;
+}
+
+.custom-muscle-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+
+.custom-muscle-pill {
+  height: 64rpx;
+  padding: 0 28rpx;
+  border-radius: 9999rpx;
+  background: #F4F5F7;
+  color: #444444;
+  font-size: 26rpx;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.custom-muscle-pill.active {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
 .add-check-circle {
   width: 40rpx;
   height: 40rpx;

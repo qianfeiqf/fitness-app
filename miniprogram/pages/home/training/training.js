@@ -70,10 +70,11 @@ Page({
     skipReasons: ['身体不适/疼痛', '器械被占用', '时间不够', '其他原因'],
     selectedSkipReason: -1,
 
-    // 添加动作（支持肌群筛选 + 多选批量添加 + 自定义动作）
+    // 添加动作（支持肌群筛选 + 多选批量添加 + 自定义动作入库）
     showAddExerciseModal: false,
     addExerciseSearch: '',
     addMuscleGroups: ['全部', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
+    customMuscleOptions: ['胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
     selectedAddMuscle: '全部',
     addSubMuscles: [],
     selectedAddSubMuscle: '全部',
@@ -82,6 +83,10 @@ Page({
     selectedAddMap: {},
     selectedAddConfigs: {},
     canAddCustomExercise: false,
+    customAddMode: false,
+    customAddName: '',
+    customAddMuscle: '',
+    customAddEquipment: '',
 
     // 自由训练模式
     isFreeWorkout: false,
@@ -1236,7 +1241,8 @@ Page({
       setRecord.actual_weight,
       setRecord.actual_reps,
       setRecord.rpe,
-      setRecord.session_id
+      setRecord.session_id,
+      setRecord.exercise_name
     );
 
     if (result.isNewPR) {
@@ -1737,6 +1743,10 @@ Page({
       selectedAddMap: {},
       selectedAddConfigs: {},
       canAddCustomExercise: false,
+      customAddMode: false,
+      customAddName: '',
+      customAddMuscle: '',
+      customAddEquipment: '',
       filteredExercises: allExercises
     });
   },
@@ -1853,18 +1863,75 @@ Page({
   },
 
   /**
-   * 直接添加自定义动作名称
+   * 进入自定义动作的「选择所属肌群」步骤
    */
-  onAddCustomExercise() {
+  onOpenCustomAddStep() {
     const customName = (this.data.addExerciseSearch || '').trim();
     if (!customName) return;
-    const customExercise = {
-      id: 'custom_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-      name: customName,
-      muscle_group: this.data.selectedAddMuscle === '全部' ? '自由训练' : this.data.selectedAddMuscle,
-      is_custom: true
-    };
-    this._appendExercisesToSession([customExercise]);
+    const preselectedMuscle = this.data.selectedAddMuscle !== '全部' ? this.data.selectedAddMuscle : '';
+    this.setData({
+      customAddMode: true,
+      customAddName: customName,
+      customAddMuscle: preselectedMuscle,
+      customAddEquipment: ''
+    });
+  },
+
+  onBackFromCustomAdd() {
+    this.setData({ customAddMode: false });
+  },
+
+  onCustomAddNameInput(e) {
+    this.setData({ customAddName: e.detail.value || '' });
+  },
+
+  onSelectCustomAddMuscle(e) {
+    const muscle = e.currentTarget.dataset.muscle || '';
+    this.setData({ customAddMuscle: muscle });
+  },
+
+  onCustomAddEquipmentInput(e) {
+    this.setData({ customAddEquipment: e.detail.value || '' });
+  },
+
+  /**
+   * 保存自定义动作到动作库（带同名去重）并加入本次训练
+   */
+  onConfirmCustomAdd() {
+    const name = (this.data.customAddName || '').trim();
+    const muscleGroup = this.data.customAddMuscle;
+    const equipment = (this.data.customAddEquipment || '').trim();
+    if (!name) {
+      wx.showToast({ title: '请输入动作名称', icon: 'none' });
+      return;
+    }
+    if (!muscleGroup) {
+      wx.showToast({ title: '请选择所属肌群', icon: 'none' });
+      return;
+    }
+
+    const allExercises = getCollection('exercises') || [];
+    const existing = allExercises.find(ex => ex && ex.name && ex.name.trim().toLowerCase() === name.toLowerCase());
+    let targetExercise = existing;
+    if (!targetExercise) {
+      targetExercise = {
+        id: 'cust_' + Date.now(),
+        name,
+        muscle_group: muscleGroup,
+        equipment,
+        is_system: false,
+        alternatives: [],
+        created_at: Date.now()
+      };
+      insert('exercises', targetExercise);
+      const app = getApp();
+      if (app && typeof app.startSync === 'function') {
+        app.startSync();
+      }
+    }
+
+    this.setData({ customAddMode: false });
+    this._appendExercisesToSession([targetExercise]);
   },
 
   /**
@@ -1874,7 +1941,7 @@ Page({
     const { selectedAddIds } = this.data;
     if (!selectedAddIds || selectedAddIds.length === 0) {
       if (this.data.canAddCustomExercise) {
-        this.onAddCustomExercise();
+        this.onOpenCustomAddStep();
         return;
       }
       wx.showToast({ title: '请先选择至少一个动作', icon: 'none' });
@@ -2143,6 +2210,10 @@ Page({
   onCancelAddExercise() {
     this.setData({
       showAddExerciseModal: false,
+      customAddMode: false,
+      customAddName: '',
+      customAddMuscle: '',
+      customAddEquipment: '',
       addExerciseSearch: '',
       selectedAddIds: [],
       selectedAddMap: {},

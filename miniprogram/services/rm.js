@@ -57,7 +57,7 @@ function calculate1RM(weight, reps) {
 /**
  * 计算并保存 1RM 历史记录
  */
-async function calculateAndSave1RM(exerciseId, weight, reps, rpe = null, sessionId = null) {
+async function calculateAndSave1RM(exerciseId, weight, reps, rpe = null, sessionId = null, exerciseName = '') {
   const result = calculate1RM(weight, reps);
 
   if (!result.isQualified) {
@@ -73,11 +73,14 @@ async function calculateAndSave1RM(exerciseId, weight, reps, rpe = null, session
   const currentBest = history.length > 0 ? history[0].estimated_1rm : 0;
 
   const isNewPR = result.estimated1RM > currentBest;
+  const exDoc = findOne('exercises', { id: exerciseId });
+  const resolvedName = (exerciseName || '').trim() || (exDoc && exDoc.name) || '';
 
   // 保存历史记录
   const record = {
     id: 'rm_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
     exercise_id: exerciseId,
+    exercise_name: resolvedName,
     estimated_1rm: result.estimated1RM,
     based_weight: weight,
     based_reps: reps,

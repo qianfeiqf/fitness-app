@@ -2,7 +2,7 @@
  * 统计页面
  */
 
-const { find, findOne, getCollection } = require('../../localdb/db.js');
+const { find, findOne, insert, getCollection } = require('../../localdb/db.js');
 const { getBigThreeOverview, get1RMHistory } = require('../../services/rm.js');
 
 Page({
@@ -117,6 +117,7 @@ Page({
    */
   loadStats() {
     this.setData({ loading: true });
+    this._backfillOrphanCustomExercises();
 
     const periodDays = parseInt(this.data.selectedPeriod, 10);
 
@@ -427,6 +428,55 @@ Page({
   },
 
   /**
+   * 自动补回历史遗留的未入库 custom_ 自定义动作，避免 PR 显示原始 ID
+   */
+  _backfillOrphanCustomExercises() {
+    const validGroups = ['胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'];
+    const allSets = getCollection('session_sets') || [];
+    const allSessions = getCollection('sessions') || [];
+    const allRM = getCollection('rm_history') || [];
+    const orphanIds = new Set();
+    allRM.forEach(r => {
+      if (r && r.exercise_id && String(r.exercise_id).startsWith('custom_') && !findOne('exercises', { id: r.exercise_id })) {
+        orphanIds.add(r.exercise_id);
+      }
+    });
+    allSets.forEach(s => {
+      if (s && s.exercise_id && String(s.exercise_id).startsWith('custom_') && !findOne('exercises', { id: s.exercise_id })) {
+        orphanIds.add(s.exercise_id);
+      }
+    });
+    orphanIds.forEach(exId => {
+      const matchedSet = allSets.find(s => s && s.exercise_id === exId && s.exercise_name);
+      let name = matchedSet ? matchedSet.exercise_name : '';
+      let muscleGroup = '';
+      for (let i = 0; i < allSessions.length; i++) {
+        const list = allSessions[i] && allSessions[i].pending_exercises;
+        if (!Array.isArray(list)) continue;
+        const found = list.find(pe => pe && pe.exercise_id === exId);
+        if (found) {
+          if (!name) name = found.exercise_name || found.name || '';
+          if (found.muscle_group && validGroups.includes(found.muscle_group)) {
+            muscleGroup = found.muscle_group;
+          }
+          break;
+        }
+      }
+      if (name) {
+        insert('exercises', {
+          id: exId,
+          name,
+          muscle_group: muscleGroup || '核心',
+          equipment: '',
+          is_system: false,
+          alternatives: [],
+          created_at: Date.now()
+        });
+      }
+    });
+  },
+
+  /**
    * 获取近期PR记录
    */
   getRecentPRs() {
@@ -437,10 +487,17 @@ Page({
 
     return allRecords.map(r => {
       const exercise = findOne('exercises', { id: r.exercise_id });
+      let displayName = (exercise && exercise.name) || r.exercise_name || '';
+      if (!displayName) {
+        const matchedSet = findOne('session_sets', { exercise_id: r.exercise_id });
+        if (matchedSet && matchedSet.exercise_name) {
+          displayName = matchedSet.exercise_name;
+        }
+      }
       const date = new Date(r.recorded_at);
       return {
         date: `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`,
-        exercise: exercise ? exercise.name : r.exercise_id,
+        exercise: displayName || '自定义动作',
         value: r.estimated_1rm.toFixed(1) + 'kg',
         type: '1RM'
       };

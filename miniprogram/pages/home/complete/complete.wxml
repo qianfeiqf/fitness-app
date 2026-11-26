@@ -29,7 +29,7 @@
   <!-- PR展示 -->
   <view wx:if="{{prCount > 0}}" class="pr-section">
     <view class="pr-banner">
-      <mp-icon icon="star" color="#07C160" size="{{20}}" />
+      <mp-icon icon="star" color="#FFFFFF" size="{{20}}" />
       <text class="pr-text">恭喜刷新 {{prCount}} 个个人纪录</text>
     </view>
   </view>
@@ -81,16 +81,16 @@
 
   <!-- 分享按钮 -->
   <view class="share-section">
-    <button class="btn btn-share btn-block" bindtap="onShareCard">
-      <mp-icon icon="share" color="#1A1A1A" size="{{18}}" />
+    <view class="complete-btn btn-share" bindtap="onShareCard">
+      <mp-icon icon="share" color="#FFFFFF" size="{{18}}" />
       <text>生成分享卡片</text>
-    </button>
+    </view>
   </view>
 
   <!-- 操作按钮 -->
   <view class="action-buttons">
-    <button class="btn btn-secondary btn-block" bindtap="onViewStats">查看统计</button>
-    <button class="btn btn-primary btn-block" bindtap="onBackHome">返回首页</button>
+    <view class="complete-btn btn-secondary" bindtap="onViewStats">查看统计</view>
+    <view class="complete-btn btn-primary" bindtap="onBackHome">返回首页</view>
   </view>
 
   <!-- 分享画布 (绝对定位在屏幕外) -->

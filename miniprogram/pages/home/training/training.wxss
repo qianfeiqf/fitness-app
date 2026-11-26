@@ -439,6 +439,52 @@
   color: #FA5151;
 }
 
+/* 统一二次确认抽屉按钮 */
+.confirm-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 8rpx 0 8rpx;
+}
+
+.confirm-sheet-btn {
+  height: 92rpx;
+  border-radius: 9999rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-sheet-btn.danger {
+  background: #FA5151;
+  color: #FFFFFF;
+}
+
+.confirm-sheet-btn.danger:active {
+  opacity: 0.88;
+}
+
+.confirm-sheet-btn.primary {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.confirm-sheet-btn.primary:active {
+  opacity: 0.88;
+}
+
+.confirm-sheet-btn.cancel {
+  background: #F4F5F7;
+  color: #333333;
+  font-weight: 500;
+}
+
+.confirm-sheet-btn.cancel:active {
+  background: #E8EAEE;
+}
+
 /* =====================
    PR徽章 — 黑白
    ===================== */

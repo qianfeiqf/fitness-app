@@ -91,6 +91,12 @@ Page({
     exerciseScrollIntoView: '',
     showExerciseListModal: false,
     showFinishModal: false,
+    showConfirmSheet: false,
+    confirmSheetTitle: '',
+    confirmSheetDesc: '',
+    confirmSheetConfirmText: '确认',
+    confirmSheetCancelText: '取消',
+    confirmSheetDanger: false,
     showExerciseDetail: false,
     detailExercise: null,
     gifLoadError: false,
@@ -218,6 +224,33 @@ Page({
 
   // 空操作函数（用于阻止事件冒泡）
   noop() {},
+
+  /**
+   * 打开统一极简二次确认抽屉（替代微信原生 wx.showModal）
+   */
+  _openConfirmSheet({ title, desc, confirmText = '确认', cancelText = '取消', danger = false, onConfirm }) {
+    this._confirmSheetCallback = onConfirm || null;
+    this.setData({
+      showConfirmSheet: true,
+      confirmSheetTitle: title || '',
+      confirmSheetDesc: desc || '',
+      confirmSheetConfirmText: confirmText,
+      confirmSheetCancelText: cancelText,
+      confirmSheetDanger: !!danger
+    });
+  },
+
+  onCancelConfirmSheet() {
+    this._confirmSheetCallback = null;
+    this.setData({ showConfirmSheet: false });
+  },
+
+  onApproveConfirmSheet() {
+    const cb = this._confirmSheetCallback;
+    this._confirmSheetCallback = null;
+    this.setData({ showConfirmSheet: false });
+    if (typeof cb === 'function') cb();
+  },
 
   calcNavBarHeight() {
     const menuButton = wx.getMenuButtonBoundingClientRect();
@@ -815,14 +848,13 @@ Page({
     };
 
     if (formalSets[idx].completed) {
-      wx.showModal({
+      this._openConfirmSheet({
         title: '删除已完成组',
-        content: `确定删除已完成的第 ${idx + 1} 组记录吗？`,
+        desc: `删除后将清除第 ${idx + 1} 组的训练记录`,
         confirmText: '确认删除',
         cancelText: '取消',
-        success: (res) => {
-          if (res.confirm) doDelete();
-        }
+        danger: true,
+        onConfirm: doDelete
       });
     } else {
       doDelete();
@@ -1086,13 +1118,13 @@ Page({
       return;
     }
     const lastSet = completedSets[completedSets.length - 1];
-    wx.showModal({
+    this._openConfirmSheet({
       title: '撤回上一组',
-      content: `确定撤回「${lastSet.exercise_name}」第${lastSet.set_number}组 (${lastSet.actual_weight}kg × ${lastSet.actual_reps}次) 吗？`,
+      desc: `${lastSet.exercise_name} 第${lastSet.set_number}组 · ${lastSet.actual_weight}kg × ${lastSet.actual_reps}次`,
       confirmText: '确认撤回',
       cancelText: '取消',
-      success: (res) => {
-        if (!res.confirm) return;
+      danger: false,
+      onConfirm: () => {
         this.clearRestTimer();
         this.restEndTime = null;
         this._clearGlobalRestState();
@@ -1574,14 +1606,13 @@ Page({
       ? `「${exName}」已记录 ${doneCount} 组，移除将同步删除这 ${doneCount} 组记录，确定移除吗？`
       : `确定从本次训练中移除「${exName}」吗？`;
 
-    wx.showModal({
+    this._openConfirmSheet({
       title: '移除动作',
-      content: modalContent,
+      desc: doneCount > 0 ? `「${exName}」已记录 ${doneCount} 组，移除后同步清除` : `将「${exName}」移出本次训练`,
       confirmText: '确认移除',
-      confirmColor: '#FA5151',
       cancelText: '取消',
-      success: (res) => {
-        if (!res.confirm) return;
+      danger: true,
+      onConfirm: () => {
         const removeIdSet = new Set(matchedSets.map(s => s.id));
         matchedSets.forEach(s => remove('session_sets', s.id));
         const nextCompletedSets = completedSets.filter(s => !removeIdSet.has(s.id));
@@ -1999,13 +2030,13 @@ Page({
 
     // 情况2：当前动作已全部做完（或已无多余未完成组），支持撤销该动作最近完成的1组并减组
     if (doneSets > 0) {
-      wx.showModal({
+      this._openConfirmSheet({
         title: '减少一组',
-        content: `「${target.exercise_name || target.name}」已完成 ${doneSets} 组，确定撤销最后完成的第 ${doneSets} 组并减少 1 组吗？`,
+        desc: `将撤销「${target.exercise_name || target.name}」第 ${doneSets} 组记录并减少 1 组`,
         confirmText: '确认减少',
         cancelText: '取消',
-        success: (res) => {
-          if (!res.confirm) return;
+        danger: true,
+        onConfirm: () => {
           // 找到该动作最后一条已完成记录并删除
           const nextCompletedSets = [...completedSets];
           for (let i = nextCompletedSets.length - 1; i >= 0; i--) {
@@ -2063,16 +2094,14 @@ Page({
   onRequestDiscardTraining() {
     const count = (this.data.completedSets || []).length;
     this.setData({ showFinishModal: false });
-    wx.showModal({
+    this._openConfirmSheet({
       title: '放弃本次训练',
-      content: `当前已记录 ${count} 组，放弃后本次训练不会计入历史记录，确定放弃吗？`,
+      desc: `当前已记录 ${count} 组，放弃后不计入历史记录`,
       confirmText: '确认放弃',
-      confirmColor: '#FA5151',
       cancelText: '返回',
-      success: (modalRes) => {
-        if (modalRes.confirm) {
-          this._discardCurrentSession();
-        }
+      danger: true,
+      onConfirm: () => {
+        this._discardCurrentSession();
       }
     });
   },

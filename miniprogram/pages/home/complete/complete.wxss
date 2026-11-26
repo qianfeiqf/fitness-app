@@ -303,24 +303,29 @@
 
 /* 分享按钮 */
 .share-section {
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
 }
 
-.btn-share {
-  background: #07C160;
-  color: #FFFFFF;
+.complete-btn {
+  width: 100%;
+  height: 96rpx;
+  border-radius: 9999rpx;
+  font-size: 32rpx;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12rpx;
-  border-radius: 9999rpx;
-  font-weight: 600;
-  height: 96rpx;
-  font-size: 32rpx;
+  box-sizing: border-box;
+}
+
+.btn-share {
+  background: #1A1A1A;
+  color: #FFFFFF;
 }
 
 .btn-share:active {
-  opacity: 0.85;
+  opacity: 0.88;
 }
 
 .share-icon {
@@ -343,39 +348,22 @@
   gap: 20rpx;
 }
 
-.btn {
-  border-radius: 9999rpx;
-  font-size: 32rpx;
-  padding: 0;
-  height: 96rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  transition: box-shadow 0.15s ease;
-  border: none;
-}
-
 .btn-primary {
   background: #07C160;
   color: #FFFFFF;
 }
 
 .btn-primary:active {
-  opacity: 0.85;
+  opacity: 0.88;
 }
 
 .btn-secondary {
-  background: #F5F5F5;
-  color: #666666;
+  background: #F4F5F7;
+  color: #333333;
 }
 
 .btn-secondary:active {
-  background-color: #F8F8F8;
-}
-
-.btn-block {
-  width: 100%;
+  background-color: #EAECEF;
 }
 
 @keyframes scaleIn {

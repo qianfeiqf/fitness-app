@@ -324,6 +324,25 @@
     </view>
   </view>
 
+  <!-- 统一二次确认抽屉（替代原生 wx.showModal：移除动作 / 撤回上一组 / 删除组 / 放弃训练） -->
+  <modal-sheet
+    visible="{{showConfirmSheet}}"
+    title="{{confirmSheetTitle}}"
+    description="{{confirmSheetDesc}}"
+    showConfirm="{{false}}"
+    showCancel="{{false}}"
+    bind:close="onCancelConfirmSheet"
+  >
+    <view class="confirm-sheet-actions">
+      <view class="confirm-sheet-btn {{confirmSheetDanger ? 'danger' : 'primary'}}" bindtap="onApproveConfirmSheet">
+        <text>{{confirmSheetConfirmText}}</text>
+      </view>
+      <view class="confirm-sheet-btn cancel" bindtap="onCancelConfirmSheet">
+        <text>{{confirmSheetCancelText}}</text>
+      </view>
+    </view>
+  </modal-sheet>
+
   <!-- 完成训练确认抽屉（三层视觉权重：主保存 / 次继续 / 弱放弃） -->
   <modal-sheet
     visible="{{showFinishModal}}"

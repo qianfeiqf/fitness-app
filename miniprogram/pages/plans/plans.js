@@ -7,6 +7,7 @@ const { find, findOne, insert, update, remove, getCollection, getPlanTemplatesSe
 Page({
   data: {
     activeMainTab: 'plans',
+    activeMainTabIndex: 0,
     plans: [],
     activePlan: null,
     templates: [],
@@ -119,7 +120,22 @@ Page({
   onSwitchMainTab(e) {
     const tab = e.currentTarget.dataset.tab;
     if (!tab || tab === this.data.activeMainTab) return;
-    this.setData({ activeMainTab: tab, playingExerciseId: '' });
+    this.setData({
+      activeMainTab: tab,
+      activeMainTabIndex: tab === 'exercises' ? 1 : 0,
+      playingExerciseId: ''
+    });
+  },
+
+  onMainSwiperChange(e) {
+    const idx = e.detail.current;
+    const tab = idx === 1 ? 'exercises' : 'plans';
+    if (tab === this.data.activeMainTab && idx === this.data.activeMainTabIndex) return;
+    this.setData({
+      activeMainTab: tab,
+      activeMainTabIndex: idx,
+      playingExerciseId: ''
+    });
   },
 
   /**

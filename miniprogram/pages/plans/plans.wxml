@@ -15,8 +15,17 @@
     </view>
   </view>
 
-  <!-- ========== 计划库视图 ========== -->
-  <block wx:if="{{activeMainTab === 'plans'}}">
+  <!-- 左右滑动切换容器（计划库 / 动作库） -->
+  <swiper
+    class="main-tab-swiper"
+    current="{{activeMainTabIndex}}"
+    bindchange="onMainSwiperChange"
+    duration="240"
+  >
+    <!-- ========== 计划库视图 ========== -->
+    <swiper-item>
+      <scroll-view scroll-y class="main-tab-scroll" show-scrollbar="{{false}}">
+        <view class="main-tab-inner">
   <!-- 训练计划列表 -->
   <view class="section first-section">
     <view class="section-header">
@@ -116,10 +125,14 @@
       </view>
     </view>
   </view>
-  </block>
+        </view>
+      </scroll-view>
+    </swiper-item>
 
-  <!-- ========== 动作库视图 ========== -->
-  <block wx:else>
+    <!-- ========== 动作库视图 ========== -->
+    <swiper-item>
+      <scroll-view scroll-y class="main-tab-scroll" show-scrollbar="{{false}}">
+        <view class="main-tab-inner">
     <view class="section first-section">
       <!-- 搜索栏 + 自定义动作入口 -->
       <view class="ex-toolbar">
@@ -222,7 +235,10 @@
         <text class="empty-desc">可以换个关键词，或点右上角添加自定义动作</text>
       </view>
     </view>
-  </block>
+        </view>
+      </scroll-view>
+    </swiper-item>
+  </swiper>
 
   <!-- 动作要领与动图半屏抽屉 -->
   <exercise-guide-sheet

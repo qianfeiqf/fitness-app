@@ -22,7 +22,7 @@
       <text class="login-headline">准备好突破了</text>
       <text class="login-subhead">登录后同步训练数据，追踪你的每一步进步</text>
     </view>
-    <button class="btn-login" bindtap="onLogin">微信一键登录</button>
+    <view class="btn-login" bindtap="onLogin"><text>微信一键登录</text></view>
   </view>
 
   <!-- 加载状态 -->
@@ -250,20 +250,20 @@
 
   <!-- 底部吸屏主操作按钮（仅在存在激活计划且无悬浮条时显示） -->
   <view wx:if="{{isLoggedIn && todayPlan && currentPlanData && !hasMinimizedFloat}}" class="home-sticky-cta">
-    <button
+    <view
       wx:if="{{currentPlanData.session && currentPlanData.session.status !== 'completed' && currentPlanData.session.status !== 'aborted'}}"
       class="sticky-cta-btn"
       bindtap="onPrimaryAction"
     >
       <text>继续训练</text>
-    </button>
-    <button
+    </view>
+    <view
       wx:elif="{{currentPlanData.exercises && currentPlanData.exercises.length > 0}}"
       class="sticky-cta-btn"
       bindtap="onPrimaryAction"
     >
       <text>{{currentPlanData.selectedDayCompleted ? ('再练一次 · ' + currentPlanData.selectedDayLabel) : (currentPlanData.selectedDayIsToday ? '开始训练' : ('开始训练 · 练' + currentPlanData.selectedDayLabel))}}</text>
-    </button>
+    </view>
   </view>
 
   <!-- 动作要领与动图半屏抽屉 -->

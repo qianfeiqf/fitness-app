@@ -92,7 +92,7 @@ page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48rpx 24rpx;
+  padding: 40rpx 24rpx;
   background: #FFFFFF;
   border-radius: 24rpx;
   border: 2rpx solid #E5E5E5;
@@ -250,7 +250,8 @@ page {
 
 .exp-info {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 14rpx;
 }
 
 .exp-name {
@@ -265,15 +266,12 @@ page {
   background: #F0F0F0;
   padding: 4rpx 16rpx;
   border-radius: 9999rpx;
-  margin-top: 4rpx;
-  align-self: flex-start;
 }
 
 .exp-desc {
   font-size: 26rpx;
   color: #666666;
   line-height: 1.5;
-  padding-left: 68rpx;
 }
 
 .exp-check {
@@ -457,38 +455,41 @@ page {
 
 .btn-prev {
   flex-shrink: 0;
-  padding: 28rpx 40rpx;
+  height: 92rpx;
+  padding: 0 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #F5F5F5;
   color: #1A1A1A;
   border-radius: 9999rpx;
   font-size: 28rpx;
   font-weight: 600;
-  border: none;
-  line-height: 1;
+}
+
+.btn-prev:active {
+  background: #EAEAEA;
 }
 
 .btn-next {
   flex: 1;
-  padding: 28rpx 0;
+  height: 92rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #1A1A1A;
   color: #FFFFFF;
   border-radius: 9999rpx;
   font-size: 28rpx;
   font-weight: 600;
-  border: none;
-  line-height: 1;
+}
+
+.btn-next:active {
+  opacity: 0.88;
 }
 
 .btn-next.disabled {
   opacity: 0.4;
-}
-
-.btn-next::after {
-  border: none;
-}
-
-.btn-prev::after {
-  border: none;
 }
 
 .skip-text {

@@ -106,6 +106,10 @@
   opacity: 0.85;
 }
 
+.modal-sheet-btn-confirm.danger {
+  background: #FA5151;
+}
+
 .modal-sheet-btn-confirm.disabled {
   opacity: 0.5;
 }

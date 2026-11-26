@@ -89,6 +89,16 @@ Page({
     wizardRecommended: [],
     wizardSelectedPlan: null,
 
+    // 统一确认弹窗
+    confirmModal: {
+      visible: false,
+      title: '',
+      content: '',
+      confirmText: '确认',
+      cancelText: '取消',
+      danger: false
+    },
+
     // 训练悬浮窗
     trainingFloat: null,
     navHeight: 0
@@ -301,20 +311,47 @@ Page({
     wx.showToast({ title: '自定义动作已添加', icon: 'success' });
   },
 
+  _openConfirmModal({ title, content, confirmText = '确认', cancelText = '取消', danger = false, onConfirm = null }) {
+    this._pendingConfirmAction = onConfirm;
+    this.setData({
+      confirmModal: {
+        visible: true,
+        title,
+        content,
+        confirmText,
+        cancelText,
+        danger
+      }
+    });
+  },
+
+  onConfirmModalCancel() {
+    this._pendingConfirmAction = null;
+    this.setData({ 'confirmModal.visible': false });
+  },
+
+  onConfirmModalOk() {
+    const action = this._pendingConfirmAction;
+    this._pendingConfirmAction = null;
+    this.setData({ 'confirmModal.visible': false });
+    if (typeof action === 'function') {
+      action();
+    }
+  },
+
   onDeleteCustomExercise() {
     const ex = this.data.detailExercise;
     if (!ex || ex.is_system !== false) return;
-    wx.showModal({
+    this._openConfirmModal({
       title: '删除自定义动作',
       content: `确定要删除「${ex.name}」吗？`,
-      confirmColor: '#FA5151',
-      success: (res) => {
-        if (res.confirm) {
-          remove('exercises', ex.id);
-          this.setData({ showExerciseDetail: false, detailExercise: null });
-          this.loadExercises();
-          wx.showToast({ title: '已删除', icon: 'success' });
-        }
+      confirmText: '确认删除',
+      danger: true,
+      onConfirm: () => {
+        remove('exercises', ex.id);
+        this.setData({ showExerciseDetail: false, detailExercise: null });
+        this.loadExercises();
+        wx.showToast({ title: '已删除', icon: 'success' });
       }
     });
   },
@@ -624,24 +661,21 @@ Page({
   onDeletePlan(e) {
     const { planId } = e.currentTarget.dataset;
 
-    wx.showModal({
+    this._openConfirmModal({
       title: '确认删除',
       content: '确定要删除这个计划吗？删除后无法恢复',
-      confirmColor: '#8B0000',
-      success: (res) => {
-        if (res.confirm) {
-          // 删除计划下的所有动作
-          const planExercises = find('plan_exercises', { plan_id: planId });
-          planExercises.forEach(pe => {
-            remove('plan_exercises', pe.id);
-          });
+      confirmText: '确认删除',
+      danger: true,
+      onConfirm: () => {
+        const planExercises = find('plan_exercises', { plan_id: planId });
+        planExercises.forEach(pe => {
+          remove('plan_exercises', pe.id);
+        });
 
-          // 删除计划
-          remove('plans', planId);
+        remove('plans', planId);
 
-          this.loadPlans();
-          wx.showToast({ title: '计划已删除', icon: 'success' });
-        }
+        this.loadPlans();
+        wx.showToast({ title: '计划已删除', icon: 'success' });
       }
     });
   },

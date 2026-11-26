@@ -37,6 +37,17 @@ Page({
     // 账号管理半屏抽屉
     showAccountSheet: false,
 
+    // 统一确认/说明弹窗
+    confirmModal: {
+      visible: false,
+      title: '',
+      content: '',
+      confirmText: '确认',
+      cancelText: '取消',
+      showCancel: true,
+      danger: false
+    },
+
     // 训练悬浮窗 & 从训练页引导填写体重的返回入口
     trainingFloat: null,
     returnTrainingSessionId: null
@@ -205,13 +216,22 @@ Page({
       }
     });
     const priorityIds = ['ex_001', 'ex_020', 'ex_030'];
-    const list = allExercises.map(ex => ({
-      id: ex.id,
-      name: ex.name,
-      name_en: ex.name_en || '',
-      muscle_group: ex.muscle_group || '其他',
-      current1RM: latestRM[ex.id] ? Math.round(latestRM[ex.id].estimated_1rm || 0) : 0
-    }));
+    const list = allExercises.map(ex => {
+      const metaParts = [ex.muscle_group || '其他'];
+      if (ex.sub_muscle) metaParts.push(ex.sub_muscle);
+      if (ex.equipment) metaParts.push(ex.equipment);
+      return {
+        id: ex.id,
+        name: ex.name,
+        name_en: ex.name_en || '',
+        aliases: ex.aliases || '',
+        muscle_group: ex.muscle_group || '其他',
+        sub_muscle: ex.sub_muscle || '',
+        equipment: ex.equipment || '',
+        metaText: metaParts.join(' · '),
+        current1RM: latestRM[ex.id] ? Math.round(latestRM[ex.id].estimated_1rm || 0) : 0
+      };
+    });
     list.sort((a, b) => {
       if (a.current1RM > 0 && b.current1RM === 0) return -1;
       if (a.current1RM === 0 && b.current1RM > 0) return 1;
@@ -239,6 +259,9 @@ Page({
       const matchKw = !kw ||
         (ex.name && ex.name.toLowerCase().includes(kw)) ||
         (ex.name_en && ex.name_en.toLowerCase().includes(kw)) ||
+        (ex.aliases && ex.aliases.toLowerCase().includes(kw)) ||
+        (ex.sub_muscle && ex.sub_muscle.toLowerCase().includes(kw)) ||
+        (ex.equipment && ex.equipment.toLowerCase().includes(kw)) ||
         (ex.muscle_group && ex.muscle_group.toLowerCase().includes(kw));
       return matchMuscle && matchKw;
     });
@@ -372,16 +395,16 @@ Page({
     const goalId = e.currentTarget.dataset.id;
     const { remove } = require('../../localdb/db.js');
 
-    wx.showModal({
+    this._openConfirmModal({
       title: '确认删除',
       content: '确定要删除这个目标吗？',
-      success: (res) => {
-        if (res.confirm) {
-          remove('goals', goalId);
-          wx.showToast({ title: '已删除', icon: 'success' });
-          this.loadGoals();
-          this._triggerSilentSync();
-        }
+      confirmText: '确认删除',
+      danger: true,
+      onConfirm: () => {
+        remove('goals', goalId);
+        wx.showToast({ title: '已删除', icon: 'success' });
+        this.loadGoals();
+        this._triggerSilentSync();
       }
     });
   },
@@ -584,8 +607,37 @@ Page({
     }
   },
 
+  _openConfirmModal({ title, content, confirmText = '确认', cancelText = '取消', showCancel = true, danger = false, onConfirm = null }) {
+    this._pendingConfirmAction = onConfirm;
+    this.setData({
+      confirmModal: {
+        visible: true,
+        title,
+        content,
+        confirmText,
+        cancelText,
+        showCancel,
+        danger
+      }
+    });
+  },
+
+  onConfirmModalCancel() {
+    this._pendingConfirmAction = null;
+    this.setData({ 'confirmModal.visible': false });
+  },
+
+  onConfirmModalOk() {
+    const action = this._pendingConfirmAction;
+    this._pendingConfirmAction = null;
+    this.setData({ 'confirmModal.visible': false });
+    if (typeof action === 'function') {
+      action();
+    }
+  },
+
   _showFallbackPrivacyModal() {
-    wx.showModal({
+    this._openConfirmModal({
       title: '隐私保护指引',
       content: '本小程序仅在您主动使用时收集训练计划、训练记录及身高体重等身体档案，用于提供跟练记录、1RM估算与云端同步服务；保存战报图片或导出数据时仅在您确认后访问相册或剪贴板。您可随时在「我的」页面导出数据或注销账号。',
       showCancel: false,
@@ -597,7 +649,7 @@ Page({
    * 查看用户服务协议
    */
   onOpenUserAgreement() {
-    wx.showModal({
+    this._openConfirmModal({
       title: '用户服务协议',
       content: '1. 本小程序提供的训练计划、1RM估算与重量演进建议仅作健身参考，不构成医疗或专业康复建议。\n2. 请根据自身身体状况合理安排负荷，训练前充分热身，如有不适请立即停止。\n3. 您的训练数据归您本人所有，可随时导出或通过「注销账号」永久删除。',
       showCancel: false,
@@ -610,27 +662,26 @@ Page({
    */
   onLogout() {
     this.setData({ showAccountSheet: false });
-    wx.showModal({
+    this._openConfirmModal({
       title: '确认退出',
       content: '退出登录后将暂停云端同步，本地训练记录和计划仍会保留。确定退出吗？',
-      success: (res) => {
-        if (res.confirm) {
-          wx.removeStorageSync('userInfo');
-          wx.removeStorageSync('accessToken');
-          const app = getApp();
-          app.globalData.isLoggedIn = false;
-          app.globalData.userId = null;
-          app.globalData.openId = null;
-          app.globalData.accessToken = null;
-          app.globalData.isOfflineMode = false;
+      confirmText: '确认退出',
+      onConfirm: () => {
+        wx.removeStorageSync('userInfo');
+        wx.removeStorageSync('accessToken');
+        const app = getApp();
+        app.globalData.isLoggedIn = false;
+        app.globalData.userId = null;
+        app.globalData.openId = null;
+        app.globalData.accessToken = null;
+        app.globalData.isOfflineMode = false;
 
-          this.setData({
-            isLoggedIn: false,
-            userInfo: null
-          });
+        this.setData({
+          isLoggedIn: false,
+          userInfo: null
+        });
 
-          wx.showToast({ title: '已退出登录', icon: 'success' });
-        }
+        wx.showToast({ title: '已退出登录', icon: 'success' });
       }
     });
   },
@@ -640,13 +691,12 @@ Page({
    */
   onDeleteAccount() {
     this.setData({ showAccountSheet: false });
-    wx.showModal({
+    this._openConfirmModal({
       title: '确认注销账号',
       content: '注销后将永久删除您的云端及本地全部训练计划、训练记录与个人档案，且无法恢复。确定要注销吗？',
       confirmText: '确认注销',
-      confirmColor: '#FA5151',
-      success: async (res) => {
-        if (!res.confirm) return;
+      danger: true,
+      onConfirm: async () => {
         wx.showLoading({ title: '正在注销...' });
         const app = getApp();
         try {

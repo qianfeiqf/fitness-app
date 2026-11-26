@@ -15,7 +15,15 @@ Page({
     dateStr: '',
     prCount: 0,
     canResumeToday: false,
-    loading: true
+    loading: true,
+    confirmModal: {
+      visible: false,
+      title: '',
+      content: '',
+      confirmText: '确认',
+      cancelText: '取消',
+      danger: false
+    }
   },
 
   onLoad(options) {
@@ -112,18 +120,44 @@ Page({
   /**
    * 当天已完成训练重新切回进行中继续补练
    */
+  _openConfirmModal({ title, content, confirmText = '确认', cancelText = '取消', danger = false, onConfirm = null }) {
+    this._pendingConfirmAction = onConfirm;
+    this.setData({
+      confirmModal: {
+        visible: true,
+        title,
+        content,
+        confirmText,
+        cancelText,
+        danger
+      }
+    });
+  },
+
+  onConfirmModalCancel() {
+    this._pendingConfirmAction = null;
+    this.setData({ 'confirmModal.visible': false });
+  },
+
+  onConfirmModalOk() {
+    const action = this._pendingConfirmAction;
+    this._pendingConfirmAction = null;
+    this.setData({ 'confirmModal.visible': false });
+    if (typeof action === 'function') {
+      action();
+    }
+  },
+
   onResumeTodayWorkout() {
     const { session, groupedSets } = this.data;
     if (!session) return;
 
-    wx.showModal({
+    this._openConfirmModal({
       title: '继续补练',
       content: '将把本次训练重新切回进行中，原有训练时长和已记录组数都会保留，完成后将覆盖更新本次记录。',
       confirmText: '去补练',
       cancelText: '取消',
-      success: (res) => {
-        if (!res.confirm) return;
-
+      onConfirm: () => {
         let pendingExercises = Array.isArray(session.pending_exercises) && session.pending_exercises.length > 0
           ? session.pending_exercises
           : groupedSets.map(g => {
@@ -173,14 +207,13 @@ Page({
   onDeleteSession() {
     const { session } = this.data;
     if (!session) return;
-    wx.showModal({
+    this._openConfirmModal({
       title: '删除训练记录',
       content: '删除后本次训练及所有组记录将无法恢复，确定删除吗？',
       confirmText: '确认删除',
-      confirmColor: '#FA5151',
       cancelText: '取消',
-      success: (res) => {
-        if (!res.confirm) return;
+      danger: true,
+      onConfirm: () => {
         const sets = find('session_sets', { session_id: session.id }) || [];
         sets.forEach(s => remove('session_sets', s.id));
         remove('sessions', session.id);

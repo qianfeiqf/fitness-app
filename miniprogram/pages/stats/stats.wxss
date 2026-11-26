@@ -61,9 +61,33 @@
   color: #999999;
 }
 
-/* WeUI 组件样式覆盖 */
-mp-tabs {
-  margin-bottom: 8rpx;
+/* 极简炭黑胶囊切换 */
+.pill-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  background: #F4F5F7;
+  padding: 6rpx;
+  border-radius: 9999rpx;
+}
+
+.pill-switch-item {
+  height: 48rpx;
+  padding: 0 20rpx;
+  border-radius: 9999rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  color: #666666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.pill-switch-item.active {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
 /* =====================

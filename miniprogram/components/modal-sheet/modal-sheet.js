@@ -37,6 +37,10 @@ Component({
       type: Boolean,
       value: false
     },
+    confirmDanger: {
+      type: Boolean,
+      value: false
+    },
     closeOnMaskTap: {
       type: Boolean,
       value: true

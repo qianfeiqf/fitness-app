@@ -19,7 +19,7 @@
       </view>
       <view
         wx:if="{{showConfirm}}"
-        class="modal-sheet-btn modal-sheet-btn-confirm {{confirmDisabled ? 'disabled' : ''}}"
+        class="modal-sheet-btn modal-sheet-btn-confirm {{confirmDanger ? 'danger' : ''}} {{confirmDisabled ? 'disabled' : ''}}"
         bindtap="onConfirm"
       >
         {{confirmText}}

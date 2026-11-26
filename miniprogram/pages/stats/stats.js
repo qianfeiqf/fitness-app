@@ -462,8 +462,24 @@ Page({
     });
   },
 
+  onSelectVolumePeriodPill(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(index) || index === this.data.periodTabIndex) return;
+    const period = this.data.periodOptions[index].key;
+    this.setData({ selectedPeriod: period, periodTabIndex: index });
+    this.loadStats();
+  },
+
+  onSelectChartPeriodPill(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(index) || index === this.data.chartPeriodTabIndex) return;
+    const period = this.data.chartPeriods[index].key;
+    this.setData({ chartPeriod: period, chartPeriodTabIndex: index });
+    this.drawRMChart();
+  },
+
   /**
-   * 切换容量周期 Tab
+   * 切换容量周期 Tab（兼容）
    */
   onPeriodTabChange(e) {
     const index = e.detail.index;
@@ -473,7 +489,7 @@ Page({
   },
 
   /**
-   * 切换图表时间范围 Tab
+   * 切换图表时间范围 Tab（兼容）
    */
   onChartPeriodTabChange(e) {
     const index = e.detail.index;

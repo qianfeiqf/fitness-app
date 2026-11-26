@@ -66,8 +66,16 @@ Page({
     this.applyFilter();
   },
 
+  onSelectPeriodPill(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    if (Number.isNaN(index) || index === this.data.periodTabIndex) return;
+    const key = this.data.periodOptions[index].key;
+    this.setData({ filterPeriod: key, periodTabIndex: index });
+    this.applyFilter();
+  },
+
   /**
-   * 切换时间筛选 Tab
+   * 切换时间筛选 Tab（兼容）
    */
   onPeriodTabChange(e) {
     const index = e.detail.index;

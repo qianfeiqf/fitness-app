@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "训练详情",
   "usingComponents": {
-    "mp-icon": "weui-miniprogram/icon/icon"
+    "mp-icon": "weui-miniprogram/icon/icon",
+    "modal-sheet": "../../../components/modal-sheet/modal-sheet"
   }
 }

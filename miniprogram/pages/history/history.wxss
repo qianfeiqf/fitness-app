@@ -50,6 +50,34 @@
   margin-bottom: 16rpx;
 }
 
+.pill-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  background: #F4F5F7;
+  padding: 8rpx;
+  border-radius: 9999rpx;
+}
+
+.pill-switch-item {
+  height: 56rpx;
+  padding: 0 26rpx;
+  border-radius: 9999rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #666666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.pill-switch-item.active {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
 /* 骨架屏 */
 .loading-wrap {
   padding: 30rpx;

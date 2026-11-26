@@ -70,4 +70,16 @@
       </view>
     </view>
   </view>
+
+  <modal-sheet
+    visible="{{confirmModal.visible}}"
+    title="{{confirmModal.title}}"
+    description="{{confirmModal.content}}"
+    confirmText="{{confirmModal.confirmText}}"
+    cancelText="{{confirmModal.cancelText}}"
+    confirmDanger="{{confirmModal.danger}}"
+    bind:confirm="onConfirmModalOk"
+    bind:cancel="onConfirmModalCancel"
+    bind:close="onConfirmModalCancel"
+  />
 </view>

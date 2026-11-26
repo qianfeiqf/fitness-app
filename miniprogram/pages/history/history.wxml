@@ -16,7 +16,15 @@
 
   <!-- 时间筛选 -->
   <view class="period-tabs-wrap">
-    <mp-tabs tabs="{{periodTabs}}" active-tab="{{periodTabIndex}}" bind:change="onPeriodTabChange" />
+    <view class="pill-switcher">
+      <view
+        wx:for="{{periodTabs}}"
+        wx:key="title"
+        class="pill-switch-item {{periodTabIndex === index ? 'active' : ''}}"
+        data-index="{{index}}"
+        bindtap="onSelectPeriodPill"
+      >{{item.title}}</view>
+    </view>
   </view>
 
   <!-- 加载中 -->

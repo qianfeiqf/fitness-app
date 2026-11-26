@@ -527,6 +527,19 @@
     </view>
   </modal-sheet>
 
+  <!-- 统一确认弹窗 -->
+  <modal-sheet
+    visible="{{confirmModal.visible}}"
+    title="{{confirmModal.title}}"
+    description="{{confirmModal.content}}"
+    confirmText="{{confirmModal.confirmText}}"
+    cancelText="{{confirmModal.cancelText}}"
+    confirmDanger="{{confirmModal.danger}}"
+    bind:confirm="onConfirmModalOk"
+    bind:cancel="onConfirmModalCancel"
+    bind:close="onConfirmModalCancel"
+  />
+
   <!-- 训练悬浮窗（含全局组间休息倒计时） -->
   <training-float />
 </view>

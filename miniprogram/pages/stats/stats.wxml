@@ -97,7 +97,15 @@
   <view class="section">
     <view class="section-header">
       <text class="section-title">1RM 趋势</text>
-      <mp-tabs tabs="{{chartPeriodTabs}}" active-tab="{{chartPeriodTabIndex}}" bind:change="onChartPeriodTabChange" />
+      <view class="pill-switcher">
+        <view
+          wx:for="{{chartPeriodTabs}}"
+          wx:key="title"
+          class="pill-switch-item {{chartPeriodTabIndex === index ? 'active' : ''}}"
+          data-index="{{index}}"
+          bindtap="onSelectChartPeriodPill"
+        >{{item.title}}</view>
+      </view>
     </view>
     <view class="chart-card">
       <canvas type="2d" id="rmTrendChart" class="rm-chart"></canvas>
@@ -166,7 +174,15 @@
     <view class="section-header">
       <view class="section-title-row">
         <text class="section-title">容量趋势</text>
-        <mp-tabs tabs="{{periodTabs}}" active-tab="{{periodTabIndex}}" bind:change="onPeriodTabChange" />
+        <view class="pill-switcher">
+          <view
+            wx:for="{{periodTabs}}"
+            wx:key="title"
+            class="pill-switch-item {{periodTabIndex === index ? 'active' : ''}}"
+            data-index="{{index}}"
+            bindtap="onSelectVolumePeriodPill"
+          >{{item.title}}</view>
+        </view>
       </view>
       <view class="total-volume">
         <text class="total-value">{{periodVolume}}</text>

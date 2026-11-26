@@ -39,7 +39,6 @@
         data-id="{{item.id}}"
         bindtap="onSelectGoal"
       >
-        <text class="goal-icon">{{item.icon}}</text>
         <text class="goal-name">{{item.name}}</text>
         <text class="goal-desc">{{item.desc}}</text>
         <view class="goal-check" wx:if="{{selectedGoal === item.id}}">
@@ -80,7 +79,6 @@
         bindtap="onSelectExp"
       >
         <view class="exp-header">
-          <text class="exp-icon">{{item.icon}}</text>
           <view class="exp-info">
             <text class="exp-name">{{item.name}}</text>
             <text class="exp-tag">{{item.tag}}</text>
@@ -136,20 +134,19 @@
   <!-- 底部按钮区 -->
   <view class="onboarding-footer">
     <view class="footer-buttons">
-      <button 
-        class="btn-prev" 
+      <view
+        class="btn-prev"
         wx:if="{{currentStep > 1}}"
         bindtap="onPrev"
-      >上一步</button>
+      >上一步</view>
       
-      <button 
-        class="btn-next {{currentStep === 1 && !selectedGoal || currentStep === 2 && !selectedDays || currentStep === 3 && !selectedExp || currentStep === 4 && recommendedPlans.length > 0 && !selectedPlan ? 'disabled' : ''}}"
-        bindtap="{{currentStep === 4 && recommendedPlans.length === 0 ? 'onSkip' : (currentStep === 4 ? 'onComplete' : 'onNext')}}"
-        loading="{{loading}}"
-      >{{currentStep === 4 ? (recommendedPlans.length === 0 ? '关闭' : '开始训练') : '下一步'}}</button>
+      <view
+        class="btn-next {{loading || currentStep === 1 && !selectedGoal || currentStep === 2 && !selectedDays || currentStep === 3 && !selectedExp || currentStep === 4 && recommendedPlans.length > 0 && !selectedPlan ? 'disabled' : ''}}"
+        bindtap="{{loading ? '' : (currentStep === 4 && recommendedPlans.length === 0 ? 'onSkip' : (currentStep === 4 ? 'onComplete' : 'onNext'))}}"
+      >{{loading ? '创建中...' : (currentStep === 4 ? (recommendedPlans.length === 0 ? '关闭' : '开始训练') : '下一步')}}</view>
     </view>
     
-    <text class="skip-text" bindtap="onSkip" wx:if="{{currentStep < 4 || currentStep === 4 && recommendedPlans.length > 0}}">跳过引导，稍后在「计划推荐」中使用</text>
+    <text class="skip-text" bindtap="onSkip" wx:if="{{currentStep < 4 || currentStep === 4 && recommendedPlans.length > 0}}">跳过引导，稍后可在「训练库 → 智能推荐」中使用</text>
   </view>
 
 </view>

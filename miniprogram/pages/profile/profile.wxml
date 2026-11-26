@@ -162,7 +162,7 @@
         <input
           class="goal-search-input"
           type="text"
-          placeholder="搜索动作名称..."
+          placeholder="搜索动作名称、俗称或器械..."
           value="{{goalExerciseSearch}}"
           bindinput="onGoalExerciseSearch"
         />
@@ -188,7 +188,7 @@
         >
           <view class="goal-picker-info">
             <text class="goal-picker-name">{{item.name}}</text>
-            <text class="goal-picker-muscle">{{item.muscle_group}}</text>
+            <text class="goal-picker-muscle">{{item.metaText}}</text>
           </view>
           <view class="goal-picker-right">
             <text wx:if="{{item.current1RM > 0}}" class="goal-picker-rm">1RM {{item.current1RM}}kg</text>
@@ -261,6 +261,20 @@
       </view>
     </view>
   </modal-sheet>
+
+  <!-- 统一确认/说明半屏弹窗 -->
+  <modal-sheet
+    visible="{{confirmModal.visible}}"
+    title="{{confirmModal.title}}"
+    description="{{confirmModal.content}}"
+    confirmText="{{confirmModal.confirmText}}"
+    cancelText="{{confirmModal.cancelText}}"
+    showCancel="{{confirmModal.showCancel}}"
+    confirmDanger="{{confirmModal.danger}}"
+    bind:confirm="onConfirmModalOk"
+    bind:cancel="onConfirmModalCancel"
+    bind:close="onConfirmModalCancel"
+  />
 
   <!-- 训练悬浮窗（含全局组间休息倒计时） -->
   <training-float />

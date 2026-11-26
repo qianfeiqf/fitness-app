@@ -34,8 +34,9 @@ Page({
       deadline: ''
     },
 
-    // 账号管理半屏抽屉
+    // 账号管理与使用小贴士半屏抽屉
     showAccountSheet: false,
+    showGuideSheet: false,
 
     // 统一确认/说明弹窗
     confirmModal: {
@@ -583,6 +584,14 @@ Page({
   },
 
 
+
+  onOpenGuideSheet() {
+    this.setData({ showGuideSheet: true });
+  },
+
+  onCloseGuideSheet() {
+    this.setData({ showGuideSheet: false });
+  },
 
   onOpenAccountSheet() {
     this.setData({ showAccountSheet: true });

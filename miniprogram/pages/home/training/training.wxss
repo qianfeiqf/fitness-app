@@ -1098,6 +1098,34 @@
   font-weight: 500;
 }
 
+/* 首次进入训练页轻提示条 */
+.training-tip-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  padding: 12rpx 18rpx;
+  margin-bottom: 14rpx;
+  border-radius: 14rpx;
+  background: #F4FBF7;
+}
+
+.training-tip-text {
+  flex: 1;
+  font-size: 22rpx;
+  color: #3D6B4F;
+  line-height: 1.4;
+}
+
+.training-tip-close {
+  padding: 6rpx 4rpx 6rpx 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 /* 热身组 / 正式组 极简分段 Tab */
 .stage-tabs {
   flex-shrink: 0;

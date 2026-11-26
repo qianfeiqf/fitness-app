@@ -1030,6 +1030,19 @@ Page({
   },
 
   /**
+   * 首页空态直达训练库并自动弹出 4 步智能推荐
+   */
+  onGoToRecommend() {
+    const app = getApp();
+    if (app && app.globalData) {
+      app.globalData.openPlanRecommend = true;
+    }
+    wx.switchTab({
+      url: '/pages/plans/plans'
+    });
+  },
+
+  /**
    * 直达自建计划页
    */
   onGoToCreatePlan() {

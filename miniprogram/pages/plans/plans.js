@@ -122,6 +122,12 @@ Page({
     this.loadPlans();
     this.loadExercises();
     this.checkTrainingFloat();
+    const app = getApp();
+    if (app && app.globalData && app.globalData.openPlanRecommend) {
+      delete app.globalData.openPlanRecommend;
+      this.setData({ activeMainTab: 'plans', activeMainTabIndex: 0 });
+      this.onShowRecommend();
+    }
   },
 
   /**

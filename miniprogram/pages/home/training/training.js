@@ -110,6 +110,9 @@ Page({
     playingExerciseId: '',
     thumbErrorMap: {},
 
+    // 首次训练操作轻提示条
+    showTrainingTip: false,
+
     // 更多操作面板
     showMoreActions: false,
 
@@ -129,6 +132,9 @@ Page({
   onLoad(options) {
     this.calcNavBarHeight();
     this._initRestFloatBounds();
+    if (!wx.getStorageSync('training_tips_dismissed')) {
+      this.setData({ showTrainingTip: true });
+    }
     console.log('=== 训练中页面加载 ===', options);
 
     if (options.sessionId) {
@@ -232,6 +238,11 @@ Page({
 
   // 空操作函数（用于阻止事件冒泡）
   noop() {},
+
+  onDismissTrainingTip() {
+    wx.setStorageSync('training_tips_dismissed', true);
+    this.setData({ showTrainingTip: false });
+  },
 
   /**
    * 打开统一极简二次确认抽屉（替代微信原生 wx.showModal）

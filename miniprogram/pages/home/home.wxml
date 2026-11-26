@@ -57,6 +57,9 @@
           <text>自建计划</text>
         </view>
       </view>
+      <view class="empty-hero-recommend" bindtap="onGoToRecommend">
+        <text>不知道怎么选？试试智能推荐 ›</text>
+      </view>
     </view>
 
     <!-- 2. 轻量单行自由训练图标卡 -->

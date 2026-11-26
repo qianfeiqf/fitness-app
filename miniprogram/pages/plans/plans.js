@@ -18,7 +18,7 @@ Page({
     allExercises: [],
     filteredExercises: [],
     exerciseSearch: '',
-    exerciseMuscleGroups: ['全部', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
+    exerciseMuscleGroups: ['全部', '自定义', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
     selectedExerciseMuscle: '全部',
     exerciseSubMuscles: [],
     selectedSubMuscle: '全部',
@@ -172,7 +172,7 @@ Page({
 
   onSelectExerciseMuscle(e) {
     const muscle = e.currentTarget.dataset.muscle || '全部';
-    const subs = (muscle !== '全部' && MUSCLE_SUB_GROUPS[muscle]) ? ['全部', ...MUSCLE_SUB_GROUPS[muscle]] : [];
+    const subs = (muscle !== '全部' && muscle !== '自定义' && MUSCLE_SUB_GROUPS[muscle]) ? ['全部', ...MUSCLE_SUB_GROUPS[muscle]] : [];
     this.setData({
       selectedExerciseMuscle: muscle,
       exerciseSubMuscles: subs,
@@ -193,7 +193,9 @@ Page({
     const { allExercises, exerciseSearch, selectedExerciseMuscle, selectedSubMuscle } = this.data;
     const kw = (exerciseSearch || '').trim().toLowerCase();
     const filtered = allExercises.filter(ex => {
-      const matchMuscle = !selectedExerciseMuscle || selectedExerciseMuscle === '全部' || ex.muscle_group === selectedExerciseMuscle;
+      const matchMuscle = !selectedExerciseMuscle || selectedExerciseMuscle === '全部'
+        ? true
+        : (selectedExerciseMuscle === '自定义' ? ex.is_system === false : ex.muscle_group === selectedExerciseMuscle);
       if (!matchMuscle) return false;
       const matchSub = !selectedSubMuscle || selectedSubMuscle === '全部' || ex.sub_muscle === selectedSubMuscle;
       if (!matchSub) return false;

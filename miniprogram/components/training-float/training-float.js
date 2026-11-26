@@ -14,11 +14,14 @@ Component({
     restActive: false,
     restDone: false,
     titleText: '',
-    subText: ''
+    subText: '',
+    posTop: null,
+    isDragging: false
   },
 
   lifetimes: {
     attached() {
+      this._initDragBounds();
       this.syncState();
     },
     detached() {
@@ -36,6 +39,27 @@ Component({
   },
 
   methods: {
+    _initDragBounds() {
+      const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+      const winH = info.windowHeight || 667;
+      const statusH = info.statusBarHeight || 20;
+      this._minTop = statusH + 56;
+      this._maxTop = Math.max(this._minTop + 80, winH - 92);
+      this._defaultTop = Math.max(this._minTop, winH - 104);
+    },
+
+    _syncSavedPosition() {
+      if (this._minTop === undefined) this._initDragBounds();
+      const app = getApp();
+      const saved = app && app.globalData ? app.globalData.trainingFloatTop : null;
+      if (typeof saved === 'number' && !Number.isNaN(saved)) {
+        const clamped = Math.min(this._maxTop, Math.max(this._minTop, saved));
+        if (this.data.posTop !== clamped) {
+          this.setData({ posTop: clamped });
+        }
+      }
+    },
+
     syncState() {
       const app = getApp();
       const gd = app && app.globalData ? app.globalData : null;
@@ -46,6 +70,7 @@ Component({
         }
         return;
       }
+      this._syncSavedPosition();
 
       const snapshot = gd.trainingSnapshot;
       const activeRest = gd.activeRest && gd.activeRest.sessionId === snapshot.sessionId
@@ -140,7 +165,39 @@ Component({
       }
     },
 
+    onTouchStart(e) {
+      if (!e.touches || !e.touches.length) return;
+      if (this._minTop === undefined) this._initDragBounds();
+      this._touchStartY = e.touches[0].clientY;
+      this._startTop = this.data.posTop !== null ? this.data.posTop : this._defaultTop;
+      this._moved = false;
+    },
+
+    onTouchMove(e) {
+      if (!e.touches || !e.touches.length || this._touchStartY === undefined) return;
+      const deltaY = e.touches[0].clientY - this._touchStartY;
+      if (!this._moved && Math.abs(deltaY) < 8) return;
+      this._moved = true;
+      const nextTop = Math.min(this._maxTop, Math.max(this._minTop, Math.round(this._startTop + deltaY)));
+      this.setData({ posTop: nextTop, isDragging: true });
+    },
+
+    onTouchEnd() {
+      if (this._moved) {
+        this._justDragged = true;
+        const app = getApp();
+        if (app && app.globalData) {
+          app.globalData.trainingFloatTop = this.data.posTop;
+        }
+        this.setData({ isDragging: false });
+        setTimeout(() => { this._justDragged = false; }, 120);
+      }
+      this._touchStartY = undefined;
+      this._moved = false;
+    },
+
     onTapFloat() {
+      if (this._justDragged) return;
       this._stopTimer();
       const app = getApp();
       const snapshot = app && app.globalData ? app.globalData.trainingSnapshot : null;

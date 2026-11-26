@@ -73,7 +73,7 @@ Page({
     // 添加动作（支持肌群筛选 + 多选批量添加 + 自定义动作入库）
     showAddExerciseModal: false,
     addExerciseSearch: '',
-    addMuscleGroups: ['全部', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
+    addMuscleGroups: ['全部', '自定义', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
     customMuscleOptions: ['胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
     selectedAddMuscle: '全部',
     addSubMuscles: [],
@@ -1755,7 +1755,9 @@ Page({
     const allExercises = getCollection('exercises') || [];
     const kw = (keyword || '').trim().toLowerCase();
     const filtered = allExercises.filter(ex => {
-      const matchMuscle = !muscle || muscle === '全部' || ex.muscle_group === muscle;
+      const matchMuscle = !muscle || muscle === '全部'
+        ? true
+        : (muscle === '自定义' ? ex.is_system === false : ex.muscle_group === muscle);
       const matchSub = !subMuscle || subMuscle === '全部' || ex.sub_muscle === subMuscle;
       const matchKw = !kw ||
         (ex.name && ex.name.toLowerCase().includes(kw)) ||
@@ -1772,7 +1774,7 @@ Page({
 
   onSelectAddMuscle(e) {
     const muscle = e.currentTarget.dataset.muscle || '全部';
-    const subs = (muscle !== '全部' && MUSCLE_SUB_GROUPS[muscle]) ? ['全部', ...MUSCLE_SUB_GROUPS[muscle]] : [];
+    const subs = (muscle !== '全部' && muscle !== '自定义' && MUSCLE_SUB_GROUPS[muscle]) ? ['全部', ...MUSCLE_SUB_GROUPS[muscle]] : [];
     const { filtered, canAddCustom } = this._filterAddExercises(this.data.addExerciseSearch, muscle, '全部');
     this.setData({
       selectedAddMuscle: muscle,
@@ -1868,7 +1870,7 @@ Page({
   onOpenCustomAddStep() {
     const customName = (this.data.addExerciseSearch || '').trim();
     if (!customName) return;
-    const preselectedMuscle = this.data.selectedAddMuscle !== '全部' ? this.data.selectedAddMuscle : '';
+    const preselectedMuscle = (this.data.selectedAddMuscle !== '全部' && this.data.selectedAddMuscle !== '自定义') ? this.data.selectedAddMuscle : '';
     this.setData({
       customAddMode: true,
       customAddName: customName,

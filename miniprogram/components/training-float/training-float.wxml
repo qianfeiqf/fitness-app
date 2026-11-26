@@ -1,9 +1,14 @@
 <view
   wx:if="{{visible}}"
-  class="training-float {{restActive ? 'resting' : (restDone ? 'rest-done' : '')}}"
+  class="training-float {{restActive ? 'resting' : (restDone ? 'rest-done' : '')}} {{isDragging ? 'dragging' : ''}}"
+  style="{{posTop !== null ? ('top: ' + posTop + 'px; bottom: auto;') : ''}}"
   bindtap="onTapFloat"
+  bindtouchstart="onTouchStart"
+  catchtouchmove="onTouchMove"
+  bindtouchend="onTouchEnd"
 >
   <view class="training-float-content">
+    <view class="training-float-grip"></view>
     <mp-icon
       icon="{{restActive ? 'time' : 'play2'}}"
       color="#07C160"

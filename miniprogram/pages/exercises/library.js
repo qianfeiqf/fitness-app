@@ -17,6 +17,7 @@ Page({
     muscleGroups: ['胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
     muscleGroupTabs: [
       { title: '全部' },
+      { title: '自定义' },
       { title: '胸部' },
       { title: '背部' },
       { title: '下肢' },
@@ -81,8 +82,10 @@ Page({
       );
     }
 
-    // 一级肌群筛选
-    if (selectedGroup) {
+    // 一级肌群筛选（支持快速筛选自定义动作）
+    if (selectedGroup === '__custom__') {
+      filtered = filtered.filter(ex => ex.is_system === false);
+    } else if (selectedGroup) {
       filtered = filtered.filter(ex => ex.muscle_group === selectedGroup);
     }
 
@@ -96,17 +99,22 @@ Page({
     const groupOrder = ['胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'];
 
     filtered.forEach(ex => {
-      const group = ex.muscle_group;
+      const group = ex.muscle_group || '其他';
       if (!groupMap[group]) {
         groupMap[group] = [];
       }
       groupMap[group].push(ex);
     });
 
-    // 转换为数组并按固定顺序排序
+    // 转换为数组并按固定顺序排序（兼容自定义其他分组）
     const grouped = [];
     groupOrder.forEach(group => {
       if (groupMap[group] && groupMap[group].length > 0) {
+        grouped.push({ group, exercises: groupMap[group] });
+      }
+    });
+    Object.keys(groupMap).forEach(group => {
+      if (!groupOrder.includes(group) && groupMap[group].length > 0) {
         grouped.push({ group, exercises: groupMap[group] });
       }
     });
@@ -145,9 +153,9 @@ Page({
    */
   onGroupTabChange(e) {
     const index = e.detail.index;
-    const groups = ['', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'];
+    const groups = ['', '__custom__', '胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'];
     const group = groups[index] || '';
-    const subs = (group && MUSCLE_SUB_GROUPS[group]) ? ['全部', ...MUSCLE_SUB_GROUPS[group]] : [];
+    const subs = (group && group !== '__custom__' && MUSCLE_SUB_GROUPS[group]) ? ['全部', ...MUSCLE_SUB_GROUPS[group]] : [];
     this.setData({
       selectedGroupIndex: index,
       selectedGroup: group,

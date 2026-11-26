@@ -31,10 +31,26 @@
   }
 }
 
+.training-float.dragging {
+  box-shadow: 0 14rpx 40rpx rgba(0, 0, 0, 0.36);
+  opacity: 0.96;
+}
+
 .training-float-content {
   display: flex;
   align-items: center;
-  gap: 20rpx;
+  gap: 16rpx;
+}
+
+.training-float-grip {
+  width: 16rpx;
+  height: 32rpx;
+  flex-shrink: 0;
+  opacity: 0.38;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 20' fill='%23FFFFFF'%3E%3Ccircle cx='3' cy='4' r='1.3'/%3E%3Ccircle cx='7' cy='4' r='1.3'/%3E%3Ccircle cx='3' cy='10' r='1.3'/%3E%3Ccircle cx='7' cy='10' r='1.3'/%3E%3Ccircle cx='3' cy='16' r='1.3'/%3E%3Ccircle cx='7' cy='16' r='1.3'/%3E%3C/svg%3E");
 }
 
 .training-float-info {

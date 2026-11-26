@@ -14,8 +14,12 @@ Page({
     exercises: [],
     groupedExercises: {},
     weekSchedule: [],
+    trainingDaysList: [],
+    activeDayCount: 0,
+    restDayCount: 0,
     loading: true,
     showIntro: false,
+    showDeleteModal: false,
     showExerciseDetail: false,
     detailExercise: null,
     gifLoadError: false
@@ -82,14 +86,20 @@ Page({
       grouped[day].push(ex);
     });
 
-    // 构建完整的周训练安排（带休息日）
+    // 构建训练日列表（仅展示有动作的训练日，隐藏休息日空卡）
     const weekSchedule = this.buildWeekSchedule(grouped, weekDays);
+    const trainingDaysList = weekSchedule.filter(d => !d.isRest);
+    const activeDayCount = trainingDaysList.length;
+    const restDayCount = Math.max(0, 7 - activeDayCount);
 
     this.setData({
       plan,
       exercises: exercisesWithDetails,
       groupedExercises: grouped,
       weekSchedule,
+      trainingDaysList,
+      activeDayCount,
+      restDayCount,
       loading: false
     });
   },
@@ -143,8 +153,11 @@ Page({
       grouped[day].push(ex);
     });
 
-    // 构建完整的周训练安排（带休息日）
+    // 构建训练日列表（仅展示有动作的训练日，隐藏休息日空卡）
     const weekSchedule = this.buildWeekSchedule(grouped, weekDays);
+    const trainingDaysList = weekSchedule.filter(d => !d.isRest);
+    const activeDayCount = template.training_days || trainingDaysList.length;
+    const restDayCount = Math.max(0, 7 - activeDayCount);
 
     // 构建 plan 对象用于页面展示
     const plan = {
@@ -165,6 +178,9 @@ Page({
       exercises: exercisesWithDetails,
       groupedExercises: grouped,
       weekSchedule,
+      trainingDaysList,
+      activeDayCount,
+      restDayCount,
       loading: false
     });
   },
@@ -292,32 +308,31 @@ Page({
    * 删除计划
    */
   onDeletePlan() {
+    this.setData({ showDeleteModal: true });
+  },
+
+  onCancelDeletePlan() {
+    this.setData({ showDeleteModal: false });
+  },
+
+  onConfirmDeletePlan() {
     const { plan } = this.data;
+    if (!plan) return;
+    this.setData({ showDeleteModal: false });
 
-    wx.showModal({
-      title: '确认删除',
-      content: '确定要删除这个计划吗？删除后无法恢复',
-      confirmColor: '#8B0000',
-      success: (res) => {
-        if (res.confirm) {
-          // 删除计划下的所有动作
-          const planExercises = find('plan_exercises', { plan_id: plan.id });
-          planExercises.forEach(pe => {
-            remove('plan_exercises', pe.id);
-          });
-
-          // 删除计划
-          remove('plans', plan.id);
-          this._triggerSilentSync();
-
-          wx.showToast({ title: '计划已删除', icon: 'success' });
-
-          setTimeout(() => {
-            wx.navigateBack();
-          }, 1500);
-        }
-      }
+    const planExercises = find('plan_exercises', { plan_id: plan.id });
+    planExercises.forEach(pe => {
+      remove('plan_exercises', pe.id);
     });
+
+    remove('plans', plan.id);
+    this._triggerSilentSync();
+
+    wx.showToast({ title: '计划已删除', icon: 'success' });
+
+    setTimeout(() => {
+      wx.navigateBack();
+    }, 800);
   },
 
   /**

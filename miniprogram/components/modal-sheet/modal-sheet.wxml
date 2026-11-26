@@ -5,11 +5,11 @@
     <view wx:if="{{title}}" class="modal-sheet-title">{{title}}</view>
     <view wx:if="{{description}}" class="modal-sheet-desc">{{description}}</view>
 
-    <view class="modal-sheet-content">
+    <view class="modal-sheet-content {{(!showCancel && !showConfirm) ? 'no-actions' : ''}}">
       <slot />
     </view>
 
-    <view class="modal-sheet-actions">
+    <view wx:if="{{showCancel || showConfirm}}" class="modal-sheet-actions">
       <view
         wx:if="{{showCancel}}"
         class="modal-sheet-btn modal-sheet-btn-cancel"

@@ -1,10 +1,10 @@
-/* 计划详情页面样式 */
+/* 计划详情页面样式 — 与全站统一的 #F7F8FA 浅灰底 + 无边框白卡 + 炭黑/微信绿 */
 
 .page-detail {
   min-height: 100vh;
-  background-color: #F5F5F5;
+  background-color: #F7F8FA;
   padding-top: 24rpx;
-  padding-bottom: 220rpx;
+  padding-bottom: calc(170rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
@@ -19,21 +19,22 @@
 
 .loading-text {
   font-size: 28rpx;
-  color: #666666;
+  color: #888888;
 }
 
-/* 计划头部 */
+/* 计划头部卡 */
 .plan-header {
-  margin: 0 32rpx 28rpx;
-  padding: 28rpx 32rpx;
+  margin: 0 32rpx 32rpx;
+  padding: 32rpx 30rpx;
   background-color: #FFFFFF;
-  border-radius: 24rpx;
+  border-radius: 26rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
 }
 
 .plan-title-row {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: 14rpx;
   margin-bottom: 12rpx;
   flex-wrap: wrap;
 }
@@ -41,7 +42,7 @@
 .plan-name {
   font-size: 40rpx;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.25;
   color: #1A1A1A;
 }
 
@@ -52,12 +53,11 @@
   display: block;
 }
 
-/* 徽章 */
+/* 状态徽章 */
 .badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 32rpx;
   height: 40rpx;
   padding: 0 16rpx;
   border-radius: 9999rpx;
@@ -65,88 +65,65 @@
   font-weight: 600;
 }
 
-.badge-success {
-  background-color: #E8F5E9;
-  color: #2E7D32;
+.badge-active {
+  background-color: #F0FBF4;
+  color: #07C160;
 }
 
-.badge-secondary {
-  background-color: #F5F5F5;
-  color: #666666;
+.badge-paused {
+  background-color: #F3F4F6;
+  color: #888888;
 }
 
-.badge-warning {
-  background-color: #FFF3E0;
-  color: #E65100;
+.badge-template {
+  background-color: #1A1A1A;
+  color: #FFFFFF;
 }
 
-.badge-info {
-  background-color: #E3F2FD;
-  color: #1565C0;
-}
-
-/* 模板标签 */
-.template-tags {
+/* 频率与难度胶囊 */
+.meta-tags {
   display: flex;
-  gap: 16rpx;
-  margin-top: 20rpx;
   flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 20rpx;
 }
 
-.template-tag {
+.meta-tag {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 44rpx;
-  padding: 0 20rpx;
+  padding: 0 18rpx;
   border-radius: 9999rpx;
+  background-color: #F4F5F7;
+  color: #555555;
   font-size: 22rpx;
-  font-weight: 600;
-}
-
-.tag-green {
-  background-color: #E8F5E9;
-  color: #2E7D32;
-}
-
-.tag-yellow {
-  background-color: #FFF8E1;
-  color: #F57F17;
-}
-
-.tag-red {
-  background-color: #FFEBEE;
-  color: #C62828;
-}
-
-.tag-gray {
-  background-color: #F5F5F5;
-  color: #666666;
+  font-weight: 500;
 }
 
 /* 介绍展开区 */
 .intro-section {
   margin-top: 24rpx;
-  border-top: 1rpx solid #EEEEEE;
-  padding-top: 20rpx;
+  border-top: 1rpx solid #F2F3F5;
+  padding-top: 16rpx;
 }
 
 .intro-toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12rpx 0;
+  padding: 8rpx 0;
 }
 
 .intro-toggle-text {
   font-size: 26rpx;
-  color: #1565C0;
-  font-weight: 500;
+  color: #07C160;
+  font-weight: 600;
 }
 
 .intro-toggle-icon {
   font-size: 24rpx;
-  color: #1565C0;
+  color: #07C160;
 }
 
 .intro-content {
@@ -154,7 +131,7 @@
 }
 
 .intro-block {
-  margin-bottom: 24rpx;
+  margin-bottom: 22rpx;
 }
 
 .intro-block:last-child {
@@ -170,32 +147,32 @@
 }
 
 .intro-text {
-  font-size: 24rpx;
+  font-size: 25rpx;
   color: #666666;
   line-height: 1.7;
   display: block;
 }
 
-/* 周期安排标题 */
+/* 课表标题 */
 .schedule-header {
-  margin: 0 32rpx 20rpx;
+  margin: 0 32rpx 18rpx;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
 }
 
 .schedule-title {
-  font-size: 32rpx;
-  font-weight: 700;
+  font-size: 30rpx;
+  font-weight: 600;
   color: #1A1A1A;
 }
 
 .schedule-subtitle {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #999999;
 }
 
-/* 周计划 */
+/* 训练日卡片 */
 .week-schedule {
   display: flex;
   flex-direction: column;
@@ -205,30 +182,17 @@
 
 .day-section {
   background-color: #FFFFFF;
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   overflow: hidden;
-}
-
-.day-section.rest-day {
-  opacity: 0.7;
-}
-
-.day-section.has-exercises {
-  /* 有训练内容的日期 */
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
 }
 
 .day-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24rpx 28rpx;
-  background-color: #FAFAFA;
-}
-
-.day-label-group {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
+  padding: 24rpx 28rpx 16rpx;
+  border-bottom: 1rpx solid #F4F5F7;
 }
 
 .day-name {
@@ -239,33 +203,43 @@
 
 .day-count {
   font-size: 22rpx;
-  color: #666666;
+  color: #888888;
   font-weight: 500;
-}
-
-.rest-badge {
-  font-size: 22rpx;
-  color: #999999;
-  font-weight: 500;
-  padding: 4rpx 16rpx;
-  background-color: #F0F0F0;
-  border-radius: 9999rpx;
 }
 
 .day-exercises {
-  padding: 8rpx 28rpx 16rpx;
+  padding: 4rpx 28rpx 8rpx;
 }
 
 .exercise-card {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #F0F0F0;
+  align-items: center;
+  gap: 18rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid #F4F5F7;
 }
 
 .exercise-card:last-child {
   border-bottom: none;
+}
+
+.exercise-card:active {
+  opacity: 0.72;
+}
+
+.exercise-num {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 14rpx;
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-size: 24rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
 }
 
 .exercise-main {
@@ -276,196 +250,136 @@
 .exercise-name-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-  margin-bottom: 4rpx;
+  gap: 12rpx;
+  margin-bottom: 6rpx;
 }
 
 .exercise-name {
   font-size: 30rpx;
   font-weight: 600;
   color: #1A1A1A;
-  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.exercise-muscle {
-  font-size: 22rpx;
-  color: #999999;
-  display: block;
-  margin-bottom: 6rpx;
+.exercise-muscle-pill {
+  flex-shrink: 0;
+  font-size: 20rpx;
+  color: #666666;
+  background: #F4F5F7;
+  padding: 4rpx 14rpx;
+  border-radius: 9999rpx;
 }
 
 .exercise-sets {
   font-size: 24rpx;
-  color: #666666;
+  color: #888888;
   display: block;
 }
 
-/* 视频按钮 */
-.video-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6rpx;
-  padding: 6rpx 16rpx;
-  background-color: #E3F2FD;
-  border-radius: 9999rpx;
+.exercise-arrow {
+  font-size: 32rpx;
+  color: #CCCCCC;
+  font-weight: 300;
   flex-shrink: 0;
 }
 
-.video-icon {
-  font-size: 20rpx;
-  color: #1565C0;
+/* 空课表提示 */
+.empty-schedule {
+  margin: 0 32rpx;
+  padding: 64rpx 32rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  text-align: center;
 }
 
-.video-text {
-  font-size: 22rpx;
-  color: #1565C0;
-  font-weight: 500;
+.empty-schedule-text {
+  font-size: 26rpx;
+  color: #999999;
 }
 
-/* 操作按钮 */
+/* 低频危险操作（移出底部吸屏栏） */
+.delete-plan-wrap {
+  margin-top: 36rpx;
+  text-align: center;
+}
+
+.delete-plan-link {
+  display: inline-block;
+  padding: 16rpx 32rpx;
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.delete-plan-link:active {
+  color: #FA5151;
+}
+
+/* 底部精简药丸操作栏 */
 .action-buttons {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 32rpx;
-  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+  padding: 20rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
   background: #FFFFFF;
-  border-top: 1rpx solid #EEEEEE;
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
+  border-top: 1rpx solid #F0F0F0;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.04);
+  z-index: 30;
 }
 
-.btn {
+.action-btn-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 88rpx;
+  gap: 18rpx;
+}
+
+.detail-btn {
+  flex: 1;
+  height: 92rpx;
   border-radius: 9999rpx;
   font-size: 30rpx;
   font-weight: 600;
-  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-primary {
+.detail-btn.primary {
   background: #07C160;
   color: #FFFFFF;
 }
 
-.btn-primary:active {
-  opacity: 0.85;
-}
-
-.btn-secondary {
-  background-color: #F5F5F5;
-  color: #666666;
-}
-
-.btn-outline {
-  background: transparent;
-  color: #666666;
-  border: 1rpx solid rgba(0, 0, 0, 0.1);
-}
-
-.btn-block {
-  width: 100%;
-}
-
-/* 动作信息图标与要领抽屉 */
-.exercise-info-btn {
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 50%;
-  background: #F2F3F5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.exercise-info-btn:active {
-  background: #E5E6EB;
-}
-
-.exercise-info-icon {
-  font-size: 24rpx;
-  font-weight: 700;
-  color: #666666;
-  font-family: Georgia, serif;
-}
-
-.ex-detail-body {
-  padding-bottom: 16rpx;
-}
-
-.ex-detail-gif-wrap {
-  width: 100%;
-  height: 320rpx;
-  background: #F7F8FA;
-  border-radius: 20rpx;
-  margin-bottom: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.ex-detail-gif {
-  width: 300rpx;
-  height: 300rpx;
-}
-
-.ex-detail-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-bottom: 24rpx;
-}
-
-.ex-detail-tag {
-  font-size: 22rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-  background: #F2F3F5;
-  padding: 6rpx 18rpx;
-  border-radius: 9999rpx;
-}
-
-.ex-detail-tag.tag-equip {
+.detail-btn.primary-soft {
+  background: #F0FBF4;
   color: #07C160;
-  background: #EAF9F0;
 }
 
-.ex-detail-block {
-  margin-bottom: 22rpx;
+.detail-btn.dark {
+  background: #1A1A1A;
+  color: #FFFFFF;
 }
 
-.ex-detail-block:last-child {
-  margin-bottom: 0;
+.detail-btn.secondary {
+  background: #F4F5F7;
+  color: #333333;
+  font-weight: 500;
 }
 
-.ex-detail-label {
-  display: block;
-  font-size: 24rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-  margin-bottom: 8rpx;
+.detail-btn.danger {
+  background: #FA5151;
+  color: #FFFFFF;
 }
 
-.ex-detail-text {
-  display: block;
-  font-size: 26rpx;
-  color: #555555;
-  line-height: 1.7;
+.detail-btn:active {
+  opacity: 0.86;
 }
 
-.ex-detail-tips {
-  padding: 20rpx 22rpx;
-  background: #F7F8FA;
-  border-radius: 16rpx;
+/* 删除确认抽屉按钮 */
+.delete-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding-top: 8rpx;
 }
-
-
-

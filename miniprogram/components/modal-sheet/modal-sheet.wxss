@@ -14,8 +14,8 @@
 
 .modal-sheet-container {
   background: #FFFFFF;
-  border-radius: 24rpx 24rpx 0 0;
-  padding: 24rpx 40rpx calc(40rpx + env(safe-area-inset-bottom));
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 24rpx 40rpx calc(28rpx + env(safe-area-inset-bottom));
   animation: slideUp 0.3s ease-out;
 }
 
@@ -66,6 +66,10 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.modal-sheet-content.no-actions {
+  margin-bottom: 0;
+}
+
 .modal-sheet-actions {
   display: flex;
   gap: 20rpx;
@@ -77,8 +81,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 16rpx;
-  font-size: 32rpx;
+  border-radius: 9999rpx;
+  font-size: 30rpx;
   font-weight: 600;
   transition: opacity 0.15s ease;
 }

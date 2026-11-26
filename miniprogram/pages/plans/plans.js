@@ -24,6 +24,8 @@ Page({
     showExerciseDetail: false,
     detailExercise: null,
     gifLoadError: false,
+    playingExerciseId: '',
+    thumbErrorMap: {},
     showAddCustomModal: false,
     customMuscleGroups: ['胸部', '背部', '下肢', '硬拉', '肩部', '手臂', '核心'],
     customExercise: {
@@ -117,7 +119,7 @@ Page({
   onSwitchMainTab(e) {
     const tab = e.currentTarget.dataset.tab;
     if (!tab || tab === this.data.activeMainTab) return;
-    this.setData({ activeMainTab: tab });
+    this.setData({ activeMainTab: tab, playingExerciseId: '' });
   },
 
   /**
@@ -173,6 +175,7 @@ Page({
       return (
         (ex.name && ex.name.toLowerCase().includes(kw)) ||
         (ex.name_en && ex.name_en.toLowerCase().includes(kw)) ||
+        (ex.aliases && ex.aliases.toLowerCase().includes(kw)) ||
         (ex.sub_muscle && ex.sub_muscle.toLowerCase().includes(kw)) ||
         (ex.equipment && ex.equipment.toLowerCase().includes(kw)) ||
         (ex.target_muscles && ex.target_muscles.toLowerCase().includes(kw)) ||
@@ -180,6 +183,26 @@ Page({
       );
     });
     this.setData({ filteredExercises: filtered });
+  },
+
+  onTogglePreviewGif(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId) return;
+    const ex = this.data.allExercises.find(item => item.id === exerciseId);
+    if (!ex) return;
+    if (!ex.gif_url) {
+      this.setData({ showExerciseDetail: true, detailExercise: ex, gifLoadError: false });
+      return;
+    }
+    this.setData({
+      playingExerciseId: this.data.playingExerciseId === exerciseId ? '' : exerciseId
+    });
+  },
+
+  onThumbError(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId || this.data.thumbErrorMap[exerciseId]) return;
+    this.setData({ [`thumbErrorMap.${exerciseId}`]: true });
   },
 
   onTapExerciseCard(e) {

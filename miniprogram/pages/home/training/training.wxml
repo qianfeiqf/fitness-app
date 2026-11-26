@@ -468,6 +468,30 @@
           bindtap="onToggleAddExercise"
           data-exercise-id="{{item.id}}"
         >
+          <view
+            class="ex-thumb-box {{playingExerciseId === item.id ? 'playing' : ''}}"
+            catchtap="onTogglePreviewGif"
+            data-exercise-id="{{item.id}}"
+          >
+            <image
+              wx:if="{{playingExerciseId === item.id && item.gif_url}}"
+              class="ex-thumb-img"
+              src="{{item.gif_url}}"
+              mode="aspectFit"
+            />
+            <image
+              wx:elif="{{item.thumb_url && !thumbErrorMap[item.id]}}"
+              class="ex-thumb-img"
+              src="{{item.thumb_url}}"
+              mode="aspectFit"
+              lazy-load="{{true}}"
+              binderror="onThumbError"
+              data-exercise-id="{{item.id}}"
+            />
+            <view wx:else class="ex-thumb-placeholder"></view>
+            <view wx:if="{{playingExerciseId === item.id && item.gif_url}}" class="ex-thumb-live-dot"></view>
+            <view wx:elif="{{item.gif_url}}" class="ex-thumb-play"></view>
+          </view>
           <view class="alt-info">
             <text class="alt-name">{{item.name}}</text>
             <text class="alt-muscle">{{item.sub_muscle || item.muscle_group}}{{item.equipment ? ' · ' + item.equipment : ''}}</text>
@@ -533,6 +557,30 @@
         bindtap="onSelectAlternative"
         data-exercise-id="{{item.id}}"
       >
+        <view
+          class="ex-thumb-box {{playingExerciseId === item.id ? 'playing' : ''}}"
+          catchtap="onTogglePreviewGif"
+          data-exercise-id="{{item.id}}"
+        >
+          <image
+            wx:if="{{playingExerciseId === item.id && item.gif_url}}"
+            class="ex-thumb-img"
+            src="{{item.gif_url}}"
+            mode="aspectFit"
+          />
+          <image
+            wx:elif="{{item.thumb_url && !thumbErrorMap[item.id]}}"
+            class="ex-thumb-img"
+            src="{{item.thumb_url}}"
+            mode="aspectFit"
+            lazy-load="{{true}}"
+            binderror="onThumbError"
+            data-exercise-id="{{item.id}}"
+          />
+          <view wx:else class="ex-thumb-placeholder"></view>
+          <view wx:if="{{playingExerciseId === item.id && item.gif_url}}" class="ex-thumb-live-dot"></view>
+          <view wx:elif="{{item.gif_url}}" class="ex-thumb-play"></view>
+        </view>
         <view class="alt-info">
           <text class="alt-name">{{item.name}}</text>
           <text class="alt-muscle">{{item.muscle_group}}{{item.equipment ? ' · ' + item.equipment : ''}}</text>

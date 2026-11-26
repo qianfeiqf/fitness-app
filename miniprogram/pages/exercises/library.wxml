@@ -32,6 +32,30 @@
       <view wx:for="{{item.exercises}}" wx:for-item="ex" wx:key="id"
             class="exercise-item {{selectedMap[ex.id] ? 'selected' : ''}}"
             bindtap="onSelectExercise" data-exercise-id="{{ex.id}}">
+        <view
+          class="ex-thumb-box {{playingExerciseId === ex.id ? 'playing' : ''}}"
+          catchtap="onTogglePreviewGif"
+          data-exercise-id="{{ex.id}}"
+        >
+          <image
+            wx:if="{{playingExerciseId === ex.id && ex.gif_url}}"
+            class="ex-thumb-img"
+            src="{{ex.gif_url}}"
+            mode="aspectFit"
+          />
+          <image
+            wx:elif="{{ex.thumb_url && !thumbErrorMap[ex.id]}}"
+            class="ex-thumb-img"
+            src="{{ex.thumb_url}}"
+            mode="aspectFit"
+            lazy-load="{{true}}"
+            binderror="onThumbError"
+            data-exercise-id="{{ex.id}}"
+          />
+          <view wx:else class="ex-thumb-placeholder"></view>
+          <view wx:if="{{playingExerciseId === ex.id && ex.gif_url}}" class="ex-thumb-live-dot"></view>
+          <view wx:elif="{{ex.gif_url}}" class="ex-thumb-play"></view>
+        </view>
         <view class="exercise-info">
           <text class="exercise-name">{{ex.name}}</text>
           <text wx:if="{{ex.sub_muscle || ex.equipment || ex.target_muscles || ex.name_en}}" class="exercise-name-en">{{ex.sub_muscle ? ex.sub_muscle + ' · ' : ''}}{{ex.equipment ? ex.equipment + ' · ' : ''}}{{ex.target_muscles || ex.name_en}}</text>

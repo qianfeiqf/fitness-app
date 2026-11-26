@@ -29,6 +29,8 @@ Page({
     showExerciseDetail: false,
     detailExercise: null,
     gifLoadError: false,
+    playingExerciseId: '',
+    thumbErrorMap: {},
     dayOfWeek: null,
     selectedIds: [],
     selectedMap: {},
@@ -73,6 +75,7 @@ Page({
       filtered = filtered.filter(ex =>
         ex.name.toLowerCase().includes(keyword) ||
         (ex.name_en && ex.name_en.toLowerCase().includes(keyword)) ||
+        (ex.aliases && ex.aliases.toLowerCase().includes(keyword)) ||
         (ex.sub_muscle && ex.sub_muscle.toLowerCase().includes(keyword)) ||
         (ex.equipment && ex.equipment.toLowerCase().includes(keyword))
       );
@@ -290,6 +293,26 @@ Page({
     this.loadExercises();
 
     wx.showToast({ title: '动作已添加', icon: 'success' });
+  },
+
+  onTogglePreviewGif(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId) return;
+    const ex = this.data.allExercises.find(item => item.id === exerciseId);
+    if (!ex) return;
+    if (!ex.gif_url) {
+      this.setData({ showExerciseDetail: true, detailExercise: ex, gifLoadError: false });
+      return;
+    }
+    this.setData({
+      playingExerciseId: this.data.playingExerciseId === exerciseId ? '' : exerciseId
+    });
+  },
+
+  onThumbError(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId || this.data.thumbErrorMap[exerciseId]) return;
+    this.setData({ [`thumbErrorMap.${exerciseId}`]: true });
   },
 
   /**

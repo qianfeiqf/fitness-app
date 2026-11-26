@@ -116,12 +116,15 @@ function initSeedData() {
 
   seedExercises.forEach(seed => {
     const resolvedGifUrl = EXERCISE_GIFS[seed.id] || seed.gif_url || '';
+    const resolvedThumbUrl = seed.thumb_url || (resolvedGifUrl && resolvedGifUrl.includes('/exercise-gifs/')
+      ? resolvedGifUrl.replace('/exercise-gifs/', '/exercise-thumbs/').replace(/\.gif$/i, '.jpg')
+      : '');
     const existing = exerciseMap[seed.id];
     if (!existing) {
-      exercises.push({ ...seed, gif_url: resolvedGifUrl });
+      exercises.push({ ...seed, gif_url: resolvedGifUrl, thumb_url: resolvedThumbUrl });
       changed = true;
     } else if (existing.is_system !== false) {
-      const fieldsToBackfill = ['sub_muscle', 'equipment', 'target_muscles', 'description', 'tips', 'name_en'];
+      const fieldsToBackfill = ['sub_muscle', 'equipment', 'target_muscles', 'description', 'tips', 'name_en', 'aliases'];
       fieldsToBackfill.forEach(field => {
         if (!existing[field] && seed[field]) {
           existing[field] = seed[field];
@@ -130,6 +133,10 @@ function initSeedData() {
       });
       if (resolvedGifUrl && existing.gif_url !== resolvedGifUrl) {
         existing.gif_url = resolvedGifUrl;
+        changed = true;
+      }
+      if (resolvedThumbUrl && existing.thumb_url !== resolvedThumbUrl) {
+        existing.thumb_url = resolvedThumbUrl;
         changed = true;
       }
       if ((!Array.isArray(existing.alternatives) || existing.alternatives.length === 0) && Array.isArray(seed.alternatives) && seed.alternatives.length > 0) {

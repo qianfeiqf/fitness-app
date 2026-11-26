@@ -94,6 +94,8 @@ Page({
     showExerciseDetail: false,
     detailExercise: null,
     gifLoadError: false,
+    playingExerciseId: '',
+    thumbErrorMap: {},
 
     // 更多操作面板
     showMoreActions: false,
@@ -1641,6 +1643,7 @@ Page({
       const matchKw = !kw ||
         (ex.name && ex.name.toLowerCase().includes(kw)) ||
         (ex.name_en && ex.name_en.toLowerCase().includes(kw)) ||
+        (ex.aliases && ex.aliases.toLowerCase().includes(kw)) ||
         (ex.sub_muscle && ex.sub_muscle.toLowerCase().includes(kw)) ||
         (ex.equipment && ex.equipment.toLowerCase().includes(kw)) ||
         (ex.muscle_group && ex.muscle_group.toLowerCase().includes(kw));
@@ -2037,7 +2040,8 @@ Page({
       addExerciseSearch: '',
       selectedAddIds: [],
       selectedAddMap: {},
-      filteredExercises: []
+      filteredExercises: [],
+      playingExerciseId: ''
     });
   },
 
@@ -2358,6 +2362,26 @@ Page({
   /**
    * 在选动作抽屉中查看任意动作要领
    */
+  onTogglePreviewGif(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId) return;
+    const detail = findOne('exercises', { id: exerciseId });
+    if (!detail) return;
+    if (!detail.gif_url) {
+      this.setData({ showExerciseDetail: true, detailExercise: detail, gifLoadError: false });
+      return;
+    }
+    this.setData({
+      playingExerciseId: this.data.playingExerciseId === exerciseId ? '' : exerciseId
+    });
+  },
+
+  onThumbError(e) {
+    const { exerciseId } = e.currentTarget.dataset;
+    if (!exerciseId || this.data.thumbErrorMap[exerciseId]) return;
+    this.setData({ [`thumbErrorMap.${exerciseId}`]: true });
+  },
+
   onViewExerciseDetail(e) {
     const { exerciseId } = e.currentTarget.dataset;
     if (!exerciseId) return;

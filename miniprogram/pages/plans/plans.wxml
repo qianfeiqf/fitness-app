@@ -167,7 +167,7 @@
 
       <!-- 动作统计行 -->
       <view class="ex-count-row">
-        <text class="section-count">共 {{filteredExercises.length}} 个动作 · 点击查看动图与要领</text>
+        <text class="section-count">共 {{filteredExercises.length}} 个动作 · 点左侧缩略图直接播动图，点卡片看要领</text>
       </view>
 
       <!-- 动作无边框白卡列表 -->
@@ -179,6 +179,30 @@
           bindtap="onTapExerciseCard"
           data-exercise-id="{{item.id}}"
         >
+          <view
+            class="ex-thumb-box {{playingExerciseId === item.id ? 'playing' : ''}}"
+            catchtap="onTogglePreviewGif"
+            data-exercise-id="{{item.id}}"
+          >
+            <image
+              wx:if="{{playingExerciseId === item.id && item.gif_url}}"
+              class="ex-thumb-img"
+              src="{{item.gif_url}}"
+              mode="aspectFit"
+            />
+            <image
+              wx:elif="{{item.thumb_url && !thumbErrorMap[item.id]}}"
+              class="ex-thumb-img"
+              src="{{item.thumb_url}}"
+              mode="aspectFit"
+              lazy-load="{{true}}"
+              binderror="onThumbError"
+              data-exercise-id="{{item.id}}"
+            />
+            <view wx:else class="ex-thumb-placeholder"></view>
+            <view wx:if="{{playingExerciseId === item.id && item.gif_url}}" class="ex-thumb-live-dot"></view>
+            <view wx:elif="{{item.gif_url}}" class="ex-thumb-play"></view>
+          </view>
           <view class="ex-lib-main">
             <view class="ex-lib-title-row">
               <text class="ex-lib-name">{{item.name}}</text>

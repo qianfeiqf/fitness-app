@@ -1,6 +1,8 @@
 /**
- * 系统内置动作库种子数据（88个高频动作，含一级大部位与二级细分部位）
+ * 系统内置动作库种子数据（200个系统动作：88个基础动作 + 112个商用器械与进阶变式）
  */
+
+const { EXTRA_EXERCISES } = require('./seed-exercises-extra.js');
 
 const MUSCLE_SUB_GROUPS = {
   "胸部": [
@@ -1476,7 +1478,8 @@ function getExercisesSeedData() {
       "ex_062",
       "ex_061"
     ]
-  }
+  },
+  ...EXTRA_EXERCISES
 ];
 }
 

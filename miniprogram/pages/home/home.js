@@ -249,23 +249,17 @@ Page({
    */
   async checkLoginAndLoadData(options = {}) {
     const app = getApp();
+    const loggedIn = !!(app && app.globalData && app.globalData.isLoggedIn);
+    const openId = app && app.globalData ? app.globalData.openId : null;
 
-    if (!app.globalData.isLoggedIn) {
-      // 未登录，显示登录引导
+    if (this.data.isLoggedIn !== loggedIn || (loggedIn && (!this.data.userInfo || this.data.userInfo.openId !== openId))) {
       this.setData({
-        isLoggedIn: false,
-        loading: false
-      });
-      return;
-    }
-
-    if (!this.data.isLoggedIn || !this.data.userInfo || this.data.userInfo.openId !== app.globalData.openId) {
-      this.setData({
-        isLoggedIn: true,
-        userInfo: { openId: app.globalData.openId }
+        isLoggedIn: loggedIn,
+        userInfo: loggedIn ? { openId } : null
       });
     }
 
+    // 本地优先架构：未登录也可直接浏览与完整跟练，登录用于开启云端备份
     await this.loadTodayTraining(options);
   },
 
@@ -727,11 +721,7 @@ Page({
     const pd = this.data.currentPlanData || this.data.planDataList[this.data.currentPlanIndex];
     if (!pd) return;
 
-    const app = getApp();
-    if (!app.globalData.isLoggedIn) {
-      this.onLogin();
-      return;
-    }
+
 
     if (pd.session && pd.session.status !== 'completed' && pd.session.status !== 'aborted') {
       this.onResumeTrainingForPlan({ currentTarget: { dataset: { sessionId: pd.session.id } } });
@@ -982,11 +972,7 @@ Page({
       return;
     }
 
-    const app = getApp();
-    if (!app.globalData.isLoggedIn) {
-      this.onLogin();
-      return;
-    }
+
 
     if (this._selectedDayByPlan && planData.plan) {
       delete this._selectedDayByPlan[planData.plan.id];
@@ -1177,7 +1163,6 @@ Page({
       const app = getApp();
       const isFullTour = !!(app && app.globalData && app.globalData.fullTourStage === 'home');
       const isFirstAuto = !isFullTour
-        && this.data.isLoggedIn
         && !(app && app.globalData && app.globalData.needsOnboarding)
         && !this.data.showRecoveryModal
         && !wx.getStorageSync('home_tour_done');
@@ -1302,11 +1287,7 @@ Page({
    * 一键开始或继续自由训练（存在进行中自由训练时直接续练，不丢失进度）
    */
   onStartFreeWorkout() {
-    const app = getApp();
-    if (!app.globalData.isLoggedIn) {
-      this.onLogin();
-      return;
-    }
+
 
     const { session: existingFree } = this._getActiveFreeSessionInfo();
     if (existingFree) {

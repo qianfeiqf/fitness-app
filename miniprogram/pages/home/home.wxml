@@ -5,29 +5,17 @@
   <!-- 顶部轻头部 -->
   <view class="welcome-section">
     <view class="welcome-content">
-      <text class="welcome-greeting">{{isLoggedIn && todayMonth ? (todayMonth + '月' + todayDate + '日 · ' + todayWeek) : '欢迎使用'}}</text>
-      <text class="welcome-title">{{isLoggedIn ? '今日训练' : '训练记一记'}}</text>
+      <text class="welcome-greeting">{{todayMonth ? (todayMonth + '月' + todayDate + '日 · ' + todayWeek) : '欢迎使用'}}</text>
+      <text class="welcome-title">今日训练</text>
     </view>
-    <view wx:if="{{isLoggedIn && todayPlan && !activeFreeSession}}" class="header-free-pill" bindtap="onStartFreeWorkout">
+    <view wx:if="{{todayPlan && !activeFreeSession}}" class="header-free-pill" bindtap="onStartFreeWorkout">
       <text class="header-free-plus">+</text>
       <text class="header-free-text">自由训练</text>
     </view>
   </view>
 
-  <!-- 未登录状态 -->
-  <view wx:if="{{!isLoggedIn}}" class="login-section">
-    <view class="login-hero">
-      <view class="login-avatar">
-        <mp-icon icon="me" color="#1A1A1A" size="{{36}}" />
-      </view>
-      <text class="login-headline">准备好突破了</text>
-      <text class="login-subhead">登录后同步训练数据，记录每一步进步</text>
-    </view>
-    <view class="btn-login" bindtap="onLogin"><text>微信一键登录</text></view>
-  </view>
-
   <!-- 加载状态 -->
-  <view wx:elif="{{loading}}" class="loading-section">
+  <view wx:if="{{loading}}" class="loading-section">
     <view class="skeleton-wrapper">
       <view class="skeleton-block tall"></view>
       <view class="skeleton-block medium"></view>
@@ -271,7 +259,7 @@
   </modal-sheet>
 
   <!-- 底部吸屏主操作按钮（仅在存在激活计划且无悬浮条时显示） -->
-  <view wx:if="{{isLoggedIn && todayPlan && currentPlanData && !hasMinimizedFloat}}" class="home-sticky-cta">
+  <view wx:if="{{todayPlan && currentPlanData && !hasMinimizedFloat}}" class="home-sticky-cta">
     <view
       wx:if="{{currentPlanData.session && currentPlanData.session.status !== 'completed' && currentPlanData.session.status !== 'aborted'}}"
       class="sticky-cta-btn"

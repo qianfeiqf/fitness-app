@@ -966,3 +966,45 @@
 .sync-login-btn:active {
   opacity: 0.88;
 }
+
+/* 未登录功能预览禁用态 */
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.locked-tag {
+  font-size: 22rpx;
+  color: #999999;
+  background: #F4F5F7;
+  padding: 6rpx 16rpx;
+  border-radius: 9999rpx;
+  flex-shrink: 0;
+}
+
+.profile-card.card-disabled {
+  background: #FAFAFB;
+  border-color: #EFEFF2;
+}
+
+.profile-card.card-disabled .card-title,
+.profile-card.card-disabled .input-label,
+.profile-card.card-disabled .input-unit,
+.profile-card.card-disabled .goals-empty-text {
+  color: #999999;
+}
+
+.profile-card.card-disabled .input {
+  background: #F4F5F7;
+  border-color: #EBECEF;
+  color: #B0B5BD;
+}
+
+.menu-item.menu-item-disabled {
+  opacity: 0.62;
+}
+
+.menu-item.menu-item-disabled:active {
+  background: transparent;
+}

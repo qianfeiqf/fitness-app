@@ -310,13 +310,18 @@ Page({
     handleLoginClose(this);
   },
 
-  onTapProfileInputs() {
+  _promptLoginFirst() {
+    wx.showToast({ title: '请先在上方登录', icon: 'none' });
+  },
+
+  onTapLockedCard() {
     if (this.data.isLoggedIn) return;
-    requireLogin(this, '登录后即可保存身高体重等身体档案');
+    this._promptLoginFirst();
   },
 
   onShowGoalModal() {
-    if (!requireLogin(this, '登录后即可添加并追踪你的 1RM 训练目标', () => this.onShowGoalModal())) {
+    if (!this.data.isLoggedIn) {
+      this._promptLoginFirst();
       return;
     }
     const today = new Date();
@@ -543,7 +548,8 @@ Page({
    * 导出训练数据（支持 Markdown 报告或 JSON 完整备份）
    */
   onExportData() {
-    if (!requireLogin(this, '登录后即可导出你的训练数据与备份', () => this.onExportData())) {
+    if (!this.data.isLoggedIn) {
+      this._promptLoginFirst();
       return;
     }
     if (this.data.exporting) return;

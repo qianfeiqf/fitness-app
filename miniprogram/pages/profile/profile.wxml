@@ -29,13 +29,14 @@
       <text class="return-banner-btn">返回训练 ›</text>
     </view>
 
-    <!-- 身体档案卡片（登录后展示） -->
-    <view wx:if="{{isLoggedIn}}" class="profile-card">
-      <view class="card-header">
+    <!-- 身体档案卡片（未登录展示禁用预览态） -->
+    <view class="profile-card {{!isLoggedIn ? 'card-disabled' : ''}}" bindtap="onTapLockedCard">
+      <view class="card-header card-header-row">
         <text class="card-title">身体档案</text>
+        <text wx:if="{{!isLoggedIn}}" class="locked-tag">登录后可用</text>
       </view>
 
-      <view class="profile-inputs" bindtap="onTapProfileInputs">
+      <view class="profile-inputs">
         <view class="profile-input-item">
           <view class="input-content">
             <text class="input-label">体重</text>
@@ -45,7 +46,7 @@
                      disabled="{{!isLoggedIn}}"
                      placeholder="0"
                      placeholder-style="color: #C0C4CC; font-weight: 400;"
-                     value="{{weight}}"
+                     value="{{isLoggedIn ? weight : ''}}"
                      bindinput="onUpdateWeight"
                      bindblur="onProfileInputBlur" />
               <text class="input-unit">kg</text>
@@ -64,7 +65,7 @@
                      disabled="{{!isLoggedIn}}"
                      placeholder="0"
                      placeholder-style="color: #C0C4CC; font-weight: 400;"
-                     value="{{height}}"
+                     value="{{isLoggedIn ? height : ''}}"
                      bindinput="onUpdateHeight"
                      bindblur="onProfileInputBlur" />
               <text class="input-unit">cm</text>
@@ -74,15 +75,16 @@
       </view>
     </view>
 
-    <!-- 训练目标（登录后展示） -->
-    <view wx:if="{{isLoggedIn}}" class="profile-card goals-card">
+    <!-- 训练目标（未登录展示禁用预览态） -->
+    <view class="profile-card goals-card {{!isLoggedIn ? 'card-disabled' : ''}}" bindtap="onTapLockedCard">
       <view class="card-header goals-header">
         <text class="card-title">训练目标</text>
-        <view class="btn-add-goal" bindtap="onShowGoalModal">+ 添加</view>
+        <view wx:if="{{isLoggedIn}}" class="btn-add-goal" catchtap="onShowGoalModal">+ 添加</view>
+        <text wx:else class="locked-tag">登录后可用</text>
       </view>
 
-      <view wx:if="{{goals.length === 0}}" class="goals-empty">
-        <text class="goals-empty-text">还没有设定目标，添加一个激励自己吧</text>
+      <view wx:if="{{!isLoggedIn || goals.length === 0}}" class="goals-empty">
+        <text class="goals-empty-text">{{isLoggedIn ? '还没有设定目标，添加一个激励自己吧' : '登录后可设定 1RM 目标，实时追踪突破进度'}}</text>
       </view>
 
       <view wx:else class="goals-list">
@@ -100,7 +102,7 @@
               <view class="progress-fill" style="{{item.progressStyle}}"></view>
             </view>
             <text class="progress-text">{{item.progress}}%</text>
-            <view class="goal-delete" bindtap="onDeleteGoal" data-id="{{item.id}}"><mp-icon icon="close" color="#999999" size="{{14}}" /></view>
+            <view class="goal-delete" catchtap="onDeleteGoal" data-id="{{item.id}}"><mp-icon icon="close" color="#999999" size="{{14}}" /></view>
           </view>
           <view wx:if="{{item.deadline}}" class="goal-deadline">
             截止日期: {{item.deadline}}
@@ -122,15 +124,16 @@
         <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
 
-      <view wx:if="{{isLoggedIn}}" class="menu-item" bindtap="onExportData">
+      <view class="menu-item {{!isLoggedIn ? 'menu-item-disabled' : ''}}" bindtap="onExportData">
         <view class="menu-icon-wrap">
-          <mp-icon icon="download" color="#1A1A1A" size="{{22}}" />
+          <mp-icon icon="download" color="{{isLoggedIn ? '#1A1A1A' : '#999999'}}" size="{{22}}" />
         </view>
         <view class="menu-content">
           <text class="menu-title">数据导出</text>
           <text class="menu-desc">导出 Markdown 报告或 JSON 备份</text>
         </view>
-        <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
+        <text wx:if="{{!isLoggedIn}}" class="locked-tag">登录后可用</text>
+        <mp-icon wx:else icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
 
       <view wx:if="{{isLoggedIn}}" class="menu-item" bindtap="onOpenAccountSheet">

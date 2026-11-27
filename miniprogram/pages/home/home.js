@@ -981,17 +981,15 @@ Page({
       return;
     }
 
-    if (!requireLogin(this, '登录后即可开始训练并云端同步记录', () => this.onStartTrainingForPlan({ currentTarget: { dataset: { planId } } }))) {
-      return;
-    }
-
-    if (this._selectedDayByPlan && planData.plan) {
-      delete this._selectedDayByPlan[planData.plan.id];
-    }
-    const session = this._createSessionForPlan(planData);
-    this.setData({ currentSession: session, isTraining: true });
-    wx.navigateTo({
-      url: '/pages/home/training/training?sessionId=' + session.id
+    requireLogin(this, '登录后即可开始训练并云端同步记录', () => {
+      if (this._selectedDayByPlan && planData.plan) {
+        delete this._selectedDayByPlan[planData.plan.id];
+      }
+      const session = this._createSessionForPlan(planData);
+      this.setData({ currentSession: session, isTraining: true });
+      wx.navigateTo({
+        url: '/pages/home/training/training?sessionId=' + session.id
+      });
     });
   },
 
@@ -1312,42 +1310,41 @@ Page({
    * 一键开始或继续自由训练（存在进行中自由训练时直接续练，不丢失进度）
    */
   onStartFreeWorkout() {
-    if (!requireLogin(this, '登录后即可开始记录自由训练', () => this.onStartFreeWorkout())) {
-      return;
-    }
-    const { session: existingFree } = this._getActiveFreeSessionInfo();
-    if (existingFree) {
-      this.setData({ currentSession: existingFree, isTraining: true });
+    requireLogin(this, '登录后即可开始记录自由训练', () => {
+      const { session: existingFree } = this._getActiveFreeSessionInfo();
+      if (existingFree) {
+        this.setData({ currentSession: existingFree, isTraining: true });
+        wx.navigateTo({
+          url: '/pages/home/training/training?sessionId=' + existingFree.id
+        });
+        return;
+      }
+
+      const now = Date.now();
+      const todayStr = this.formatDate(new Date(now));
+      const session = {
+        id: 'sess_' + now + '_' + Math.random().toString(36).substr(2, 6),
+        plan_id: null,
+        plan_name: '自由训练',
+        is_free_workout: true,
+        scheduled_date: todayStr,
+        status: 'in_progress',
+        started_at: now,
+        completed_sets: [],
+        pending_exercises: [],
+        current_exercise_index: 0,
+        current_set_index: 0,
+        created_at: now,
+        updated_at: now,
+        sync_status: 'pending'
+      };
+
+      insert('sessions', session);
+      this.setData({ currentSession: session, isTraining: true });
+
       wx.navigateTo({
-        url: '/pages/home/training/training?sessionId=' + existingFree.id
+        url: '/pages/home/training/training?sessionId=' + session.id
       });
-      return;
-    }
-
-    const now = Date.now();
-    const todayStr = this.formatDate(new Date(now));
-    const session = {
-      id: 'sess_' + now + '_' + Math.random().toString(36).substr(2, 6),
-      plan_id: null,
-      plan_name: '自由训练',
-      is_free_workout: true,
-      scheduled_date: todayStr,
-      status: 'in_progress',
-      started_at: now,
-      completed_sets: [],
-      pending_exercises: [],
-      current_exercise_index: 0,
-      current_set_index: 0,
-      created_at: now,
-      updated_at: now,
-      sync_status: 'pending'
-    };
-
-    insert('sessions', session);
-    this.setData({ currentSession: session, isTraining: true });
-
-    wx.navigateTo({
-      url: '/pages/home/training/training?sessionId=' + session.id
     });
   }
 });

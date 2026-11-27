@@ -446,7 +446,7 @@ Page({
             ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
             ctx.font = '22px sans-serif';
             ctx.textAlign = 'right';
-            ctx.fillText('坚持的每一组都算数', width - 50, footerLineY + 60);
+            ctx.fillText('记录进步', width - 50, footerLineY + 60);
 
             wx.canvasToTempFilePath({
               canvas,

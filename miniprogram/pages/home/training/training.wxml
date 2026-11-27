@@ -113,7 +113,6 @@
       </view>
       <view class="exercise-remove-btn" bindtap="onRemoveCurrentExercise">
         <view class="exercise-remove-icon"></view>
-        <text class="exercise-remove-text">移除</text>
       </view>
     </view>
 

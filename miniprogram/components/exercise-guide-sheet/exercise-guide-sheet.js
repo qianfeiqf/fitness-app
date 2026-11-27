@@ -1,14 +1,18 @@
 const { getCollection } = require('../../localdb/db.js');
 const { calculate1RM } = require('../../services/rm.js');
 
-function formatHistoryDate(ts) {
+const HISTORY_PAGE_SIZE = 20;
+
+function formatMonthDay(ts) {
   if (!ts) return '';
   const d = new Date(ts);
-  const now = new Date();
-  const y = d.getFullYear();
-  const m = d.getMonth() + 1;
-  const day = d.getDate();
-  return y === now.getFullYear() ? `${m}月${day}日` : `${y}年${m}月${day}日`;
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${m}/${day}`;
+}
+
+function getYearFromTs(ts) {
+  return ts ? new Date(ts).getFullYear() : new Date().getFullYear();
 }
 
 function formatWeight(val) {
@@ -69,6 +73,8 @@ Component({
     gifLoadError: false,
     activeTab: 'guide',
     historyList: [],
+    historyTotal: 0,
+    historyHasMore: false,
     historySummary: {
       best1RM: 0,
       maxWeight: 0,
@@ -79,11 +85,15 @@ Component({
   observers: {
     'visible, exercise, initialTab': function(visible, exercise, initialTab) {
       if (visible && exercise) {
-        const { historyList, historySummary } = this._buildExerciseHistory(exercise);
+        const { fullList, historySummary } = this._buildExerciseHistory(exercise);
+        this._allHistoryList = fullList;
+        const firstPage = fullList.slice(0, HISTORY_PAGE_SIZE);
         this.setData({
           gifLoadError: false,
           activeTab: initialTab === 'history' ? 'history' : 'guide',
-          historyList,
+          historyList: firstPage,
+          historyTotal: fullList.length,
+          historyHasMore: fullList.length > firstPage.length,
           historySummary
         });
       }
@@ -100,10 +110,29 @@ Component({
       }
     },
 
+    onScrollToLower() {
+      if (this.data.activeTab !== 'history' || !this.data.historyHasMore) return;
+      this.onLoadMoreHistory();
+    },
+
+    onLoadMoreHistory() {
+      const all = this._allHistoryList || [];
+      const currentLen = (this.data.historyList || []).length;
+      if (currentLen >= all.length) {
+        this.setData({ historyHasMore: false });
+        return;
+      }
+      const nextSlice = all.slice(0, currentLen + HISTORY_PAGE_SIZE);
+      this.setData({
+        historyList: nextSlice,
+        historyHasMore: all.length > nextSlice.length
+      });
+    },
+
     _buildExerciseHistory(exercise) {
       const exId = exercise.id || exercise.exercise_id || '';
       const exName = (exercise.name || exercise.exercise_name || '').trim();
-      const empty = { historyList: [], historySummary: { best1RM: 0, maxWeight: 0, sessionCount: 0 } };
+      const empty = { fullList: [], historySummary: { best1RM: 0, maxWeight: 0, sessionCount: 0 } };
       if (!exId && !exName) return empty;
 
       const isMatch = (s) => {
@@ -129,8 +158,8 @@ Component({
         if (set.id && seenSetIds.has(set.id)) return;
         if (set.id) seenSetIds.add(set.id);
 
-        const sessId = set.session_id || (sess && sess.id) || ('day_' + formatHistoryDate(set.completed_at || set.created_at));
         const ts = (sess && (sess.completed_at || sess.started_at)) || set.completed_at || set.created_at || 0;
+        const sessId = set.session_id || (sess && sess.id) || ('day_' + getYearFromTs(ts) + '_' + formatMonthDay(ts));
         if (!groupMap[sessId]) {
           groupMap[sessId] = {
             sessionId: sessId,
@@ -175,7 +204,7 @@ Component({
       let overallBest1RM = 0;
       let overallMaxWeight = 0;
 
-      const enriched = ascGroups.map(g => {
+      const enrichedAsc = ascGroups.map(g => {
         g.sets.sort((a, b) => (a.setNumber - b.setNumber) || (a.completedAt - b.completedAt));
         let sessionBest1RM = 0;
         let sessionMaxWeight = 0;
@@ -192,7 +221,8 @@ Component({
 
         return {
           sessionId: g.sessionId,
-          dateText: formatHistoryDate(g.timestamp),
+          year: getYearFromTs(g.timestamp),
+          dateText: formatMonthDay(g.timestamp),
           planName: g.planName,
           setCount: g.sets.length,
           best1RM: formatWeight(sessionBest1RM),
@@ -202,8 +232,16 @@ Component({
         };
       });
 
+      // 按时间倒序排列，并为每个年份段的首条记录标记年份分组头
+      const descList = enrichedAsc.reverse();
+      let prevYear = null;
+      descList.forEach(item => {
+        item.showYearHeader = item.year !== prevYear;
+        prevYear = item.year;
+      });
+
       return {
-        historyList: enriched.reverse().slice(0, 30),
+        fullList: descList,
         historySummary: {
           best1RM: formatWeight(overallBest1RM),
           maxWeight: formatWeight(overallMaxWeight),

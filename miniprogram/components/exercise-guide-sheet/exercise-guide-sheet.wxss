@@ -241,14 +241,22 @@
   padding: 4rpx 4rpx 0;
 }
 
-.ex-history-row {
-  padding: 24rpx 4rpx;
-  border-bottom: 1rpx solid #F0F1F4;
+.ex-history-year-header {
+  padding: 18rpx 4rpx 6rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #999999;
+  letter-spacing: 1rpx;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
 }
 
-.ex-history-row:last-child {
-  border-bottom: none;
-  padding-bottom: 8rpx;
+.ex-history-year-header:first-child {
+  padding-top: 6rpx;
+}
+
+.ex-history-row {
+  padding: 22rpx 4rpx;
+  border-bottom: 1rpx solid #F0F1F4;
 }
 
 .ex-history-row-head {
@@ -262,7 +270,7 @@
 .ex-history-date-wrap {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: 14rpx;
   min-width: 0;
   flex: 1;
 }
@@ -272,6 +280,8 @@
   font-weight: 700;
   color: #1A1A1A;
   flex-shrink: 0;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
 .ex-history-plan {
@@ -314,6 +324,14 @@
   line-height: 1.5;
   font-family: 'DIN Alternate', system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
+}
+
+.ex-history-more,
+.ex-history-end {
+  padding: 24rpx 0 8rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #B0B5BD;
 }
 
 .ex-history-empty {

@@ -18,11 +18,11 @@
       </view>
 
       <view class="login-sheet-actions">
-        <view class="login-sheet-btn secondary" bindtap="onClose">
-          <text>暂不登录</text>
-        </view>
         <view class="login-sheet-btn primary {{submitting ? 'loading' : ''}}" bindtap="onConfirmLogin">
           <text>{{submitting ? '登录中...' : '微信一键登录'}}</text>
+        </view>
+        <view class="login-sheet-skip" bindtap="onClose">
+          <text>暂不登录</text>
         </view>
       </view>
     </view>

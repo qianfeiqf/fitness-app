@@ -112,6 +112,10 @@ Page({
     console.log('=== 训练中心页面显示 ===');
     this.checkLoginAndLoadData();
     this.checkTrainingFloat();
+    const app = getApp();
+    if (!(app && app.globalData && app.globalData.needsOnboarding)) {
+      this.checkFirstLaunchProfilePrompt();
+    }
   },
 
   async onPullDownRefresh() {
@@ -167,24 +171,35 @@ Page({
   },
 
   /**
-   * 首次打开小程序时展示非阻塞的身体档案轻提示条（替代冷启动弹窗）
+   * 未填写体重时展示非阻塞轻提示条；点「×」或「去填写」但仍未填体重时静默 14 天后再次轻提醒
    */
   checkFirstLaunchProfilePrompt() {
     try {
-      if (wx.getStorageSync('has_prompted_profile')) return;
       const profile = findOne('profiles', {});
-      if (profile && profile.weight) {
-        wx.setStorageSync('has_prompted_profile', true);
+      if (profile && Number(profile.weight) > 0) {
+        if (this.data.showProfileBanner) {
+          this.setData({ showProfileBanner: false });
+        }
         return;
       }
-      this.setData({ showProfileBanner: true });
+      const cooldownMs = 14 * 24 * 60 * 60 * 1000;
+      const dismissedAt = Number(wx.getStorageSync('profile_prompt_dismissed_at')) || 0;
+      if (dismissedAt > 0 && (Date.now() - dismissedAt) < cooldownMs) {
+        if (this.data.showProfileBanner) {
+          this.setData({ showProfileBanner: false });
+        }
+        return;
+      }
+      if (!this.data.showProfileBanner) {
+        this.setData({ showProfileBanner: true });
+      }
     } catch (e) {
-      console.warn('首次身体档案提示检查失败:', e);
+      console.warn('身体档案提示检查失败:', e);
     }
   },
 
   onGoToProfileBanner() {
-    wx.setStorageSync('has_prompted_profile', true);
+    wx.setStorageSync('profile_prompt_dismissed_at', Date.now());
     this.setData({ showProfileBanner: false });
     const app = getApp();
     app.globalData.profilePrompt = 'profile';
@@ -192,7 +207,7 @@ Page({
   },
 
   onDismissProfileBanner() {
-    wx.setStorageSync('has_prompted_profile', true);
+    wx.setStorageSync('profile_prompt_dismissed_at', Date.now());
     this.setData({ showProfileBanner: false });
   },
 

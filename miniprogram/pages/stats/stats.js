@@ -88,6 +88,7 @@ Page({
     this.checkTrainingFloat();
     const app = getApp();
     if (app && app.globalData && app.globalData.fullTourStage === 'stats') {
+      wx.pageScrollTo({ scrollTop: 0, duration: 0 });
       if (this._statsTourTimer) clearTimeout(this._statsTourTimer);
       this._statsTourTimer = setTimeout(() => {
         const offset = app.globalData.fullTourOffset || 5;
@@ -111,11 +112,23 @@ Page({
           lastNextText: '完成引导',
           onFinish: () => {
             app.globalData.fullTourStage = null;
+            this._redrawChartsAfterTour();
             wx.showToast({ title: '引导完成，祝训练顺利', icon: 'none' });
+          },
+          onSkip: () => {
+            this._redrawChartsAfterTour();
           }
         });
-      }, 360);
+      }, 380);
     }
+  },
+
+  _redrawChartsAfterTour() {
+    setTimeout(() => {
+      this.drawRMChart();
+      const { muscleData } = this.calcMuscleDistribution();
+      this.drawRadarChart(muscleData);
+    }, 120);
   },
 
   onCoachTourNext() {

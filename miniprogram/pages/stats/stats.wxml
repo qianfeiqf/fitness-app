@@ -1,4 +1,5 @@
 <!-- 统计页面 - 现代化风格 -->
+<page-meta page-style="overflow: {{coachTour.visible ? 'hidden' : 'visible'}}" />
 
 <view class="page-stats" style="padding-top: {{navHeight}}px;">
   <!-- 页面标题 -->
@@ -108,7 +109,7 @@
       </view>
     </view>
     <view class="chart-card">
-      <canvas type="2d" id="rmTrendChart" class="rm-chart"></canvas>
+      <canvas type="2d" id="rmTrendChart" class="rm-chart" hidden="{{coachTour.visible}}"></canvas>
       <view class="chart-legend">
         <view class="legend-item">
           <view class="legend-dot" style="background: #1A1A1A;"></view>
@@ -215,7 +216,7 @@
       <text class="section-subtitle">近30天</text>
     </view>
     <view class="chart-card radar-card">
-      <canvas type="2d" id="muscleRadarChart" class="radar-chart"></canvas>
+      <canvas type="2d" id="muscleRadarChart" class="radar-chart" hidden="{{coachTour.visible}}"></canvas>
       <view wx:if="{{muscleAdvice}}" class="muscle-advice">
         <mp-icon icon="info" color="#07C160" size="{{18}}" />
         <text class="advice-text">{{muscleAdvice}}</text>

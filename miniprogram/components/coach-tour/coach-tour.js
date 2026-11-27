@@ -78,11 +78,11 @@ Component({
       const spaceAbove = spotTop - (statusH + 44);
 
       let cardStyle = '';
-      if (spaceBelow >= 185 || spaceBelow >= spaceAbove) {
-        const cardTop = Math.min(winH - 190, spotBottom + 16);
+      if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
+        const cardTop = Math.min(winH - 215, spotBottom + 14);
         cardStyle = `top: ${Math.max(statusH + 48, cardTop)}px;`;
       } else {
-        const cardBottom = Math.min(winH - statusH - 52, winH - spotTop + 16);
+        const cardBottom = Math.min(winH - statusH - 52, winH - spotTop + 14);
         cardStyle = `bottom: ${Math.max(24, cardBottom)}px;`;
       }
 

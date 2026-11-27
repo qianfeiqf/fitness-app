@@ -1,4 +1,5 @@
 <!-- 训练库页面（计划库 + 动作库） -->
+<page-meta page-style="overflow: {{coachTour.visible ? 'hidden' : 'visible'}}" />
 
 <view class="page-plans" style="padding-top: {{navHeight}}px;">
   <!-- 顶部双大字分段 Tab -->

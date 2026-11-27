@@ -1,4 +1,5 @@
 <wxs src="./training.wxs" module="wxs" />
+<page-meta page-style="overflow: {{coachTour.visible ? 'hidden' : 'visible'}}" />
 
 <!-- 训练中页面 - 沉浸式极简风格 -->
 

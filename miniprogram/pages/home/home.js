@@ -456,10 +456,11 @@ Page({
 
     const dayGroups = [];
     if (cycleType === 'natural_week') {
-      const dows = [...new Set(planExercises.map(pe => Number(pe.day_of_week)).filter(Boolean))].sort((a, b) => a - b);
+      const savedDows = Array.isArray(plan.selected_days) ? plan.selected_days.map(Number).filter(Boolean) : [];
+      const exDows = planExercises.map(pe => Number(pe.day_of_week)).filter(Boolean);
+      const dows = [...new Set([...savedDows, ...exDows])].sort((a, b) => a - b);
       dows.forEach(dow => {
         const list = this._hydratePlanExercises(planExercises.filter(pe => Number(pe.day_of_week) === dow));
-        if (list.length === 0) return;
         dayGroups.push({
           key: String(dow),
           label: weekDayNames[dow] || `第${dow}天`,
@@ -471,7 +472,6 @@ Page({
       const labels = [...new Set(planExercises.map(pe => pe.cycle_label).filter(Boolean))];
       labels.forEach(lbl => {
         const list = this._hydratePlanExercises(planExercises.filter(pe => pe.cycle_label === lbl));
-        if (list.length === 0) return;
         dayGroups.push({
           key: String(lbl),
           label: lbl.length <= 2 ? `${lbl}日` : lbl,
@@ -520,6 +520,7 @@ Page({
     }
 
     const exercisesWithDetails = selectedDay ? selectedDay.exercises : [];
+    const needsExercises = exercisesWithDetails.length === 0;
     const isRestDay = !selectedDay;
     const totalSets = selectedDay ? selectedDay.totalSets : 0;
     const estimatedMinutes = selectedDay ? selectedDay.estimatedMinutes : 0;
@@ -541,6 +542,7 @@ Page({
       selectedDayIsToday: selectedDay ? selectedDay.isToday : false,
       selectedDayCompleted: selectedDay ? selectedDay.completedThisWeek : false,
       exercises: exercisesWithDetails,
+      needsExercises,
       nextDayLabel: selectedDay ? selectedDay.label : '',
       nextExercises: exercisesWithDetails,
       session,
@@ -573,6 +575,7 @@ Page({
       selectedDayIsToday: picked.isToday,
       selectedDayCompleted: picked.completedThisWeek,
       exercises: picked.exercises,
+      needsExercises: picked.exercises.length === 0,
       totalSets: picked.totalSets,
       estimatedMinutes: picked.estimatedMinutes,
       muscleGroups: picked.muscleGroups,
@@ -1031,6 +1034,14 @@ Page({
   /**
    * 跳转到训练库
    */
+  onEditPlanExercises(e) {
+    const planId = e.currentTarget.dataset.planId || (this.data.currentPlanData && this.data.currentPlanData.plan && this.data.currentPlanData.plan.id);
+    if (!planId) return;
+    wx.navigateTo({
+      url: `/pages/plans/create/create?planId=${planId}`
+    });
+  },
+
   onGoToPlans() {
     wx.switchTab({
       url: '/pages/plans/plans'

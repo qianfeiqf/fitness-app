@@ -1,4 +1,5 @@
 <!-- 训练中心首页 - 浅色极简 -->
+<page-meta page-style="overflow: {{coachTour.visible ? 'hidden' : 'visible'}}" />
 
 <view class="page-home" style="padding-top: {{navHeight}}px;">
   <!-- 顶部轻头部 -->
@@ -131,10 +132,14 @@
               <view class="hero-card-left">
                 <view class="hero-title-row">
                   <text class="card-title">{{pd.plan.name}}</text>
-                  <text wx:if="{{pd.isRestDay}}" class="badge-pill rest">休息日</text>
+                  <text wx:if="{{pd.needsExercises}}" class="badge-pill">待添加动作</text>
+                  <text wx:elif="{{pd.isRestDay}}" class="badge-pill rest">休息日</text>
                   <text wx:elif="{{pd.muscleGroups}}" class="badge-pill">{{pd.muscleGroups}}</text>
                 </view>
-                <view wx:if="{{pd.isRestDay}}" class="card-meta-line compact">
+                <view wx:if="{{pd.needsExercises}}" class="card-meta-line compact">
+                  <text class="meta-chip">尚未添加训练动作</text>
+                </view>
+                <view wx:elif="{{pd.isRestDay}}" class="card-meta-line compact">
                   <text class="meta-chip">休整恢复{{pd.nextDayLabel ? ' · 下次 ' + pd.nextDayLabel : ''}}</text>
                 </view>
                 <view wx:else class="card-meta-line compact">
@@ -223,6 +228,18 @@
           <view class="exercise-tag">{{item.muscle_group}}</view>
           <text class="exercise-arrow">›</text>
         </view>
+      </view>
+    </view>
+
+    <!-- 有计划但该训练日尚未添加动作时的引导卡 -->
+    <view
+      class="plan-empty-ex-card"
+      wx:elif="{{currentPlanData && (!currentPlanData.exercises || currentPlanData.exercises.length === 0)}}"
+    >
+      <text class="plan-empty-ex-title">{{currentPlanData.selectedDayLabel ? (currentPlanData.selectedDayLabel + ' 尚未添加动作') : '尚未添加训练动作'}}</text>
+      <text class="plan-empty-ex-desc">给这一天安排几个动作，就能直接开始跟练并记录重量</text>
+      <view class="plan-empty-ex-btn" data-plan-id="{{currentPlanData.plan.id}}" bindtap="onEditPlanExercises">
+        <text>+ 去添加动作</text>
       </view>
     </view>
 </view>

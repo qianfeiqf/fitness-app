@@ -60,6 +60,115 @@
 }
 
 /* =====================
+   排课方式二选一
+   ===================== */
+.mode-cards {
+  display: flex;
+  gap: 16rpx;
+}
+
+.mode-card {
+  flex: 1;
+  padding: 24rpx 22rpx;
+  background: #FFFFFF;
+  border-radius: 22rpx;
+  border: 2rpx solid transparent;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.mode-card.active {
+  border-color: #1A1A1A;
+  background: #FFFFFF;
+  box-shadow: 0 6rpx 20rpx rgba(26, 26, 26, 0.08);
+}
+
+.mode-card-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-bottom: 6rpx;
+}
+
+.mode-card-desc {
+  display: block;
+  font-size: 22rpx;
+  color: #888888;
+  line-height: 1.4;
+}
+
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.section-title.inline {
+  margin-bottom: 0;
+}
+
+.cycle-add-pill {
+  height: 52rpx;
+  padding: 0 22rpx;
+  border-radius: 9999rpx;
+  background: #FFFFFF;
+  color: #07C160;
+  font-size: 24rpx;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.04);
+}
+
+.cycle-add-pill:active {
+  background: #F0FBF4;
+}
+
+.cycle-slots-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+
+.cycle-slot-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  height: 68rpx;
+  padding: 0 24rpx;
+  border-radius: 9999rpx;
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+.cycle-slot-text {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.cycle-slot-remove {
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.day-ex-count {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+/* =====================
    训练日选择（单行 7 列齐平）
    ===================== */
 .day-selector {

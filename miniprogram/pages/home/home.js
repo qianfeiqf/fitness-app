@@ -469,7 +469,9 @@ Page({
         });
       });
     } else {
-      const labels = [...new Set(planExercises.map(pe => pe.cycle_label).filter(Boolean))];
+      const savedLabels = Array.isArray(plan.cycle_labels) ? plan.cycle_labels.filter(Boolean) : [];
+      const exLabels = planExercises.map(pe => pe.cycle_label).filter(Boolean);
+      const labels = [...new Set([...savedLabels, ...exLabels])];
       labels.forEach(lbl => {
         const list = this._hydratePlanExercises(planExercises.filter(pe => pe.cycle_label === lbl));
         dayGroups.push({

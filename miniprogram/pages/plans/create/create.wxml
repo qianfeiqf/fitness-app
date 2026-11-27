@@ -1,135 +1,131 @@
-<!-- 新建计划页面 -->
+<!-- 新建/编辑计划页面 -->
 <view class="page-create">
   <scroll-view scroll-y class="create-scroll" show-scrollbar="{{false}}">
     <view class="create-scroll-inner">
-  <!-- 计划名称 -->
-  <view class="form-section">
-    <text class="section-title">计划名称</text>
-    <input class="form-input"
-           placeholder="输入计划名称"
-           value="{{planName}}"
-           bindinput="onInputPlanName" />
-  </view>
-
-  <!-- 选择训练日 -->
-  <view class="form-section">
-    <text class="section-title">选择训练日</text>
-    <view class="day-selector">
-      <view wx:for="{{weekDays}}" wx:key="day"
-            class="day-item {{selectedDaysIndex[item.day - 1] ? 'active' : ''}}"
-            bindtap="onToggleDay" data-day="{{item.day}}">
-        <text class="day-name">{{item.label}}</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 高级选项 -->
-  <view class="form-section">
-    <view class="advanced-toggle" bindtap="onToggleAdvanced">
-      <text class="advanced-toggle-text">高级选项</text>
-      <text class="advanced-toggle-icon {{showAdvancedOptions ? 'expanded' : ''}}">›</text>
-    </view>
-
-    <view wx:if="{{showAdvancedOptions}}" class="advanced-content">
-      <view class="advanced-option">
-        <view class="advanced-option-header">
-          <text class="advanced-option-title">循环模式</text>
-          <text class="advanced-option-hint">开启后可为训练日分配A/B/C/D标签，实现交替训练</text>
-        </view>
-        <switch class="advanced-switch" checked="{{cycleType === 'cycle'}}" bindchange="onCycleModeChange" />
+      <!-- 计划名称 -->
+      <view class="form-section">
+        <text class="section-title">计划名称</text>
+        <input class="form-input"
+               placeholder="例如：三分化增肌 / 上下肢交替"
+               value="{{planName}}"
+               bindinput="onInputPlanName" />
       </view>
 
-      <view wx:if="{{cycleType === 'cycle'}}" class="cycle-length-section">
-        <view class="cycle-length-header">
-          <text class="cycle-length-title">循环长度</text>
-          <text class="cycle-length-hint">一个完整训练周期包含多少天（2-14天）</text>
-        </view>
-        <picker class="cycle-length-picker" mode="selector" range="{{cycleLengthOptions}}"
-                value="{{cycleLength - 2}}"
-                bindchange="onCycleLengthChange">
-          <view class="picker-value picker-cycle-length">
-            {{cycleLength}} 天
-            <text class="picker-arrow">›</text>
+      <!-- 排课方式二选一 -->
+      <view class="form-section">
+        <text class="section-title">排课方式</text>
+        <view class="mode-cards">
+          <view
+            class="mode-card {{cycleType === 'natural_week' ? 'active' : ''}}"
+            data-mode="natural_week"
+            bindtap="onSelectScheduleMode"
+          >
+            <text class="mode-card-title">按星期排课</text>
+            <text class="mode-card-desc">固定周一至周日，适合规律作息</text>
           </view>
-        </picker>
+          <view
+            class="mode-card {{cycleType === 'cycle' ? 'active' : ''}}"
+            data-mode="cycle"
+            bindtap="onSelectScheduleMode"
+          >
+            <text class="mode-card-title">按课表轮换</text>
+            <text class="mode-card-desc">A / B / C 交替练，不绑死周几</text>
+          </view>
+        </view>
       </view>
 
-      <view wx:if="{{cycleType === 'cycle' && selectedDays.length > 0}}" class="cycle-labels">
-        <text class="cycle-labels-title">分配循环标签</text>
-        <view wx:for="{{selectedDays}}" wx:key="day" class="cycle-label-row">
-          <text class="cycle-label-day">{{weekDays[item - 1].label}}</text>
-          <picker class="cycle-label-picker" mode="selector" range="{{cycleLabels}}"
-                  value="{{dayLabels[item] || 0}}"
-                  bindchange="onSelectDayLabel" data-day="{{item}}">
-            <view class="picker-value">
-              {{dayLabels[item] !== undefined ? cycleLabels[dayLabels[item]] : 'A'}}
+      <!-- 模式 1：按星期排课（选择周几） -->
+      <view wx:if="{{cycleType === 'natural_week'}}" class="form-section">
+        <text class="section-title">选择训练日</text>
+        <view class="day-selector">
+          <view wx:for="{{weekDays}}" wx:key="day"
+                class="day-item {{selectedDaysIndex[item.day - 1] ? 'active' : ''}}"
+                bindtap="onToggleDay" data-day="{{item.day}}">
+            <text class="day-name">{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 模式 2：按课表轮换（管理 A/B/C 课表） -->
+      <view wx:else class="form-section">
+        <view class="section-header-row">
+          <text class="section-title inline">轮换课表（{{cycleSlotLabels.length}} 套）</text>
+          <view wx:if="{{cycleSlotLabels.length < 6}}" class="cycle-add-pill" bindtap="onAddCycleSlot">
+            <text>+ 添加课表</text>
+          </view>
+        </view>
+        <view class="cycle-slots-bar">
+          <view wx:for="{{cycleSlotLabels}}" wx:key="*this" class="cycle-slot-pill">
+            <text class="cycle-slot-text">课表 {{item}}</text>
+            <view
+              wx:if="{{cycleSlotLabels.length > 2}}"
+              class="cycle-slot-remove"
+              data-label="{{item}}"
+              bindtap="onRemoveCycleSlot"
+            >×</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 训练日 / 课表动作编辑 -->
+      <view wx:if="{{selectedDaysDisplay.length > 0}}" class="form-section">
+        <text class="section-title">编辑训练动作</text>
+
+        <view wx:for="{{selectedDaysDisplay}}" wx:key="slotKey" class="day-exercises">
+          <view class="day-header">
+            <text class="day-title">{{item.label}}</text>
+            <text class="day-ex-count">{{item.exercises.length}} 个动作</text>
+          </view>
+
+          <!-- 动作列表 -->
+          <view wx:for="{{item.exercises}}" wx:for-item="ex" wx:for-index="exIdx" wx:key="exIdx" class="exercise-card">
+            <view class="exercise-card-header">
+              <view class="exercise-card-name-wrap" bindtap="onViewExerciseGuide" data-exercise-id="{{ex.id}}">
+                <text class="exercise-card-name">{{ex.name}}</text>
+                <view class="exercise-info-btn">
+                  <text class="exercise-info-icon">i</text>
+                </view>
+              </view>
+              <text class="exercise-card-muscle">{{ex.muscle_group}}</text>
+              <view class="exercise-card-delete" catchtap="onRemoveExercise" data-slot-key="{{item.slotKey}}" data-index="{{exIdx}}">×</view>
             </view>
-          </picker>
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 训练日动作编辑 -->
-  <view wx:if="{{selectedDaysDisplay.length > 0}}" class="form-section">
-    <text class="section-title">编辑训练动作</text>
-
-    <view wx:for="{{selectedDaysDisplay}}" wx:key="dayOfWeek" class="day-exercises">
-      <view class="day-header">
-        <text class="day-title">{{item.label}}</text>
-        <view wx:if="{{item.cycleLabel}}" class="day-cycle-tag">{{item.cycleLabel}}</view>
-      </view>
-
-      <!-- 动作列表 -->
-      <view wx:for="{{item.exercises}}" wx:for-item="ex" wx:key="id" class="exercise-card">
-        <view class="exercise-card-header">
-          <view class="exercise-card-name-wrap" bindtap="onViewExerciseGuide" data-exercise-id="{{ex.id}}">
-            <text class="exercise-card-name">{{ex.name}}</text>
-            <view class="exercise-info-btn">
-              <text class="exercise-info-icon">i</text>
+            <view class="exercise-card-body">
+              <view class="exercise-param">
+                <text class="param-label">组数</text>
+                <input class="param-input" type="number" value="{{ex.target_sets}}"
+                       bindinput="onUpdateExerciseParam" data-slot-key="{{item.slotKey}}" data-index="{{exIdx}}" data-field="target_sets" />
+              </view>
+              <view class="exercise-param">
+                <text class="param-label">次数</text>
+                <input class="param-input" type="number" value="{{ex.target_reps}}"
+                       bindinput="onUpdateExerciseParam" data-slot-key="{{item.slotKey}}" data-index="{{exIdx}}" data-field="target_reps" />
+              </view>
+              <view class="exercise-param">
+                <text class="param-label">重量(kg)</text>
+                <input class="param-input" type="digit" value="{{ex.initial_weight}}"
+                       bindinput="onUpdateExerciseParam" data-slot-key="{{item.slotKey}}" data-index="{{exIdx}}" data-field="initial_weight" />
+              </view>
+              <view class="exercise-param">
+                <text class="param-label">休息(秒)</text>
+                <input class="param-input" type="number" value="{{ex.rest_seconds}}"
+                       bindinput="onUpdateExerciseParam" data-slot-key="{{item.slotKey}}" data-index="{{exIdx}}" data-field="rest_seconds" />
+              </view>
             </view>
           </view>
-          <text class="exercise-card-muscle">{{ex.muscle_group}}</text>
-          <view class="exercise-card-delete" catchtap="onRemoveExercise" data-day="{{item.dayOfWeek}}" data-index="{{index}}">×</view>
-        </view>
-        <view class="exercise-card-body">
-          <view class="exercise-param">
-            <text class="param-label">组数</text>
-            <input class="param-input" type="number" value="{{ex.target_sets}}"
-                   bindinput="onUpdateExerciseParam" data-day="{{item.dayOfWeek}}" data-index="{{index}}" data-field="target_sets" />
-          </view>
-          <view class="exercise-param">
-            <text class="param-label">次数</text>
-            <input class="param-input" type="number" value="{{ex.target_reps}}"
-                   bindinput="onUpdateExerciseParam" data-day="{{item.dayOfWeek}}" data-index="{{index}}" data-field="target_reps" />
-          </view>
-          <view class="exercise-param">
-            <text class="param-label">重量(kg)</text>
-            <input class="param-input" type="digit" value="{{ex.initial_weight}}"
-                   bindinput="onUpdateExerciseParam" data-day="{{item.dayOfWeek}}" data-index="{{index}}" data-field="initial_weight" />
-          </view>
-          <view class="exercise-param">
-            <text class="param-label">休息(秒)</text>
-            <input class="param-input" type="number" value="{{ex.rest_seconds}}"
-                   bindinput="onUpdateExerciseParam" data-day="{{item.dayOfWeek}}" data-index="{{index}}" data-field="rest_seconds" />
+
+          <!-- 添加动作按钮 -->
+          <view class="add-exercise-btn" bindtap="onAddExercise" data-slot-key="{{item.slotKey}}">
+            <text class="add-icon">+</text>
+            <text>添加动作</text>
           </view>
         </view>
       </view>
-
-      <!-- 添加动作按钮 -->
-      <view class="add-exercise-btn" bindtap="onAddExercise" data-day="{{item.dayOfWeek}}">
-        <text class="add-icon">+</text>
-        <text>添加动作</text>
-      </view>
-    </view>
-  </view>
-
     </view>
   </scroll-view>
 
-  <!-- 底部固定操作栏（独立于滚动区域外，彻底避免原生输入框文字透出按钮） -->
+  <!-- 底部固定操作栏 -->
   <view class="bottom-actions">
-    <view class="btn-save {{isEditMode ? 'edit' : ''}}" bindtap="onSavePlan">
+    <view class="btn-save" bindtap="onSavePlan">
       <text>{{isEditMode ? '保存修改' : '创建计划'}}</text>
     </view>
   </view>

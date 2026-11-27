@@ -1,8 +1,10 @@
 /**
- * 新建/编辑计划页面
+ * 新建/编辑计划页面 — 支持「按星期排课」与「按课表轮换」清晰二选一
  */
 
 const { insert, find, findOne, update, remove } = require('../../../localdb/db.js');
+
+const CYCLE_ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 Page({
   data: {
@@ -12,9 +14,8 @@ Page({
     // 计划信息
     planName: '',
     cycleType: 'natural_week', // natural_week | cycle
-    showAdvancedOptions: false, // 高级选项折叠状态
 
-    // 训练安排
+    // 按星期排课
     weekDays: [
       { day: 1, label: '周一' },
       { day: 2, label: '周二' },
@@ -26,21 +27,19 @@ Page({
     ],
     selectedDays: [],
     selectedDaysIndex: [false, false, false, false, false, false, false],
-    cycleLength: 4, // 自定义循环长度 2-14
-    cycleLengthOptions: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-    cycleLabels: ['A', 'B', 'C', 'D'],
-    dayLabels: {}, // dayOfWeek -> labelIndex
 
-    // 动作数据
-    selectedDaysDisplay: [], // 带动作的显示数据
-    planExercises: [], // 待保存的动作数据
+    // 按课表轮换
+    cycleSlotLabels: ['A', 'B'],
+
+    // 动作数据（每条动作带 slotKey：星期模式为 "day_1"，轮换模式为 "cycle_A"）
+    selectedDaysDisplay: [],
+    planExercises: [],
     showExerciseGuide: false,
     guideExercise: null
   },
 
   onLoad(options) {
     if (options.planId) {
-      // 编辑模式
       this.setData({
         isEditMode: true,
         editPlanId: options.planId
@@ -48,35 +47,34 @@ Page({
       wx.setNavigationBarTitle({ title: '编辑计划' });
       this.loadPlanForEdit(options.planId);
     } else if (options.templateId) {
-      // 从模板创建
       wx.setNavigationBarTitle({ title: '使用计划' });
       this.loadTemplateForCreate(options.templateId);
     }
   },
 
   /**
-   * 加载计划数据进行编辑
+   * 加载已有计划进行编辑
    */
   loadPlanForEdit(planId) {
-    console.log('loadPlanForEdit called, planId:', planId);
     const plan = findOne('plans', { id: planId });
-    console.log('plan found:', plan ? plan.name : 'null', 'selected_days:', plan ? plan.selected_days : 'undefined');
     if (!plan) {
       wx.showToast({ title: '计划不存在', icon: 'error' });
       return;
     }
 
-    // 获取计划动作
-    const planExercises = find('plan_exercises', { plan_id: planId });
+    const cycleType = plan.cycle_type === 'cycle' ? 'cycle' : 'natural_week';
+    const planExercises = find('plan_exercises', { plan_id: planId }) || [];
 
-    // 获取动作详情，转换为创建页面使用的格式
     const exercisesWithDetails = planExercises.map(pe => {
       const exercise = findOne('exercises', { id: pe.exercise_id });
       if (!exercise) return null;
+      const dow = Number(pe.day_of_week) || 1;
+      const cLabel = pe.cycle_label || CYCLE_ALPHABET[dow - 1] || 'A';
       return {
         id: pe.exercise_id,
-        dayOfWeek: pe.day_of_week,
-        cycle_label: pe.cycle_label,
+        dayOfWeek: dow,
+        cycleLabel: cLabel,
+        slotKey: cycleType === 'cycle' ? `cycle_${cLabel}` : `day_${dow}`,
         target_sets: pe.target_sets,
         target_reps: pe.target_reps,
         initial_weight: pe.initial_weight,
@@ -84,41 +82,35 @@ Page({
         name: exercise.name,
         muscle_group: exercise.muscle_group
       };
-    }).filter(e => e !== null);
+    }).filter(Boolean);
 
-    // 获取已选训练日（优先从计划中读取，否则从动作反推）
-    const selectedDays = plan.selected_days || [...new Set(exercisesWithDetails.map(e => e.dayOfWeek))].sort();
-    // 构建索引数组用于快速判断
-    const selectedDaysIndex = [false, false, false, false, false, false, false];
-    selectedDays.forEach(d => { selectedDaysIndex[d - 1] = true; });
+    if (cycleType === 'cycle') {
+      const exLabels = [...new Set(exercisesWithDetails.map(e => e.cycleLabel).filter(Boolean))];
+      const savedLabels = Array.isArray(plan.cycle_labels) && plan.cycle_labels.length > 0 ? plan.cycle_labels : [];
+      const merged = [...new Set([...savedLabels, ...exLabels])];
+      const cycleSlotLabels = merged.length >= 2 ? merged : (merged.length === 1 ? [merged[0], merged[0] === 'A' ? 'B' : 'A'] : ['A', 'B']);
 
-    // 获取循环标签
-    const dayLabels = {};
-    exercisesWithDetails.forEach(ex => {
-      if (ex.cycle_label) {
-        const labelIndex = this.data.cycleLabels.indexOf(ex.cycle_label);
-        if (labelIndex !== -1) {
-          dayLabels[ex.dayOfWeek] = labelIndex;
-        }
-      }
-    });
+      this.setData({
+        planName: plan.name,
+        cycleType: 'cycle',
+        cycleSlotLabels,
+        planExercises: exercisesWithDetails
+      });
+    } else {
+      const savedDays = Array.isArray(plan.selected_days) ? plan.selected_days.map(Number).filter(Boolean) : [];
+      const exDays = exercisesWithDetails.map(e => e.dayOfWeek).filter(Boolean);
+      const selectedDays = [...new Set([...savedDays, ...exDays])].sort((a, b) => a - b);
+      const selectedDaysIndex = [false, false, false, false, false, false, false];
+      selectedDays.forEach(d => { selectedDaysIndex[d - 1] = true; });
 
-    // 加载循环长度
-    const cycleLength = plan.cycle_length || 4;
-    const cycleLabels = this.generateCycleLabels(cycleLength);
-
-    this.setData({
-      planName: plan.name,
-      cycleType: plan.cycle_type || 'natural_week',
-      showAdvancedOptions: plan.cycle_type === 'cycle',
-      cycleLength,
-      cycleLabels,
-      selectedDays,
-      selectedDaysIndex,
-      dayLabels,
-      planExercises: exercisesWithDetails
-    });
-    console.log('loadPlanForEdit selectedDays:', selectedDays, 'selectedDaysIndex:', selectedDaysIndex);
+      this.setData({
+        planName: plan.name,
+        cycleType: 'natural_week',
+        selectedDays,
+        selectedDaysIndex,
+        planExercises: exercisesWithDetails
+      });
+    }
 
     this.updateSelectedDaysDisplay();
   },
@@ -127,14 +119,13 @@ Page({
    * 从模板加载数据创建计划
    */
   loadTemplateForCreate(templateId) {
-    const { findOne, find } = require('../../../localdb/db.js');
     const template = findOne('plan_templates', { id: templateId });
     if (!template) {
       wx.showToast({ title: '模板不存在', icon: 'error' });
       return;
     }
 
-    // 获取动作详情
+    const cycleType = template.cycle_type === 'cycle' ? 'cycle' : 'natural_week';
     const allExercises = find('exercises') || [];
     const exerciseMap = {};
     allExercises.forEach(ex => { exerciseMap[ex.id] = ex; });
@@ -142,10 +133,13 @@ Page({
     const exercisesWithDetails = (template.exercises || []).map(ex => {
       const exercise = exerciseMap[ex.exercise_id];
       if (!exercise) return null;
+      const dow = Number(ex.day_of_week) || 1;
+      const cLabel = ex.cycle_label || CYCLE_ALPHABET[dow - 1] || 'A';
       return {
         id: ex.exercise_id,
-        dayOfWeek: ex.day_of_week || 1,
-        cycle_label: ex.cycle_label,
+        dayOfWeek: dow,
+        cycleLabel: cLabel,
+        slotKey: cycleType === 'cycle' ? `cycle_${cLabel}` : `day_${dow}`,
         target_sets: ex.target_sets,
         target_reps: ex.target_reps,
         initial_weight: ex.initial_weight,
@@ -153,27 +147,7 @@ Page({
         name: exercise.name,
         muscle_group: exercise.muscle_group
       };
-    }).filter(e => e !== null);
-
-    // 获取已选训练日
-    const selectedDays = [...new Set(exercisesWithDetails.map(e => e.dayOfWeek))].sort();
-    const selectedDaysIndex = [false, false, false, false, false, false, false];
-    selectedDays.forEach(d => { selectedDaysIndex[d - 1] = true; });
-
-    // 获取循环标签
-    const dayLabels = {};
-    exercisesWithDetails.forEach(ex => {
-      if (ex.cycle_label) {
-        const labelIndex = this.data.cycleLabels.indexOf(ex.cycle_label);
-        if (labelIndex !== -1) {
-          dayLabels[ex.dayOfWeek] = labelIndex;
-        }
-      }
-    });
-
-    // 加载循环长度
-    const cycleLength = template.cycle_length || 4;
-    const cycleLabels = this.generateCycleLabels(cycleLength);
+    }).filter(Boolean);
 
     const existingNames = (find('plans') || []).map(p => (p.name || '').trim());
     let defaultName = (template.name || '').trim() || '我的训练计划';
@@ -183,83 +157,96 @@ Page({
       defaultName = `${defaultName} ${idx}`;
     }
 
-    this.setData({
-      planName: defaultName,
-      cycleType: template.cycle_type || 'natural_week',
-      showAdvancedOptions: template.cycle_type === 'cycle',
-      cycleLength,
-      cycleLabels,
-      selectedDays,
-      selectedDaysIndex,
-      dayLabels,
-      planExercises: exercisesWithDetails
-    });
+    if (cycleType === 'cycle') {
+      const labels = [...new Set(exercisesWithDetails.map(e => e.cycleLabel).filter(Boolean))];
+      this.setData({
+        planName: defaultName,
+        cycleType: 'cycle',
+        cycleSlotLabels: labels.length >= 2 ? labels : ['A', 'B'],
+        planExercises: exercisesWithDetails
+      });
+    } else {
+      const selectedDays = [...new Set(exercisesWithDetails.map(e => e.dayOfWeek))].sort((a, b) => a - b);
+      const selectedDaysIndex = [false, false, false, false, false, false, false];
+      selectedDays.forEach(d => { selectedDaysIndex[d - 1] = true; });
+      this.setData({
+        planName: defaultName,
+        cycleType: 'natural_week',
+        selectedDays,
+        selectedDaysIndex,
+        planExercises: exercisesWithDetails
+      });
+    }
 
     this.updateSelectedDaysDisplay();
   },
 
-  /**
-   * 输入计划名称
-   */
   onInputPlanName(e) {
     this.setData({ planName: e.detail.value });
   },
 
   /**
-   * 切换高级选项
+   * 切换排课方式（按星期排课 vs 按课表轮换）
    */
-  onToggleAdvanced() {
-    this.setData({
-      showAdvancedOptions: !this.data.showAdvancedOptions
-    });
-  },
+  onSelectScheduleMode(e) {
+    const mode = e.currentTarget.dataset.mode;
+    if (!mode || mode === this.data.cycleType) return;
 
-  /**
-   * 循环模式开关
-   */
-  onCycleModeChange(e) {
-    this.setData({
-      cycleType: e.detail.value ? 'cycle' : 'natural_week'
-    });
-    this.updateSelectedDaysDisplay();
-  },
-
-  /**
-   * 生成循环标签
-   */
-  generateCycleLabels(length) {
-    const labels = [];
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    for (let i = 0; i < length; i++) {
-      labels.push(alphabet[i] || String(i + 1));
+    if (mode === 'cycle') {
+      // 从星期模式切到轮换模式时，按顺序把已有动作映射到课表 A/B/C...
+      const { selectedDays, planExercises } = this.data;
+      const dayOrder = selectedDays.length > 0 ? selectedDays : [...new Set(planExercises.map(ex => ex.dayOfWeek).filter(Boolean))].sort((a, b) => a - b);
+      const count = Math.min(6, Math.max(2, dayOrder.length));
+      const nextLabels = CYCLE_ALPHABET.slice(0, count);
+      const dayToLabel = {};
+      dayOrder.forEach((d, idx) => {
+        if (idx < nextLabels.length) dayToLabel[d] = nextLabels[idx];
+      });
+      const migrated = planExercises.map(ex => {
+        const lbl = dayToLabel[ex.dayOfWeek] || ex.cycleLabel || 'A';
+        return { ...ex, cycleLabel: lbl, slotKey: `cycle_${lbl}` };
+      });
+      this.setData({
+        cycleType: 'cycle',
+        cycleSlotLabels: nextLabels,
+        planExercises: migrated
+      });
+    } else {
+      // 从轮换模式切回星期模式时，映射回默认周几（1, 3, 5...）
+      const { cycleSlotLabels, planExercises, selectedDays } = this.data;
+      const defaultWeekMap = [1, 3, 5, 2, 4, 6];
+      const nextDays = selectedDays.length >= cycleSlotLabels.length
+        ? selectedDays
+        : defaultWeekMap.slice(0, cycleSlotLabels.length).sort((a, b) => a - b);
+      const selectedDaysIndex = [false, false, false, false, false, false, false];
+      nextDays.forEach(d => { selectedDaysIndex[d - 1] = true; });
+      const labelToDay = {};
+      cycleSlotLabels.forEach((lbl, idx) => {
+        labelToDay[lbl] = nextDays[idx] || (idx + 1);
+      });
+      const migrated = planExercises.map(ex => {
+        const d = labelToDay[ex.cycleLabel] || ex.dayOfWeek || 1;
+        return { ...ex, dayOfWeek: d, slotKey: `day_${d}` };
+      });
+      this.setData({
+        cycleType: 'natural_week',
+        selectedDays: nextDays,
+        selectedDaysIndex,
+        planExercises: migrated
+      });
     }
-    return labels;
-  },
 
-  /**
-   * 选择循环长度
-   */
-  onCycleLengthChange(e) {
-    const index = parseInt(e.detail.value);
-    const cycleLength = this.data.cycleLengthOptions[index];
-    const cycleLabels = this.generateCycleLabels(cycleLength);
-    this.setData({
-      cycleLength,
-      cycleLabels,
-      dayLabels: {} // 重置标签分配
-    });
     this.updateSelectedDaysDisplay();
   },
 
   /**
-   * 切换训练日选择
+   * 星期模式：切换训练日
    */
   onToggleDay(e) {
-    const day = e.currentTarget.dataset.day;
+    const day = Number(e.currentTarget.dataset.day);
     const { selectedDays, selectedDaysIndex } = this.data;
 
     if (selectedDays.includes(day)) {
-      // 取消选择
       const newIndex = [...selectedDaysIndex];
       newIndex[day - 1] = false;
       this.setData({
@@ -267,66 +254,78 @@ Page({
         selectedDaysIndex: newIndex
       });
     } else {
-      // 选中
       const newIndex = [...selectedDaysIndex];
       newIndex[day - 1] = true;
       this.setData({
-        selectedDays: [...selectedDays, day].sort(),
+        selectedDays: [...selectedDays, day].sort((a, b) => a - b),
         selectedDaysIndex: newIndex
       });
     }
 
-    // 更新显示数据
     this.updateSelectedDaysDisplay();
   },
 
   /**
-   * 选择循环标签
+   * 轮换模式：新增一套课表（最多 6 套 A-F）
    */
-  onSelectDayLabel(e) {
-    const day = e.currentTarget.dataset.day;
-    const labelIndex = parseInt(e.detail.value);
-    const { dayLabels } = this.data;
-
+  onAddCycleSlot() {
+    const { cycleSlotLabels } = this.data;
+    if (cycleSlotLabels.length >= 6) return;
+    const nextLabel = CYCLE_ALPHABET.find(l => !cycleSlotLabels.includes(l));
+    if (!nextLabel) return;
     this.setData({
-      dayLabels: {
-        ...dayLabels,
-        [day]: labelIndex
-      }
+      cycleSlotLabels: [...cycleSlotLabels, nextLabel]
     });
-
     this.updateSelectedDaysDisplay();
   },
 
   /**
-   * 更新已选训练日显示数据
+   * 轮换模式：移除某套课表（最少保留 2 套）
+   */
+  onRemoveCycleSlot(e) {
+    const label = e.currentTarget.dataset.label;
+    const { cycleSlotLabels, planExercises } = this.data;
+    if (cycleSlotLabels.length <= 2 || !label) return;
+    const slotKey = `cycle_${label}`;
+    this.setData({
+      cycleSlotLabels: cycleSlotLabels.filter(l => l !== label),
+      planExercises: planExercises.filter(ex => ex.slotKey !== slotKey)
+    });
+    this.updateSelectedDaysDisplay();
+  },
+
+  /**
+   * 更新展示列表（统一星期与轮换两种模式）
    */
   updateSelectedDaysDisplay() {
-    const { selectedDays, weekDays, cycleType, dayLabels, cycleLabels, planExercises } = this.data;
+    const { cycleType, selectedDays, weekDays, cycleSlotLabels, planExercises } = this.data;
 
-    const selectedDaysDisplay = selectedDays.map(day => {
-      const dayInfo = weekDays[day - 1];
-      let cycleLabel = '';
-
-      if (cycleType === 'cycle' && dayLabels[day] !== undefined) {
-        cycleLabel = cycleLabels[dayLabels[day]];
-      }
-
-      // 获取该天的已有动作
-      const dayExercises = planExercises
-        .filter(pe => pe.dayOfWeek === day)
-        .map(pe => ({
-          ...pe,
-          dayOfWeek: day
-        }));
-
-      return {
-        dayOfWeek: day,
-        label: dayInfo.label,
-        cycleLabel,
-        exercises: dayExercises
-      };
-    });
+    let selectedDaysDisplay = [];
+    if (cycleType === 'cycle') {
+      selectedDaysDisplay = cycleSlotLabels.map((lbl, idx) => {
+        const slotKey = `cycle_${lbl}`;
+        const exercises = planExercises.filter(pe => pe.slotKey === slotKey);
+        return {
+          slotKey,
+          cycleLabel: lbl,
+          dayOfWeek: idx + 1,
+          label: lbl.length <= 2 ? `课表 ${lbl}` : lbl,
+          exercises
+        };
+      });
+    } else {
+      selectedDaysDisplay = selectedDays.map(day => {
+        const dayInfo = weekDays[day - 1];
+        const slotKey = `day_${day}`;
+        const exercises = planExercises.filter(pe => pe.slotKey === slotKey);
+        return {
+          slotKey,
+          dayOfWeek: day,
+          label: dayInfo.label,
+          exercises
+        };
+      });
+    }
 
     this.setData({ selectedDaysDisplay });
   },
@@ -335,44 +334,49 @@ Page({
    * 添加动作
    */
   onAddExercise(e) {
-    const dayOfWeek = e.currentTarget.dataset.day;
+    const slotKey = e.currentTarget.dataset.slotKey;
+    this._addingSlotKey = slotKey;
     wx.navigateTo({
-      url: '/pages/exercises/library?returnUrl=/pages/plans/create/create&dayOfWeek=' + dayOfWeek
+      url: '/pages/exercises/library?returnUrl=/pages/plans/create/create'
     });
   },
 
   /**
-   * 批量选择动作回调（从多选动作库返回时调用）
+   * 批量选择动作回调
    */
   selectExercises(exercisesList) {
     if (!Array.isArray(exercisesList) || exercisesList.length === 0) return;
+    const slotKey = this._addingSlotKey || (this.data.selectedDaysDisplay[0] && this.data.selectedDaysDisplay[0].slotKey) || 'day_1';
+    const isCycle = slotKey.startsWith('cycle_');
+    const cycleLabel = isCycle ? slotKey.replace('cycle_', '') : null;
+    const dayOfWeek = isCycle
+      ? Math.max(1, this.data.cycleSlotLabels.indexOf(cycleLabel) + 1)
+      : (parseInt(slotKey.replace('day_', ''), 10) || 1);
+
     const additions = exercisesList.map(ex => {
-      const { dayOfWeek, ...rest } = ex;
+      const { dayOfWeek: _ignored, ...rest } = ex;
       return {
         ...rest,
+        slotKey,
         dayOfWeek,
+        cycleLabel,
         target_sets: 4,
         target_reps: 8,
         initial_weight: 20,
         rest_seconds: 120
       };
     });
+
     this.setData({
       planExercises: [...this.data.planExercises, ...additions]
     });
     this.updateSelectedDaysDisplay();
   },
 
-  /**
-   * 选择动作回调（兼容单选）
-   */
   selectExercise(exercise) {
     this.selectExercises([exercise]);
   },
 
-  /**
-   * 移除动作
-   */
   onViewExerciseGuide(e) {
     const { exerciseId } = e.currentTarget.dataset;
     if (!exerciseId) return;
@@ -392,138 +396,111 @@ Page({
   },
 
   onRemoveExercise(e) {
-    const { day, index } = e.currentTarget.dataset;
+    const { slotKey, index } = e.currentTarget.dataset;
     const { planExercises } = this.data;
-
-    // 找到该天的动作索引
-    const dayExercises = planExercises.filter(pe => pe.dayOfWeek === day);
-    if (dayExercises[index]) {
-      const exerciseToRemove = dayExercises[index];
+    const slotList = planExercises.filter(pe => pe.slotKey === slotKey);
+    const target = slotList[index];
+    if (target) {
       this.setData({
-        planExercises: planExercises.filter(pe => pe !== exerciseToRemove)
+        planExercises: planExercises.filter(pe => pe !== target)
       });
       this.updateSelectedDaysDisplay();
     }
   },
 
-  /**
-   * 更新动作参数
-   */
   onUpdateExerciseParam(e) {
-    const { day, index, field } = e.currentTarget.dataset;
+    const { slotKey, index, field } = e.currentTarget.dataset;
     const value = e.detail.value;
     const { planExercises } = this.data;
-
-    // 找到该动作
-    const dayExercises = planExercises.filter(pe => pe.dayOfWeek === day);
-    if (dayExercises[index]) {
-      const exercise = dayExercises[index];
-      const exerciseIndex = planExercises.indexOf(exercise);
-
+    const slotList = planExercises.filter(pe => pe.slotKey === slotKey);
+    const target = slotList[index];
+    if (target) {
+      const globalIdx = planExercises.indexOf(target);
       this.setData({
-        [`planExercises[${exerciseIndex}].${field}`]: parseFloat(value) || 0
+        [`planExercises[${globalIdx}].${field}`]: parseFloat(value) || 0
       });
     }
   },
 
-  /**
-   * 保存计划
-   */
   onSavePlan() {
-    const { planName, selectedDays, planExercises } = this.data;
+    const { planName, cycleType, selectedDays, cycleSlotLabels, planExercises } = this.data;
 
     if (!planName.trim()) {
       wx.showToast({ title: '请输入计划名称', icon: 'none' });
       return;
     }
 
-    if (selectedDays.length === 0) {
+    if (cycleType === 'natural_week' && selectedDays.length === 0) {
       wx.showToast({ title: '请至少选择一个训练日', icon: 'none' });
       return;
     }
 
-    if (!planExercises || planExercises.length === 0) {
+    if (cycleType === 'cycle' && cycleSlotLabels.length < 2) {
+      wx.showToast({ title: '轮换模式至少保留 2 套课表', icon: 'none' });
+      return;
+    }
+
+    const activeSlotKeys = new Set(
+      cycleType === 'cycle'
+        ? cycleSlotLabels.map(l => `cycle_${l}`)
+        : selectedDays.map(d => `day_${d}`)
+    );
+    const activeExercises = (planExercises || []).filter(ex => activeSlotKeys.has(ex.slotKey));
+
+    if (activeExercises.length === 0) {
       wx.showToast({ title: '请至少添加一个训练动作', icon: 'none' });
       return;
     }
 
-    this.createPlan();
+    this.createPlan(activeExercises);
   },
 
-  /**
-   * 创建/更新计划
-   */
-  createPlan() {
-    const { isEditMode, editPlanId, planName, cycleType, cycleLength, dayLabels, cycleLabels, planExercises, selectedDays } = this.data;
+  createPlan(activeExercises) {
+    const { isEditMode, editPlanId, planName, cycleType, selectedDays, cycleSlotLabels } = this.data;
+
+    const buildPlanExerciseDoc = (planId, ex) => ({
+      id: 'pe_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      plan_id: planId,
+      exercise_id: ex.id,
+      day_of_week: cycleType === 'cycle' ? (cycleSlotLabels.indexOf(ex.cycleLabel) + 1 || 1) : ex.dayOfWeek,
+      cycle_label: cycleType === 'cycle' ? ex.cycleLabel : null,
+      target_sets: ex.target_sets || 4,
+      target_reps: ex.target_reps || 8,
+      initial_weight: ex.initial_weight || 20,
+      rest_seconds: ex.rest_seconds || 120,
+      created_at: Date.now()
+    });
 
     if (isEditMode) {
-      // 编辑模式：更新计划
       update('plans', editPlanId, {
         name: planName.trim(),
         cycle_type: cycleType,
-        cycle_length: cycleLength,
-        selected_days: selectedDays,
+        cycle_length: cycleType === 'cycle' ? cycleSlotLabels.length : 7,
+        cycle_labels: cycleType === 'cycle' ? cycleSlotLabels : [],
+        selected_days: cycleType === 'natural_week' ? selectedDays : [],
         updated_at: Date.now()
       });
 
-      // 删除旧的动作
-      const oldExercises = find('plan_exercises', { plan_id: editPlanId });
-      oldExercises.forEach(pe => {
-        remove('plan_exercises', pe.id);
-      });
-
-      // 插入新动作
-      planExercises.forEach(ex => {
-        const planExercise = {
-          id: 'pe_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-          plan_id: editPlanId,
-          exercise_id: ex.id,
-          day_of_week: ex.dayOfWeek,
-          cycle_label: cycleType === 'cycle' && dayLabels[ex.dayOfWeek] !== undefined
-            ? cycleLabels[dayLabels[ex.dayOfWeek]]
-            : null,
-          target_sets: ex.target_sets || 4,
-          target_reps: ex.target_reps || 8,
-          initial_weight: ex.initial_weight || 20,
-          rest_seconds: ex.rest_seconds || 120,
-          created_at: Date.now()
-        };
-        insert('plan_exercises', planExercise);
-      });
+      const oldExercises = find('plan_exercises', { plan_id: editPlanId }) || [];
+      oldExercises.forEach(pe => remove('plan_exercises', pe.id));
+      activeExercises.forEach(ex => insert('plan_exercises', buildPlanExerciseDoc(editPlanId, ex)));
 
       wx.showToast({ title: '计划已更新', icon: 'success' });
     } else {
-      // 新建模式
       const plan = {
         id: 'plan_' + Date.now(),
         name: planName.trim(),
         status: 'active',
         cycle_type: cycleType,
-        cycle_length: cycleLength,
-        selected_days: selectedDays,
+        cycle_length: cycleType === 'cycle' ? cycleSlotLabels.length : 7,
+        cycle_labels: cycleType === 'cycle' ? cycleSlotLabels : [],
+        selected_days: cycleType === 'natural_week' ? selectedDays : [],
         created_at: Date.now(),
         updated_at: Date.now()
       };
 
       insert('plans', plan);
-
-      planExercises.forEach(ex => {
-        const planExercise = {
-          id: 'pe_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-          plan_id: plan.id,
-          exercise_id: ex.id,
-          day_of_week: ex.dayOfWeek,
-          cycle_label: cycleType === 'cycle' && dayLabels[ex.dayOfWeek] !== undefined
-            ? cycleLabels[dayLabels[ex.dayOfWeek]]
-            : null,
-          target_sets: ex.target_sets || 4,
-          target_reps: ex.target_reps || 8,
-          initial_weight: ex.initial_weight || 20,
-          rest_seconds: ex.rest_seconds || 120,
-          created_at: Date.now()
-        };
-        insert('plan_exercises', planExercise);
-      });
+      activeExercises.forEach(ex => insert('plan_exercises', buildPlanExerciseDoc(plan.id, ex)));
 
       wx.showToast({ title: '计划已创建', icon: 'success' });
 

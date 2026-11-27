@@ -47,7 +47,7 @@
         <text class="empty-hero-eyebrow">训练计划</text>
       </view>
       <text class="empty-hero-title">制定你的训练计划</text>
-      <text class="empty-hero-desc">选用经典体系，或按习惯自由编排每周课表</text>
+      <text class="empty-hero-desc">选用经典体系，或按习惯自由安排每周训练</text>
       <view class="empty-hero-actions">
         <view class="empty-hero-btn primary" bindtap="onGoToPlans">
           <view class="empty-btn-icon icon-list"></view>
@@ -70,7 +70,7 @@
       </view>
       <view class="empty-free-info">
         <text class="empty-free-title">{{activeFreeSession ? '继续自由训练' : '自由训练'}}</text>
-        <text class="empty-free-desc">{{activeFreeSession ? activeFreeSummary : '不按固定课表，进馆随选动作边练边记'}}</text>
+        <text class="empty-free-desc">{{activeFreeSession ? activeFreeSummary : '不按固定计划，进馆随选动作边练边记'}}</text>
       </view>
       <view class="empty-free-pill {{activeFreeSession ? 'active' : ''}}">{{activeFreeSession ? '继续 ›' : '开练 ›'}}</view>
     </view>
@@ -126,12 +126,15 @@
     >
       <swiper-item wx:for="{{planDataList}}" wx:key="id" wx:for-item="pd">
         <view class="plan-swiper-item-inner">
-          <view class="training-card">
+          <view class="training-card" data-plan-id="{{pd.plan.id}}" bindtap="onPreviewPlanById" hover-class="training-card-hover" hover-stay-time="100">
             <view class="training-card-watermark"></view>
             <view class="hero-card-row">
               <view class="hero-card-left">
                 <view class="hero-title-row">
-                  <text class="card-title">{{pd.plan.name}}</text>
+                  <view class="card-title-wrap">
+                    <text class="card-title">{{pd.plan.name}}</text>
+                    <text class="card-title-arrow">›</text>
+                  </view>
                   <text wx:if="{{pd.needsExercises}}" class="badge-pill">待添加动作</text>
                   <text wx:elif="{{pd.isRestDay}}" class="badge-pill rest">休息日</text>
                   <text wx:elif="{{pd.muscleGroups}}" class="badge-pill">{{pd.muscleGroups}}</text>
@@ -203,9 +206,9 @@
       wx:if="{{currentPlanData && currentPlanData.exercises && currentPlanData.exercises.length > 0}}"
     >
       <view class="section-header">
-        <text class="section-title">{{currentPlanData.selectedDayIsToday ? '今日动作' : (currentPlanData.selectedDayLabel ? (currentPlanData.selectedDayLabel + '课表') : '训练动作')}}</text>
-        <view class="section-link" data-plan-id="{{currentPlanData.plan.id}}" bindtap="onPreviewPlanById">
-          <text>计划详情</text>
+        <text class="section-title">{{currentPlanData.selectedDayIsToday ? '今日动作' : (currentPlanData.selectedDayLabel ? (currentPlanData.selectedDayLabel + '动作') : '训练动作')}}</text>
+        <view class="section-link" data-plan-id="{{currentPlanData.plan.id}}" bindtap="onEditPlanExercises">
+          <text>编辑计划</text>
           <text class="link-arrow">›</text>
         </view>
       </view>

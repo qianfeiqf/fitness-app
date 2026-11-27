@@ -11,30 +11,30 @@
                bindinput="onInputPlanName" />
       </view>
 
-      <!-- 排课方式二选一 -->
+      <!-- 训练安排二选一 -->
       <view class="form-section">
-        <text class="section-title">排课方式</text>
+        <text class="section-title">训练安排</text>
         <view class="mode-cards">
           <view
             class="mode-card {{cycleType === 'natural_week' ? 'active' : ''}}"
             data-mode="natural_week"
             bindtap="onSelectScheduleMode"
           >
-            <text class="mode-card-title">按星期排课</text>
-            <text class="mode-card-desc">固定周一至周日，适合规律作息</text>
+            <text class="mode-card-title">按星期练</text>
+            <text class="mode-card-desc">固定每周几练，如周一、三、五</text>
           </view>
           <view
             class="mode-card {{cycleType === 'cycle' ? 'active' : ''}}"
             data-mode="cycle"
             bindtap="onSelectScheduleMode"
           >
-            <text class="mode-card-title">按课表轮换</text>
-            <text class="mode-card-desc">A / B / C 交替练，不绑死周几</text>
+            <text class="mode-card-title">顺序轮换</text>
+            <text class="mode-card-desc">不绑星期，按训练日 A → B 轮流练</text>
           </view>
         </view>
       </view>
 
-      <!-- 模式 1：按星期排课（选择周几） -->
+      <!-- 模式 1：按星期练（选择周几） -->
       <view wx:if="{{cycleType === 'natural_week'}}" class="form-section">
         <text class="section-title">选择训练日</text>
         <view class="day-selector">
@@ -46,17 +46,17 @@
         </view>
       </view>
 
-      <!-- 模式 2：按课表轮换（管理 A/B/C 课表） -->
+      <!-- 模式 2：顺序轮换（管理训练日 A/B/C） -->
       <view wx:else class="form-section">
         <view class="section-header-row">
-          <text class="section-title inline">轮换课表（{{cycleSlotLabels.length}} 套）</text>
+          <text class="section-title inline">轮换训练日（{{cycleSlotLabels.length}} 天）</text>
           <view wx:if="{{cycleSlotLabels.length < 6}}" class="cycle-add-pill" bindtap="onAddCycleSlot">
-            <text>+ 添加课表</text>
+            <text>+ 添加训练日</text>
           </view>
         </view>
         <view class="cycle-slots-bar">
           <view wx:for="{{cycleSlotLabels}}" wx:key="*this" class="cycle-slot-pill">
-            <text class="cycle-slot-text">课表 {{item}}</text>
+            <text class="cycle-slot-text">训练日 {{item}}</text>
             <view
               wx:if="{{cycleSlotLabels.length > 2}}"
               class="cycle-slot-remove"

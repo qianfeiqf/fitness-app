@@ -309,7 +309,7 @@ Page({
           slotKey,
           cycleLabel: lbl,
           dayOfWeek: idx + 1,
-          label: lbl.length <= 2 ? `课表 ${lbl}` : lbl,
+          label: lbl.length <= 2 ? `训练日 ${lbl}` : lbl,
           exercises
         };
       });
@@ -436,7 +436,7 @@ Page({
     }
 
     if (cycleType === 'cycle' && cycleSlotLabels.length < 2) {
-      wx.showToast({ title: '轮换模式至少保留 2 套课表', icon: 'none' });
+      wx.showToast({ title: '轮换模式至少保留 2 个训练日', icon: 'none' });
       return;
     }
 

@@ -53,7 +53,7 @@
 
     <!-- 周期安排标题 -->
     <view class="schedule-header">
-      <text class="schedule-title">训练课表</text>
+      <text class="schedule-title">训练安排</text>
       <text class="schedule-subtitle">点击动作查看动图与要领</text>
     </view>
 

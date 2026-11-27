@@ -115,7 +115,7 @@
         </view>
         <view class="menu-content">
           <text class="menu-title">使用小贴士</text>
-          <text class="menu-desc">课表调序、悬浮拖动、快捷做组等实用技巧</text>
+          <text class="menu-desc">训练日调序、悬浮拖动、快捷做组等实用技巧</text>
         </view>
         <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>

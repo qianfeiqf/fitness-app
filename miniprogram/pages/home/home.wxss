@@ -850,6 +850,12 @@
   padding: 0;
   box-shadow: 0 12rpx 32rpx rgba(26, 26, 26, 0.16);
   overflow: hidden;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.training-card-hover {
+  opacity: 0.92;
+  transform: scale(0.99);
 }
 
 .training-card-watermark {
@@ -887,15 +893,30 @@
   margin-bottom: 12rpx;
 }
 
+.card-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  flex: 1;
+  min-width: 0;
+}
+
 .card-title {
   font-size: 38rpx;
   font-weight: 700;
   color: #FFFFFF;
-  flex: 1;
-  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.card-title-arrow {
+  font-size: 34rpx;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.52);
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .badge-pill {

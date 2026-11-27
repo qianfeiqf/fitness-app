@@ -1,7 +1,7 @@
-<view class="onboarding-container" style="padding-top: {{navHeight}}px;">
+<view class="onboarding-container">
   
-  <!-- 顶部进度条 -->
-  <view class="onboarding-header">
+  <!-- 顶部进度条（白底自然延伸至状态栏，避让微信胶囊） -->
+  <view class="onboarding-header" style="padding-top: {{navHeight}}px;">
     <view class="progress-bar">
       <view class="progress-track">
         <view class="progress-fill" style="width: {{(currentStep / 4) * 100}}%"></view>

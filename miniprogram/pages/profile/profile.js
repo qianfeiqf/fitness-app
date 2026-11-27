@@ -159,6 +159,17 @@ Page({
     app.wxLogin().then(() => {
       this.checkLoginStatus();
       wx.showToast({ title: '登录成功', icon: 'success' });
+      const completed = wx.getStorageSync('onboarding_completed');
+      const existingPlans = getCollection('plans') || [];
+      if (!completed && existingPlans.length === 0) {
+        app.globalData.needsOnboarding = true;
+        setTimeout(() => {
+          wx.navigateTo({ url: '/pages/onboarding/onboarding' });
+        }, 500);
+      } else if (!completed && existingPlans.length > 0) {
+        wx.setStorageSync('onboarding_completed', true);
+        app.globalData.needsOnboarding = false;
+      }
     }).catch(() => {
       wx.showToast({ title: '登录失败', icon: 'error' });
     });

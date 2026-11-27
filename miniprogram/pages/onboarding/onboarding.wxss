@@ -1,60 +1,66 @@
 /* =====================
-   Onboarding 引导页
+   Onboarding 引导页 — 与全站统一的 #F7F8FA 浅灰底 + 无边框白卡 + 微信绿 #07C160
    ===================== */
 
 page {
-  background: #F5F5F5;
+  background: #F7F8FA;
 }
 
 .onboarding-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  background: #F7F8FA;
   box-sizing: border-box;
 }
 
 /* =====================
-   顶部进度条
+   顶部进度条（白底直达状态栏，避让微信胶囊）
    ===================== */
 .onboarding-header {
-  padding: 32rpx 40rpx;
+  padding: 20rpx 40rpx 36rpx;
   background: #FFFFFF;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.03);
+  flex-shrink: 0;
 }
 
 .progress-bar {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: 18rpx;
   margin-bottom: 32rpx;
 }
 
 .progress-track {
   flex: 1;
-  height: 6rpx;
-  background: #E5E5E5;
-  border-radius: 3rpx;
+  height: 8rpx;
+  background: #EFEFF2;
+  border-radius: 9999rpx;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: #1A1A1A;
-  border-radius: 3rpx;
+  background: #07C160;
+  border-radius: 9999rpx;
   transition: width 0.3s ease;
 }
 
 .progress-text {
   font-size: 24rpx;
-  color: #999999;
-  font-weight: 500;
+  color: #888888;
+  font-weight: 600;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
 .step-header {
-  margin-top: 16rpx;
+  margin-top: 8rpx;
 }
 
 .step-title {
-  font-size: 40rpx;
+  font-size: 42rpx;
   font-weight: 700;
   color: #1A1A1A;
   display: block;
@@ -63,10 +69,10 @@ page {
 }
 
 .step-subtitle {
-  font-size: 28rpx;
-  color: #666666;
+  font-size: 26rpx;
+  color: #888888;
   display: block;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 /* =====================
@@ -74,9 +80,11 @@ page {
    ===================== */
 .step-content {
   flex: 1;
-  padding: 24rpx 40rpx;
+  padding: 32rpx 36rpx;
   overflow-y: auto;
   min-height: 0;
+  box-sizing: border-box;
+  animation: fadeIn 0.28s ease;
 }
 
 /* =====================
@@ -92,50 +100,49 @@ page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40rpx 24rpx;
+  justify-content: center;
+  padding: 44rpx 24rpx;
   background: #FFFFFF;
-  border-radius: 24rpx;
-  border: 2rpx solid #E5E5E5;
-  transition: all 0.2s ease;
+  border-radius: 26rpx;
+  border: 2rpx solid transparent;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+  transition: all 0.18s ease;
   position: relative;
+  box-sizing: border-box;
 }
 
 .goal-card.selected {
-  border-color: #1A1A1A;
-  background: #F8F8F8;
+  border-color: #07C160;
+  background: #F2FBF6;
+  box-shadow: 0 6rpx 18rpx rgba(7, 193, 96, 0.1);
 }
 
 .goal-card:active {
   transform: scale(0.98);
 }
 
-.goal-icon {
-  font-size: 56rpx;
-  margin-bottom: 20rpx;
-}
-
 .goal-name {
-  font-size: 30rpx;
-  font-weight: 600;
+  font-size: 32rpx;
+  font-weight: 700;
   color: #1A1A1A;
-  margin-bottom: 8rpx;
+  margin-bottom: 10rpx;
 }
 
 .goal-desc {
   font-size: 22rpx;
-  color: #999999;
+  color: #888888;
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .goal-check {
   position: absolute;
   top: 16rpx;
   right: 16rpx;
-  width: 36rpx;
-  height: 36rpx;
+  width: 38rpx;
+  height: 38rpx;
   border-radius: 50%;
-  background: #1A1A1A;
+  background: #07C160;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -161,17 +168,19 @@ page {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40rpx 0;
+  padding: 40rpx 12rpx;
   background: #FFFFFF;
   border-radius: 24rpx;
-  border: 2rpx solid #E5E5E5;
-  transition: all 0.2s ease;
+  border: 2rpx solid transparent;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+  transition: all 0.18s ease;
   position: relative;
 }
 
 .day-card.selected {
-  border-color: #1A1A1A;
-  background: #F8F8F8;
+  border-color: #07C160;
+  background: #F2FBF6;
+  box-shadow: 0 6rpx 18rpx rgba(7, 193, 96, 0.1);
 }
 
 .day-card:active {
@@ -183,6 +192,7 @@ page {
   font-weight: 700;
   color: #1A1A1A;
   line-height: 1;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
 }
 
 .day-label {
@@ -201,10 +211,10 @@ page {
   position: absolute;
   top: 12rpx;
   right: 12rpx;
-  width: 32rpx;
-  height: 32rpx;
+  width: 34rpx;
+  height: 34rpx;
   border-radius: 50%;
-  background: #1A1A1A;
+  background: #07C160;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -220,17 +230,19 @@ page {
 }
 
 .exp-card {
-  padding: 36rpx 32rpx;
+  padding: 34rpx 32rpx;
   background: #FFFFFF;
   border-radius: 24rpx;
-  border: 2rpx solid #E5E5E5;
-  transition: all 0.2s ease;
+  border: 2rpx solid transparent;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+  transition: all 0.18s ease;
   position: relative;
 }
 
 .exp-card.selected {
-  border-color: #1A1A1A;
-  background: #F8F8F8;
+  border-color: #07C160;
+  background: #F2FBF6;
+  box-shadow: 0 6rpx 18rpx rgba(7, 193, 96, 0.1);
 }
 
 .exp-card:active {
@@ -244,10 +256,6 @@ page {
   margin-bottom: 12rpx;
 }
 
-.exp-icon {
-  font-size: 48rpx;
-}
-
 .exp-info {
   display: flex;
   align-items: center;
@@ -256,20 +264,26 @@ page {
 
 .exp-name {
   font-size: 32rpx;
-  font-weight: 600;
+  font-weight: 700;
   color: #1A1A1A;
 }
 
 .exp-tag {
   font-size: 22rpx;
-  color: #1A1A1A;
-  background: #F0F0F0;
+  color: #555555;
+  background: #F3F4F6;
   padding: 4rpx 16rpx;
   border-radius: 9999rpx;
 }
 
+.exp-card.selected .exp-tag {
+  background: rgba(7, 193, 96, 0.14);
+  color: #07C160;
+  font-weight: 600;
+}
+
 .exp-desc {
-  font-size: 26rpx;
+  font-size: 25rpx;
   color: #666666;
   line-height: 1.5;
 }
@@ -278,10 +292,10 @@ page {
   position: absolute;
   top: 24rpx;
   right: 24rpx;
-  width: 36rpx;
-  height: 36rpx;
+  width: 38rpx;
+  height: 38rpx;
   border-radius: 50%;
-  background: #1A1A1A;
+  background: #07C160;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -300,14 +314,16 @@ page {
   padding: 32rpx;
   background: #FFFFFF;
   border-radius: 24rpx;
-  border: 2rpx solid #E5E5E5;
-  transition: all 0.2s ease;
+  border: 2rpx solid transparent;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+  transition: all 0.18s ease;
   position: relative;
 }
 
 .recommend-card.selected {
-  border-color: #1A1A1A;
-  background: #F8F8F8;
+  border-color: #07C160;
+  background: #F2FBF6;
+  box-shadow: 0 6rpx 18rpx rgba(7, 193, 96, 0.1);
 }
 
 .recommend-card:active {
@@ -318,12 +334,13 @@ page {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 12rpx;
   margin-bottom: 12rpx;
 }
 
 .recommend-name {
   font-size: 32rpx;
-  font-weight: 600;
+  font-weight: 700;
   color: #1A1A1A;
   flex: 1;
 }
@@ -336,29 +353,29 @@ page {
 
 .tag {
   font-size: 20rpx;
-  padding: 4rpx 12rpx;
+  padding: 4rpx 14rpx;
   border-radius: 9999rpx;
-  background: #F0F0F0;
+  background: #F3F4F6;
   color: #666666;
 }
 
 .tag-beginner {
-  background: #E8F5E9;
-  color: #2E7D32;
+  background: #EAF9F0;
+  color: #07C160;
 }
 
 .tag-intermediate {
-  background: #FFF3E0;
-  color: #E65100;
+  background: #FFF4E5;
+  color: #D97706;
 }
 
 .tag-advanced {
-  background: #FFEBEE;
-  color: #C62828;
+  background: #FFECEC;
+  color: #E5484D;
 }
 
 .recommend-desc {
-  font-size: 26rpx;
+  font-size: 25rpx;
   color: #666666;
   line-height: 1.5;
   margin-bottom: 16rpx;
@@ -367,7 +384,7 @@ page {
 
 .recommend-features {
   display: flex;
-  gap: 8rpx;
+  gap: 10rpx;
   flex-wrap: wrap;
 }
 
@@ -375,7 +392,7 @@ page {
   font-size: 20rpx;
   padding: 6rpx 16rpx;
   border-radius: 9999rpx;
-  background: #F5F5F5;
+  background: #F4F5F7;
   color: #666666;
 }
 
@@ -385,8 +402,8 @@ page {
 }
 
 .check-text {
-  font-size: 26rpx;
-  color: #1A1A1A;
+  font-size: 24rpx;
+  color: #07C160;
   font-weight: 600;
 }
 
@@ -396,17 +413,12 @@ page {
   padding: 120rpx 40rpx;
 }
 
-.empty-icon {
-  font-size: 64rpx;
-  margin-bottom: 24rpx;
-  display: block;
-}
-
 .empty-title {
   font-size: 32rpx;
   font-weight: 600;
   color: #1A1A1A;
   display: block;
+  margin-top: 20rpx;
   margin-bottom: 12rpx;
 }
 
@@ -421,8 +433,8 @@ page {
   display: inline-flex;
   align-items: center;
   gap: 8rpx;
-  padding: 16rpx 32rpx;
-  background: #1A1A1A;
+  padding: 18rpx 36rpx;
+  background: #07C160;
   border-radius: 9999rpx;
 }
 
@@ -442,15 +454,15 @@ page {
    底部按钮区
    ===================== */
 .onboarding-footer {
-  padding: 24rpx 40rpx calc(48rpx + env(safe-area-inset-bottom));
+  padding: 24rpx 36rpx calc(36rpx + env(safe-area-inset-bottom));
   background: #FFFFFF;
-  border-top: 1rpx solid #E5E5E5;
+  border-top: 1rpx solid #F0F1F4;
   flex-shrink: 0;
 }
 
 .footer-buttons {
   display: flex;
-  gap: 20rpx;
+  gap: 18rpx;
 }
 
 .btn-prev {
@@ -460,15 +472,15 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #F5F5F5;
-  color: #1A1A1A;
+  background: #F4F5F7;
+  color: #333333;
   border-radius: 9999rpx;
   font-size: 28rpx;
   font-weight: 600;
 }
 
 .btn-prev:active {
-  background: #EAEAEA;
+  background: #E8EAEE;
 }
 
 .btn-next {
@@ -477,11 +489,12 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1A1A1A;
+  background: #07C160;
   color: #FFFFFF;
   border-radius: 9999rpx;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 600;
+  transition: background-color 0.18s ease, color 0.18s ease;
 }
 
 .btn-next:active {
@@ -489,32 +502,30 @@ page {
 }
 
 .btn-next.disabled {
-  opacity: 0.4;
+  background: #E8EAEE;
+  color: #9CA3AF;
 }
 
 .skip-text {
   display: block;
   text-align: center;
-  margin-top: 24rpx;
-  font-size: 26rpx;
+  margin-top: 20rpx;
+  font-size: 24rpx;
   color: #999999;
-  padding: 12rpx;
+  padding: 8rpx;
 }
 
-/* =====================
-   动画
-   ===================== */
+.skip-text:active {
+  color: #555555;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20rpx);
+    transform: translateY(16rpx);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.step-content {
-  animation: fadeIn 0.3s ease;
 }

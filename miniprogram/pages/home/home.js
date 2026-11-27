@@ -159,15 +159,20 @@ Page({
   },
 
   /**
-   * 检查是否需要跳转到引导页
+   * 检查是否需要跳转到引导页（仅已登录且尚无任何计划的新用户才触发）
    */
   checkOnboardingRedirect() {
     const app = getApp();
-    if (app.globalData.needsOnboarding) {
-      wx.redirectTo({
-        url: '/pages/onboarding/onboarding'
-      });
+    if (!app.globalData.isLoggedIn || !app.globalData.needsOnboarding) return;
+    const existingPlans = getCollection('plans') || [];
+    if (existingPlans.length > 0) {
+      wx.setStorageSync('onboarding_completed', true);
+      app.globalData.needsOnboarding = false;
+      return;
     }
+    wx.redirectTo({
+      url: '/pages/onboarding/onboarding'
+    });
   },
 
   /**

@@ -129,24 +129,18 @@
     </view>
   </view>
 
-  <!-- 删除计划极简底部确认抽屉 -->
+  <!-- 删除计划确认抽屉 -->
   <modal-sheet
     visible="{{showDeleteModal}}"
     title="删除计划"
     description="删除「{{plan ? plan.name : ''}}」后无法恢复"
-    showConfirm="{{false}}"
-    showCancel="{{false}}"
+    confirmText="确认删除"
+    cancelText="取消"
+    confirmDanger="{{true}}"
+    bind:confirm="onConfirmDeletePlan"
+    bind:cancel="onCancelDeletePlan"
     bind:close="onCancelDeletePlan"
-  >
-    <view class="delete-sheet-actions">
-      <view class="detail-btn danger" bindtap="onConfirmDeletePlan">
-        <text>确认删除</text>
-      </view>
-      <view class="detail-btn secondary" bindtap="onCancelDeletePlan">
-        <text>取消</text>
-      </view>
-    </view>
-  </modal-sheet>
+  />
 
   <!-- 动作要领与动图半屏抽屉 -->
   <exercise-guide-sheet

@@ -384,11 +384,3 @@
 .detail-btn:active {
   opacity: 0.86;
 }
-
-/* 删除确认抽屉按钮 */
-.delete-sheet-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-  padding-top: 8rpx;
-}

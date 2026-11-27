@@ -1183,18 +1183,19 @@ Page({
         && !wx.getStorageSync('home_tour_done');
       if (!isFullTour && !isFirstAuto) return;
 
+      wx.pageScrollTo({ scrollTop: 0, duration: 0 });
       const steps = this.data.todayPlan
         ? [
             {
               selector: '.week-day-section',
               title: '训练日自由调序',
-              desc: '点击任意一天，可随时调换今天先练哪一天，本周已练会自动打钩。',
+              desc: '点击任意训练日可随时调序，已完成会自动打钩；点击上方计划卡片直达计划详情。',
               radius: 18
             },
             {
               selector: '.exercise-list',
-              title: '动作动图与要领',
-              desc: '点击任意动作，随时查看高清动图示范与发力避坑要点。',
+              title: '动作要领与历史记录',
+              desc: '点击任意动作，可查看高清动图、发力要领，以及该动作的历史重量与预估 1RM。',
               radius: 16
             },
             {

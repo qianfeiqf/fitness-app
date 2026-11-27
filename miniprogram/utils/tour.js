@@ -25,7 +25,7 @@ function measureRect(page, selector) {
 }
 
 /**
- * 在指定页面启动一组高亮步骤
+ * 在指定页面启动一组高亮步骤（每步渲染前实时测量坐标，避免切换动画或滚动导致错位）
  * @param {object} page - Page 实例
  * @param {Array} steps - [{ selector, title, desc, radius?, pad?, nextText? }]
  * @param {object} opts - { startOffset, totalCount, lastNextText, onFinish, onSkip }
@@ -70,10 +70,21 @@ async function startPageTour(page, steps, opts = {}) {
   _renderCurrentStep(page);
 }
 
-function _renderCurrentStep(page) {
+async function _renderCurrentStep(page) {
   const runner = page._coachTourRunner;
   if (!runner) return;
   const step = runner.steps[runner.index];
+  // 实时重测一次当前步骤目标位置，避免前一步状态变化导致坐标偏移
+  const freshRect = await measureRect(page, step.selector);
+  if (page._coachTourRunner !== runner) return;
+  const rect = freshRect
+    ? {
+        ...freshRect,
+        radius: step.radius !== undefined ? step.radius : 14,
+        pad: step.pad !== undefined ? step.pad : 6
+      }
+    : step.rect;
+
   const isStepLast = runner.index === runner.steps.length - 1;
   const globalIdx = runner.startOffset + runner.index + 1;
   const globalTotal = Math.max(runner.totalCount, runner.startOffset + runner.steps.length);
@@ -81,7 +92,7 @@ function _renderCurrentStep(page) {
   page.setData({
     coachTour: {
       visible: true,
-      rect: step.rect,
+      rect,
       title: step.title,
       desc: step.desc,
       stepText: `${globalIdx} / ${globalTotal}`,

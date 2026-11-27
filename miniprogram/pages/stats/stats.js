@@ -95,10 +95,11 @@ Page({
         const total = app.globalData.fullTourTotal || (offset + 2);
         startPageTour(this, [
           {
-            selector: '.calendar-card',
+            selector: '.calendar-grid',
             title: '训练日历一目了然',
             desc: '绿色标记打卡日期，点击任意一天即可查看当天的训练摘要。',
-            radius: 18
+            radius: 16,
+            pad: 10
           },
           {
             selector: '.history-entry',

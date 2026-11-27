@@ -134,6 +134,7 @@ Page({
       return;
     }
     if (app && app.globalData && app.globalData.fullTourStage === 'plans') {
+      wx.pageScrollTo({ scrollTop: 0, duration: 0 });
       this.setData({ activeMainTab: 'exercises', activeMainTabIndex: 1, playingExerciseId: '' });
       if (this._plansTourTimer) clearTimeout(this._plansTourTimer);
       this._plansTourTimer = setTimeout(() => {
@@ -143,7 +144,7 @@ Page({
           {
             selector: '.ex-thumb-box',
             title: '点缩略图直接播动图',
-            desc: '轻点左侧缩略图即可原地播放示范动图，点右侧卡片查看完整动作要领。',
+            desc: '轻点左侧缩略图原地播动图，点右侧卡片查看动作要领与历史 1RM 记录。',
             radius: 14
           },
           {
@@ -162,7 +163,7 @@ Page({
             wx.switchTab({ url: '/pages/stats/stats' });
           }
         });
-      }, 360);
+      }, 520);
     }
   },
 

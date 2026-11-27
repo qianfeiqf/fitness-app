@@ -455,37 +455,36 @@ Page({
   },
 
   /**
-   * 顺序轮换模式进度计算：按最近完成记录自动推进，整轮练完自动开启新一轮，本周按实际完成次数统计
+   * 顺序轮换模式进度计算：按本轮完成记录推进，整轮练完保留绿勾等待用户主动「开启新一轮」
    */
   _getCycleProgress(plan, dayGroups) {
-    const { monday, sunday } = this._getWeekRange();
-    const allCompleted = (find('sessions', s =>
+    const roundStartedAt = Number(plan.cycle_round_started_at) || 0;
+    const roundSessions = (find('sessions', s =>
       s.status === 'completed' &&
-      s.plan_id === plan.id
+      s.plan_id === plan.id &&
+      (s.completed_at || s.created_at || 0) >= roundStartedAt
     ) || []).sort((a, b) => (a.completed_at || a.created_at || 0) - (b.completed_at || b.created_at || 0));
 
-    const weeklySessionCount = allCompleted.filter(s =>
-      s.completed_at >= monday.getTime() && s.completed_at <= sunday.getTime()
-    ).length;
-
     if (dayGroups.length === 0) {
-      return { nextKey: '', roundCompletedKeys: new Set(), weeklySessionCount };
+      return { nextKey: '', roundCompletedKeys: new Set(), isRoundCompleted: false };
     }
 
     const roundSet = new Set();
     let lastKey = null;
-    allCompleted.forEach(s => {
+    roundSessions.forEach(s => {
       const key = this._resolveSessionDayKey(s, plan, dayGroups);
       if (!key) return;
-      lastKey = key;
-      roundSet.add(key);
+      // 兼容旧数据：若已有满轮记录且后面还有新训练，则自动从那次新训练算作新一轮；最后满轮保持完成态不自动清空
       if (roundSet.size >= dayGroups.length) {
         roundSet.clear();
       }
+      lastKey = key;
+      roundSet.add(key);
     });
 
+    const isRoundCompleted = roundSet.size >= dayGroups.length;
     let nextKey = dayGroups[0].key;
-    if (lastKey) {
+    if (!isRoundCompleted && lastKey) {
       const lastIdx = dayGroups.findIndex(g => g.key === lastKey);
       const candidateIdx = lastIdx >= 0 ? (lastIdx + 1) % dayGroups.length : 0;
       const candidateKey = dayGroups[candidateIdx].key;
@@ -497,7 +496,7 @@ Page({
       }
     }
 
-    return { nextKey, roundCompletedKeys: roundSet, weeklySessionCount };
+    return { nextKey, roundCompletedKeys: roundSet, isRoundCompleted };
   },
 
   _buildPlanData(plan) {
@@ -538,11 +537,11 @@ Page({
     }
 
     let completedKeys;
-    let weeklySessionCount = 0;
+    let isRoundCompleted = false;
     if (isCycleMode) {
       const cycleProgress = this._getCycleProgress(plan, dayGroups);
       completedKeys = cycleProgress.roundCompletedKeys;
-      weeklySessionCount = cycleProgress.weeklySessionCount;
+      isRoundCompleted = cycleProgress.isRoundCompleted;
       dayGroups.forEach(g => {
         g.isToday = g.key === cycleProgress.nextKey;
       });
@@ -594,13 +593,13 @@ Page({
     const estimatedMinutes = selectedDay ? selectedDay.estimatedMinutes : 0;
     const muscleGroups = selectedDay ? selectedDay.muscleGroups : '';
     const plannedDays = Math.max(dayOptions.length, 1);
-    const completedDays = isCycleMode ? weeklySessionCount : completedKeys.size;
-    const ringTarget = isCycleMode ? Math.max(dayOptions.length, 3) : plannedDays;
+    const completedDays = Math.min(completedKeys.size, plannedDays);
     const weekProgress = {
       isCycle: isCycleMode,
-      plannedDays: dayOptions.length || 3,
-      completedDays,
-      percent: ringTarget > 0 ? Math.min(Math.round((completedDays / ringTarget) * 100), 100) : 0
+      label: isCycleMode ? '本轮' : '本周',
+      plannedDays: dayOptions.length || (isCycleMode ? 2 : 3),
+      completedDays: isCycleMode ? completedDays : completedKeys.size,
+      percent: dayOptions.length > 0 ? Math.min(Math.round((completedDays / plannedDays) * 100), 100) : 0
     };
 
     return {
@@ -611,6 +610,7 @@ Page({
       selectedDayLabel: selectedDay ? selectedDay.label : '',
       selectedDayIsToday: selectedDay ? selectedDay.isToday : false,
       selectedDayCompleted: selectedDay ? selectedDay.completedThisWeek : false,
+      isRoundCompleted,
       exercises: exercisesWithDetails,
       needsExercises,
       nextDayLabel: selectedDay ? selectedDay.label : '',
@@ -686,6 +686,28 @@ Page({
   /**
    * 底部吸屏主按钮统一入口（继续训练 / 开始训练当前选中课表）
    */
+  /**
+   * 顺序轮换模式：用户主动点击「开启新一轮」，清空本轮绿勾并回到首个训练日
+   */
+  onStartNewCycleRound() {
+    const pd = this.data.currentPlanData || this.data.planDataList[this.data.currentPlanIndex];
+    if (!pd || !pd.plan) return;
+    const now = Date.now();
+    update('plans', pd.plan.id, {
+      cycle_round_started_at: now,
+      updated_at: now
+    });
+    if (this._selectedDayByPlan) {
+      delete this._selectedDayByPlan[pd.plan.id];
+    }
+    this.loadTodayTraining({ silent: true });
+    wx.showToast({ title: '已开启新一轮', icon: 'success' });
+    const app = getApp();
+    if (app && typeof app.startSync === 'function') {
+      app.startSync();
+    }
+  },
+
   onPrimaryAction() {
     const pd = this.data.currentPlanData || this.data.planDataList[this.data.currentPlanIndex];
     if (!pd) return;

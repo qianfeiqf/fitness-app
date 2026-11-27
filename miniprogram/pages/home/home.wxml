@@ -136,6 +136,7 @@
                     <text class="card-title-arrow">›</text>
                   </view>
                   <text wx:if="{{pd.needsExercises}}" class="badge-pill">待添加动作</text>
+                  <text wx:elif="{{pd.isRoundCompleted}}" class="badge-pill rest">本轮已完成</text>
                   <text wx:elif="{{pd.isRestDay}}" class="badge-pill rest">休息日</text>
                   <text wx:elif="{{pd.muscleGroups}}" class="badge-pill">{{pd.muscleGroups}}</text>
                 </view>
@@ -159,10 +160,10 @@
                   <view class="progress-ring-fill" style="background: conic-gradient(#07C160 {{pd.weekProgress.percent * 3.6}}deg, rgba(255, 255, 255, 0.14) 0deg);"></view>
                   <view class="progress-ring-center">
                     <text class="progress-ring-num">{{pd.weekProgress.completedDays}}</text>
-                    <text class="progress-ring-total">{{pd.weekProgress.isCycle ? '次' : ('/' + pd.weekProgress.plannedDays)}}</text>
+                    <text class="progress-ring-total">/{{pd.weekProgress.plannedDays}}</text>
                   </view>
                 </view>
-                <text class="hero-ring-label">本周</text>
+                <text class="hero-ring-label">{{pd.weekProgress.label || '本周'}}</text>
               </view>
             </view>
           </view>
@@ -279,6 +280,13 @@
       bindtap="onPrimaryAction"
     >
       <text>继续训练</text>
+    </view>
+    <view
+      wx:elif="{{currentPlanData.isRoundCompleted}}"
+      class="sticky-cta-btn"
+      bindtap="onStartNewCycleRound"
+    >
+      <text>开启新一轮</text>
     </view>
     <view
       wx:elif="{{currentPlanData.exercises && currentPlanData.exercises.length > 0}}"

@@ -16,6 +16,35 @@ function formatWeight(val) {
   return Number.isInteger(n) ? String(n) : String(Math.round(n * 10) / 10);
 }
 
+function estimate1RM(weight, reps) {
+  if (weight <= 0 || reps <= 0) return 0;
+  const res = calculate1RM(weight, reps);
+  if (res && typeof res === 'object' && res.estimated1RM) {
+    return res.estimated1RM;
+  }
+  return Math.round(weight * (1 + reps / 30) * 10) / 10;
+}
+
+function formatSetsSummary(sets) {
+  if (!Array.isArray(sets) || sets.length === 0) return '';
+  const chunks = [];
+  sets.forEach(s => {
+    const last = chunks[chunks.length - 1];
+    if (last && last.weightText === s.weightText && last.reps === s.reps) {
+      last.count += 1;
+    } else {
+      chunks.push({ weightText: s.weightText, reps: s.reps, count: 1 });
+    }
+  });
+  if (chunks.length === 1) {
+    const c = chunks[0];
+    return c.count > 1 ? `${c.weightText}kg × ${c.reps} × ${c.count}组` : `${c.weightText}kg × ${c.reps}`;
+  }
+  return chunks
+    .map(c => (c.count > 1 ? `${c.weightText}kg × ${c.reps} (${c.count}组)` : `${c.weightText}kg × ${c.reps}`))
+    .join(' · ');
+}
+
 Component({
   properties: {
     visible: {
@@ -117,7 +146,7 @@ Component({
           weight: w,
           reps: r,
           weightText: formatWeight(w),
-          est1RM: calculate1RM(w, r),
+          est1RM: estimate1RM(w, r),
           completedAt: set.completed_at || set.created_at || 0
         });
       };
@@ -169,7 +198,7 @@ Component({
           best1RM: formatWeight(sessionBest1RM),
           maxWeight: formatWeight(sessionMaxWeight),
           isPR,
-          sets: g.sets
+          setsSummary: formatSetsSummary(g.sets)
         };
       });
 

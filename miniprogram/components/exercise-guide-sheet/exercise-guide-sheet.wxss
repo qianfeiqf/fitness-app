@@ -235,30 +235,40 @@
   background: rgba(255, 255, 255, 0.14);
 }
 
-.ex-history-card {
-  background: #F7F8FA;
-  border-radius: 20rpx;
-  padding: 22rpx 24rpx;
+.ex-history-list {
+  display: flex;
+  flex-direction: column;
+  padding: 4rpx 4rpx 0;
 }
 
-.ex-history-card-head {
+.ex-history-row {
+  padding: 24rpx 4rpx;
+  border-bottom: 1rpx solid #F0F1F4;
+}
+
+.ex-history-row:last-child {
+  border-bottom: none;
+  padding-bottom: 8rpx;
+}
+
+.ex-history-row-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12rpx;
-  margin-bottom: 16rpx;
+  margin-bottom: 10rpx;
 }
 
 .ex-history-date-wrap {
   display: flex;
   align-items: center;
-  gap: 10rpx;
+  gap: 12rpx;
   min-width: 0;
   flex: 1;
 }
 
 .ex-history-date {
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 700;
   color: #1A1A1A;
   flex-shrink: 0;
@@ -266,7 +276,7 @@
 
 .ex-history-plan {
   font-size: 22rpx;
-  color: #888888;
+  color: #999999;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -289,45 +299,19 @@
 }
 
 .ex-history-rm {
-  font-size: 22rpx;
+  font-size: 23rpx;
   font-weight: 600;
-  color: #555555;
+  color: #666666;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
 }
 
-.ex-history-sets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10rpx;
-}
-
-.ex-history-set-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8rpx;
-  padding: 8rpx 16rpx;
-  border-radius: 12rpx;
-  background: #FFFFFF;
-}
-
-.ex-history-set-idx {
-  width: 28rpx;
-  height: 28rpx;
-  border-radius: 50%;
-  background: #F0F1F4;
-  color: #666666;
-  font-size: 20rpx;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'DIN Alternate', system-ui, sans-serif;
-}
-
-.ex-history-set-val {
-  font-size: 24rpx;
-  font-weight: 600;
-  color: #1A1A1A;
+.ex-history-summary-line {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #333333;
+  line-height: 1.5;
   font-family: 'DIN Alternate', system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
 }

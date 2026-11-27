@@ -91,23 +91,20 @@
             </view>
           </view>
 
-          <!-- 按日期倒序的历史记录卡片 -->
-          <view wx:for="{{historyList}}" wx:key="sessionId" class="ex-history-card">
-            <view class="ex-history-card-head">
-              <view class="ex-history-date-wrap">
-                <text class="ex-history-date">{{item.dateText}}</text>
-                <text wx:if="{{item.planName}}" class="ex-history-plan">{{item.planName}}</text>
+          <!-- 极简白底分割线历史列表 -->
+          <view class="ex-history-list">
+            <view wx:for="{{historyList}}" wx:key="sessionId" class="ex-history-row">
+              <view class="ex-history-row-head">
+                <view class="ex-history-date-wrap">
+                  <text class="ex-history-date">{{item.dateText}}</text>
+                  <text wx:if="{{item.planName}}" class="ex-history-plan">{{item.planName}}</text>
+                </view>
+                <view class="ex-history-rm-wrap">
+                  <text wx:if="{{item.isPR}}" class="ex-history-pr-tag">PR</text>
+                  <text class="ex-history-rm">1RM {{item.best1RM}}kg</text>
+                </view>
               </view>
-              <view class="ex-history-rm-wrap">
-                <text wx:if="{{item.isPR}}" class="ex-history-pr-tag">PR</text>
-                <text class="ex-history-rm">预估 1RM {{item.best1RM}}kg</text>
-              </view>
-            </view>
-            <view class="ex-history-sets">
-              <view wx:for="{{item.sets}}" wx:for-item="set" wx:key="displayIndex" class="ex-history-set-chip">
-                <text class="ex-history-set-idx">{{set.displayIndex}}</text>
-                <text class="ex-history-set-val">{{set.weightText}}kg × {{set.reps}}</text>
-              </view>
+              <text class="ex-history-summary-line">{{item.setsSummary}}</text>
             </view>
           </view>
         </view>

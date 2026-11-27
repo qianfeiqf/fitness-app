@@ -21,7 +21,7 @@
         <mp-icon icon="me" color="#1A1A1A" size="{{36}}" />
       </view>
       <text class="login-headline">准备好突破了</text>
-      <text class="login-subhead">登录后同步训练数据，追踪你的每一步进步</text>
+      <text class="login-subhead">登录后同步训练数据，记录每一步进步</text>
     </view>
     <view class="btn-login" bindtap="onLogin"><text>微信一键登录</text></view>
   </view>

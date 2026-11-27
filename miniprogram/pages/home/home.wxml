@@ -252,13 +252,11 @@
   <modal-sheet
     visible="{{showRecoveryModal}}"
     title="发现未完成的训练"
+    description="{{unfinishedSummary}}"
     showConfirm="{{false}}"
     showCancel="{{false}}"
     bind:close="onDismissRecoveryModal"
   >
-    <view wx:if="{{unfinishedSummary}}" class="recovery-summary-card">
-      <text class="recovery-summary-text">{{unfinishedSummary}}</text>
-    </view>
     <view class="recovery-sheet-actions">
       <view class="recovery-btn-primary" bindtap="onRecoverTraining">
         <text>继续训练</text>

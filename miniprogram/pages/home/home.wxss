@@ -1277,20 +1277,6 @@
 }
 
 /* 恢复训练弹窗样式 */
-.recovery-summary-card {
-  background: #F4F5F7;
-  border-radius: 18rpx;
-  padding: 20rpx 24rpx;
-  margin-bottom: 28rpx;
-  text-align: center;
-}
-
-.recovery-summary-text {
-  font-size: 26rpx;
-  font-weight: 500;
-  color: #555555;
-}
-
 .recovery-sheet-actions {
   display: flex;
   flex-direction: column;

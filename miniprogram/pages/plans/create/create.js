@@ -417,7 +417,7 @@ Page({
     if (target) {
       const globalIdx = planExercises.indexOf(target);
       this.setData({
-        [`planExercises[${globalIdx}].${field}`]: parseFloat(value) || 0
+        [`planExercises[${globalIdx}].${field}`]: value
       });
     }
   },
@@ -458,18 +458,24 @@ Page({
   createPlan(activeExercises) {
     const { isEditMode, editPlanId, planName, cycleType, selectedDays, cycleSlotLabels } = this.data;
 
-    const buildPlanExerciseDoc = (planId, ex) => ({
-      id: 'pe_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-      plan_id: planId,
-      exercise_id: ex.id,
-      day_of_week: cycleType === 'cycle' ? (cycleSlotLabels.indexOf(ex.cycleLabel) + 1 || 1) : ex.dayOfWeek,
-      cycle_label: cycleType === 'cycle' ? ex.cycleLabel : null,
-      target_sets: ex.target_sets || 4,
-      target_reps: ex.target_reps || 8,
-      initial_weight: ex.initial_weight || 20,
-      rest_seconds: ex.rest_seconds || 120,
-      created_at: Date.now()
-    });
+    const buildPlanExerciseDoc = (planId, ex) => {
+      const parsedSets = parseInt(ex.target_sets, 10);
+      const parsedReps = parseInt(ex.target_reps, 10);
+      const parsedWeight = parseFloat(ex.initial_weight);
+      const parsedRest = parseInt(ex.rest_seconds, 10);
+      return {
+        id: 'pe_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+        plan_id: planId,
+        exercise_id: ex.id,
+        day_of_week: cycleType === 'cycle' ? (cycleSlotLabels.indexOf(ex.cycleLabel) + 1 || 1) : ex.dayOfWeek,
+        cycle_label: cycleType === 'cycle' ? ex.cycleLabel : null,
+        target_sets: !Number.isNaN(parsedSets) && parsedSets > 0 ? parsedSets : 4,
+        target_reps: !Number.isNaN(parsedReps) && parsedReps > 0 ? parsedReps : 8,
+        initial_weight: !Number.isNaN(parsedWeight) && parsedWeight >= 0 ? parsedWeight : 20,
+        rest_seconds: !Number.isNaN(parsedRest) && parsedRest > 0 ? parsedRest : 120,
+        created_at: Date.now()
+      };
+    };
 
     if (isEditMode) {
       update('plans', editPlanId, {

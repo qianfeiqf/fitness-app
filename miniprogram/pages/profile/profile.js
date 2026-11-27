@@ -171,12 +171,18 @@ Page({
     const profile = findOne('profiles', {});
 
     if (profile) {
+      const w = Number(profile.weight) > 0 ? Number(profile.weight) : 0;
+      const h = Number(profile.height) > 0 ? Number(profile.height) : 0;
+      this._savedWeight = w;
+      this._savedHeight = h;
       this.setData({
         profile,
-        weight: Number(profile.weight) > 0 ? String(profile.weight) : '',
-        height: Number(profile.height) > 0 ? String(profile.height) : ''
+        weight: w > 0 ? String(w) : '',
+        height: h > 0 ? String(h) : ''
       });
     } else {
+      this._savedWeight = 0;
+      this._savedHeight = 0;
       this.setData({ profile: null, weight: '', height: '' });
     }
 
@@ -350,11 +356,11 @@ Page({
   },
 
   /**
-   * 输入目标重量
+   * 输入目标重量（保留原始文本，支持彻底删空和输入小数点）
    */
   onInputGoalWeight(e) {
     this.setData({
-      'newGoal.target_weight': parseFloat(e.detail.value) || 0
+      'newGoal.target_weight': e.detail.value || ''
     });
   },
 
@@ -373,8 +379,9 @@ Page({
   onSaveGoal() {
     const { newGoal } = this.data;
     const { insert } = require('../../localdb/db.js');
+    const targetWeight = parseFloat(newGoal.target_weight);
 
-    if (!newGoal.target_weight || newGoal.target_weight <= 0) {
+    if (Number.isNaN(targetWeight) || targetWeight <= 0) {
       wx.showToast({ title: '请输入目标重量', icon: 'none' });
       return;
     }
@@ -382,7 +389,7 @@ Page({
     const goal = {
       id: 'goal_' + Date.now(),
       exercise_id: newGoal.exercise_id,
-      target_weight: newGoal.target_weight,
+      target_weight: targetWeight,
       deadline: newGoal.deadline,
       status: 'active',
       created_at: Date.now()
@@ -432,10 +439,7 @@ Page({
    */
   onUpdateWeight(e) {
     const raw = e.detail.value || '';
-    const num = parseFloat(raw);
     this.setData({ weight: raw });
-    this._profileDirty = true;
-    this.saveProfile({ weight: !Number.isNaN(num) && num > 0 ? num : 0 });
   },
 
   /**
@@ -443,25 +447,28 @@ Page({
    */
   onUpdateHeight(e) {
     const raw = e.detail.value || '';
-    const num = parseFloat(raw);
     this.setData({ height: raw });
-    this._profileDirty = true;
-    this.saveProfile({ height: !Number.isNaN(num) && num > 0 ? num : 0 });
   },
 
   /**
-   * 身体档案失焦时规范化展示值、轻提示已保存并静默同步到云端
+   * 身体档案失焦：仅当真实数值较上次已保存值有变化时才保存、提示并同步
    */
   onProfileInputBlur() {
-    const wNum = parseFloat(this.data.weight);
-    const hNum = parseFloat(this.data.height);
-    const nextWeight = !Number.isNaN(wNum) && wNum > 0 ? String(wNum) : '';
-    const nextHeight = !Number.isNaN(hNum) && hNum > 0 ? String(hNum) : '';
+    const parsedW = parseFloat(this.data.weight);
+    const parsedH = parseFloat(this.data.height);
+    const wNum = !Number.isNaN(parsedW) && parsedW > 0 ? parsedW : 0;
+    const hNum = !Number.isNaN(parsedH) && parsedH > 0 ? parsedH : 0;
+    const nextWeight = wNum > 0 ? String(wNum) : '';
+    const nextHeight = hNum > 0 ? String(hNum) : '';
     if (nextWeight !== this.data.weight || nextHeight !== this.data.height) {
       this.setData({ weight: nextWeight, height: nextHeight });
     }
-    if (this._profileDirty) {
-      this._profileDirty = false;
+    const prevW = Number(this._savedWeight) || 0;
+    const prevH = Number(this._savedHeight) || 0;
+    if (wNum !== prevW || hNum !== prevH) {
+      this._savedWeight = wNum;
+      this._savedHeight = hNum;
+      this.saveProfile({ weight: wNum, height: hNum });
       wx.showToast({ title: '身体档案已保存', icon: 'success', duration: 1200 });
       this._triggerSilentSync();
     }

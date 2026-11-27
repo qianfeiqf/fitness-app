@@ -73,7 +73,7 @@ Page({
     guideExercise: null,
 
     // 页面实战高亮引导
-    coachTour: { visible: false },
+    coachTour: { visible: false, rect: {}, title: '', desc: '', stepText: '', nextText: '下一步', isLast: false },
 
     // 按需登录半屏抽屉
     loginSheet: { visible: false, desc: '' }

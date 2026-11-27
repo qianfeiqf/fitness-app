@@ -113,7 +113,7 @@ Page({
     thumbErrorMap: {},
 
     // 首次训练高亮引导
-    coachTour: { visible: false },
+    coachTour: { visible: false, rect: {}, title: '', desc: '', stepText: '', nextText: '下一步', isLast: false },
 
     // 更多操作面板
     showMoreActions: false,

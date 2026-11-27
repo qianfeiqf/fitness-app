@@ -68,7 +68,7 @@ Page({
     trainingFloat: null,
 
     // 页面实战高亮引导
-    coachTour: { visible: false }
+    coachTour: { visible: false, rect: {}, title: '', desc: '', stepText: '', nextText: '下一步', isLast: false }
   },
 
   onLoad() {

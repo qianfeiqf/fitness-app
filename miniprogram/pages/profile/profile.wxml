@@ -35,13 +35,14 @@
         <text class="card-title">身体档案</text>
       </view>
 
-      <view class="profile-inputs">
+      <view class="profile-inputs" bindtap="onTapProfileInputs">
         <view class="profile-input-item">
           <view class="input-content">
             <text class="input-label">体重</text>
             <view class="input-row">
               <input class="input"
                      type="digit"
+                     disabled="{{!isLoggedIn}}"
                      placeholder="0"
                      placeholder-style="color: #C0C4CC; font-weight: 400;"
                      value="{{weight}}"
@@ -60,6 +61,7 @@
             <view class="input-row">
               <input class="input"
                      type="digit"
+                     disabled="{{!isLoggedIn}}"
                      placeholder="0"
                      placeholder-style="color: #C0C4CC; font-weight: 400;"
                      value="{{height}}"
@@ -306,6 +308,14 @@
 
   <!-- 训练悬浮窗（含全局组间休息倒计时） -->
   <training-float />
+
+  <!-- 按需登录半屏抽屉 -->
+  <login-sheet
+    visible="{{loginSheet.visible}}"
+    desc="{{loginSheet.desc}}"
+    bind:success="onLoginSheetSuccess"
+    bind:close="onLoginSheetClose"
+  />
 
   <!-- 微信隐私保护指引弹窗 -->
   <privacy-popup />

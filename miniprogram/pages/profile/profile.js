@@ -3,6 +3,7 @@
  */
 
 const { findOne, update, getCollection } = require('../../localdb/db.js');
+const { requireLogin, handleLoginSuccess, handleLoginClose } = require('../../utils/auth.js');
 
 Page({
   data: {
@@ -56,7 +57,10 @@ Page({
 
     // 训练悬浮窗 & 从训练页引导填写体重的返回入口
     trainingFloat: null,
-    returnTrainingSessionId: null
+    returnTrainingSessionId: null,
+
+    // 按需登录半屏抽屉
+    loginSheet: { visible: false, desc: '' }
   },
 
   onLoad() {
@@ -295,7 +299,26 @@ Page({
   /**
    * 显示添加目标弹窗
    */
+  onLoginSheetSuccess() {
+    handleLoginSuccess(this, () => {
+      this.checkLoginStatus();
+      this.loadProfile();
+    });
+  },
+
+  onLoginSheetClose() {
+    handleLoginClose(this);
+  },
+
+  onTapProfileInputs() {
+    if (this.data.isLoggedIn) return;
+    requireLogin(this, '登录后即可保存身高体重等身体档案');
+  },
+
   onShowGoalModal() {
+    if (!requireLogin(this, '登录后即可添加并追踪你的 1RM 训练目标', () => this.onShowGoalModal())) {
+      return;
+    }
     const today = new Date();
     const threeMonthsLater = new Date(today.getFullYear(), today.getMonth() + 3, today.getDate());
     const deadlineStr = this.formatDate(threeMonthsLater);
@@ -520,6 +543,9 @@ Page({
    * 导出训练数据（支持 Markdown 报告或 JSON 完整备份）
    */
   onExportData() {
+    if (!requireLogin(this, '登录后即可导出你的训练数据与备份', () => this.onExportData())) {
+      return;
+    }
     if (this.data.exporting) return;
 
     wx.showActionSheet({

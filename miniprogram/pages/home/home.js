@@ -6,6 +6,7 @@ const { getCollection, findOne, find, insert, update, getDatabase } = require('.
 const { calculateAndSave1RM, checkMilestone } = require('../../services/rm.js');
 const { calculateProgression } = require('../../services/progression.js');
 const { startPageTour, advancePageTour, skipPageTour } = require('../../utils/tour.js');
+const { requireLogin, handleLoginSuccess, handleLoginClose } = require('../../utils/auth.js');
 
 Page({
   data: {
@@ -72,7 +73,10 @@ Page({
     guideExercise: null,
 
     // 页面实战高亮引导
-    coachTour: { visible: false }
+    coachTour: { visible: false },
+
+    // 按需登录半屏抽屉
+    loginSheet: { visible: false, desc: '' }
   },
 
   // 空操作函数（用于阻止事件冒泡）
@@ -977,7 +981,9 @@ Page({
       return;
     }
 
-
+    if (!requireLogin(this, '登录后即可开始训练并云端同步记录', () => this.onStartTrainingForPlan({ currentTarget: { dataset: { planId } } }))) {
+      return;
+    }
 
     if (this._selectedDayByPlan && planData.plan) {
       delete this._selectedDayByPlan[planData.plan.id];
@@ -1135,11 +1141,23 @@ Page({
   /**
    * 跳转到训练库
    */
+  onLoginSheetSuccess() {
+    handleLoginSuccess(this, () => {
+      this.checkLoginAndLoadData({ silent: true });
+    });
+  },
+
+  onLoginSheetClose() {
+    handleLoginClose(this);
+  },
+
   onEditPlanExercises(e) {
     const planId = e.currentTarget.dataset.planId || (this.data.currentPlanData && this.data.currentPlanData.plan && this.data.currentPlanData.plan.id);
     if (!planId) return;
-    wx.navigateTo({
-      url: `/pages/plans/create/create?planId=${planId}`
+    requireLogin(this, '登录后即可编辑你的训练计划', () => {
+      wx.navigateTo({
+        url: `/pages/plans/create/create?planId=${planId}`
+      });
     });
   },
 
@@ -1251,8 +1269,10 @@ Page({
    * 直达自建计划页
    */
   onGoToCreatePlan() {
-    wx.navigateTo({
-      url: '/pages/plans/create/create'
+    requireLogin(this, '登录后即可自建训练计划并云端同步', () => {
+      wx.navigateTo({
+        url: '/pages/plans/create/create'
+      });
     });
   },
 
@@ -1292,8 +1312,9 @@ Page({
    * 一键开始或继续自由训练（存在进行中自由训练时直接续练，不丢失进度）
    */
   onStartFreeWorkout() {
-
-
+    if (!requireLogin(this, '登录后即可开始记录自由训练', () => this.onStartFreeWorkout())) {
+      return;
+    }
     const { session: existingFree } = this._getActiveFreeSessionInfo();
     if (existingFree) {
       this.setData({ currentSession: existingFree, isTraining: true });

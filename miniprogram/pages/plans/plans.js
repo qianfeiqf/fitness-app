@@ -4,6 +4,7 @@
 
 const { find, findOne, insert, update, remove, getCollection, getPlanTemplatesSeedData, MUSCLE_SUB_GROUPS } = require('../../localdb/db.js');
 const { startPageTour, advancePageTour, skipPageTour } = require('../../utils/tour.js');
+const { requireLogin, handleLoginSuccess, handleLoginClose } = require('../../utils/auth.js');
 
 Page({
   data: {
@@ -105,7 +106,10 @@ Page({
     navHeight: 0,
 
     // 页面实战高亮引导
-    coachTour: { visible: false }
+    coachTour: { visible: false },
+
+    // 按需登录半屏抽屉
+    loginSheet: { visible: false, desc: '' }
   },
 
   onLoad() {
@@ -308,17 +312,30 @@ Page({
     });
   },
 
+  onLoginSheetSuccess() {
+    handleLoginSuccess(this, () => {
+      this.loadPlans();
+      this.loadExercises();
+    });
+  },
+
+  onLoginSheetClose() {
+    handleLoginClose(this);
+  },
+
   onShowAddCustomModal() {
-    const preselected = this.data.customMuscleGroups.includes(this.data.selectedExerciseMuscle)
-      ? this.data.selectedExerciseMuscle
-      : '';
-    this.setData({
-      showAddCustomModal: true,
-      customExercise: {
-        name: '',
-        muscle_group: preselected,
-        equipment: ''
-      }
+    requireLogin(this, '登录后即可创建并保存你的自定义动作', () => {
+      const preselected = this.data.customMuscleGroups.includes(this.data.selectedExerciseMuscle)
+        ? this.data.selectedExerciseMuscle
+        : '';
+      this.setData({
+        showAddCustomModal: true,
+        customExercise: {
+          name: '',
+          muscle_group: preselected,
+          equipment: ''
+        }
+      });
     });
   },
 
@@ -458,8 +475,10 @@ Page({
    * 跳转到新建计划页面
    */
   onNavigateToCreate() {
-    wx.navigateTo({
-      url: '/pages/plans/create/create'
+    requireLogin(this, '登录后即可自建训练计划并云端同步', () => {
+      wx.navigateTo({
+        url: '/pages/plans/create/create'
+      });
     });
   },
 
@@ -556,8 +575,10 @@ Page({
   onShowCloneTemplateModal(e) {
     const { templateId } = e.currentTarget.dataset;
     if (!templateId) return;
-    wx.navigateTo({
-      url: '/pages/plans/create/create?templateId=' + templateId
+    requireLogin(this, '登录后即可使用该模板并按需调整', () => {
+      wx.navigateTo({
+        url: '/pages/plans/create/create?templateId=' + templateId
+      });
     });
   },
 
@@ -567,9 +588,11 @@ Page({
   onShowCloneTemplateFromDetail() {
     const template = this.data.selectedTemplate;
     if (!template) return;
-    this.setData({ showTemplateDetailModal: false });
-    wx.navigateTo({
-      url: '/pages/plans/create/create?templateId=' + template.id
+    requireLogin(this, '登录后即可使用该模板并按需调整', () => {
+      this.setData({ showTemplateDetailModal: false });
+      wx.navigateTo({
+        url: '/pages/plans/create/create?templateId=' + template.id
+      });
     });
   },
 
@@ -579,9 +602,11 @@ Page({
   onShowCloneTemplateFromIntro() {
     const template = this.data.selectedTemplate;
     if (!template) return;
-    this.setData({ showTemplateIntroModal: false });
-    wx.navigateTo({
-      url: '/pages/plans/create/create?templateId=' + template.id
+    requireLogin(this, '登录后即可使用该模板并按需调整', () => {
+      this.setData({ showTemplateIntroModal: false });
+      wx.navigateTo({
+        url: '/pages/plans/create/create?templateId=' + template.id
+      });
     });
   },
 
@@ -952,9 +977,11 @@ Page({
       completed: true
     });
 
-    this.setData({ showRecommendModal: false });
-    wx.navigateTo({
-      url: '/pages/plans/create/create?templateId=' + planId
+    requireLogin(this, '登录后即可应用推荐计划并按需调整', () => {
+      this.setData({ showRecommendModal: false });
+      wx.navigateTo({
+        url: '/pages/plans/create/create?templateId=' + planId
+      });
     });
   },
 

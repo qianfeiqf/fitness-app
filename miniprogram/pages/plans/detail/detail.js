@@ -4,6 +4,7 @@
  */
 
 const { findOne, find, update, remove } = require('../../../localdb/db.js');
+const { requireLogin, handleLoginSuccess, handleLoginClose } = require('../../../utils/auth.js');
 
 Page({
   data: {
@@ -22,7 +23,8 @@ Page({
     showDeleteModal: false,
     showExerciseDetail: false,
     detailExercise: null,
-    gifLoadError: false
+    gifLoadError: false,
+    loginSheet: { visible: false, desc: '' }
   },
 
   onLoad(options) {
@@ -253,10 +255,20 @@ Page({
   /**
    * 使用此模板（模板模式）
    */
+  onLoginSheetSuccess() {
+    handleLoginSuccess(this);
+  },
+
+  onLoginSheetClose() {
+    handleLoginClose(this);
+  },
+
   onUseTemplate() {
-    const { templateId, plan } = this.data;
-    wx.navigateTo({
-      url: '/pages/plans/create/create?templateId=' + templateId
+    const { templateId } = this.data;
+    requireLogin(this, '登录后即可使用该模板并按需调整', () => {
+      wx.navigateTo({
+        url: '/pages/plans/create/create?templateId=' + templateId
+      });
     });
   },
 
@@ -269,22 +281,26 @@ Page({
    * 恢复计划（支持首页多计划并行，不再强行暂停其他计划）
    */
   onActivatePlan() {
-    const { plan } = this.data;
-    update('plans', plan.id, { status: 'active', updated_at: Date.now() });
-    wx.showToast({ title: '计划已恢复', icon: 'success' });
-    this.loadPlan(plan.id);
-    this._triggerSilentSync();
+    requireLogin(this, '登录后即可管理你的训练计划', () => {
+      const { plan } = this.data;
+      update('plans', plan.id, { status: 'active', updated_at: Date.now() });
+      wx.showToast({ title: '计划已恢复', icon: 'success' });
+      this.loadPlan(plan.id);
+      this._triggerSilentSync();
+    });
   },
 
   /**
    * 暂停计划（从首页移出，保留记录可随时恢复）
    */
   onArchivePlan() {
-    const { plan } = this.data;
-    update('plans', plan.id, { status: 'archived', updated_at: Date.now() });
-    wx.showToast({ title: '计划已暂停', icon: 'success' });
-    this.loadPlan(plan.id);
-    this._triggerSilentSync();
+    requireLogin(this, '登录后即可管理你的训练计划', () => {
+      const { plan } = this.data;
+      update('plans', plan.id, { status: 'archived', updated_at: Date.now() });
+      wx.showToast({ title: '计划已暂停', icon: 'success' });
+      this.loadPlan(plan.id);
+      this._triggerSilentSync();
+    });
   },
 
   _triggerSilentSync() {
@@ -299,8 +315,10 @@ Page({
    */
   onEditPlan() {
     const { plan } = this.data;
-    wx.navigateTo({
-      url: '/pages/plans/create/create?planId=' + plan.id
+    requireLogin(this, '登录后即可编辑你的训练计划', () => {
+      wx.navigateTo({
+        url: '/pages/plans/create/create?planId=' + plan.id
+      });
     });
   },
 
@@ -308,7 +326,9 @@ Page({
    * 删除计划
    */
   onDeletePlan() {
-    this.setData({ showDeleteModal: true });
+    requireLogin(this, '登录后即可管理你的训练计划', () => {
+      this.setData({ showDeleteModal: true });
+    });
   },
 
   onCancelDeletePlan() {

@@ -154,4 +154,12 @@
     exercise="{{detailExercise}}"
     bind:close="onCloseExerciseDetail"
   />
+
+  <!-- 按需登录半屏抽屉 -->
+  <login-sheet
+    visible="{{loginSheet.visible}}"
+    desc="{{loginSheet.desc}}"
+    bind:success="onLoginSheetSuccess"
+    bind:close="onLoginSheetClose"
+  />
 </view>

@@ -1,0 +1,95 @@
+.login-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.48);
+  z-index: 1300;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  animation: loginSheetFadeIn 0.2s ease-out;
+}
+
+.login-sheet-card {
+  background: #FFFFFF;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 20rpx 40rpx calc(40rpx + env(safe-area-inset-bottom));
+  text-align: center;
+  box-sizing: border-box;
+  animation: loginSheetSlideUp 0.24s ease-out;
+}
+
+.login-sheet-handle {
+  width: 56rpx;
+  height: 6rpx;
+  background: #E2E4E8;
+  border-radius: 9999rpx;
+  margin: 0 auto 28rpx;
+}
+
+.login-sheet-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-bottom: 14rpx;
+}
+
+.login-sheet-desc {
+  display: block;
+  font-size: 26rpx;
+  color: #777777;
+  line-height: 1.55;
+  margin-bottom: 40rpx;
+}
+
+.login-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.login-sheet-btn {
+  height: 92rpx;
+  border-radius: 9999rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-sheet-btn.primary {
+  background: #07C160;
+  color: #FFFFFF;
+}
+
+.login-sheet-btn.primary:active {
+  opacity: 0.88;
+}
+
+.login-sheet-btn.primary.loading {
+  opacity: 0.7;
+}
+
+.login-sheet-btn.secondary {
+  background: #F4F5F7;
+  color: #555555;
+  font-weight: 500;
+}
+
+.login-sheet-btn.secondary:active {
+  background: #E8EAEE;
+}
+
+@keyframes loginSheetFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes loginSheetSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

@@ -3,6 +3,7 @@
   "usingComponents": {
     "mp-loading": "weui-miniprogram/loading/loading",
     "modal-sheet": "../../../components/modal-sheet/modal-sheet",
-    "exercise-guide-sheet": "../../../components/exercise-guide-sheet/exercise-guide-sheet"
+    "exercise-guide-sheet": "../../../components/exercise-guide-sheet/exercise-guide-sheet",
+    "login-sheet": "../../../components/login-sheet/login-sheet"
   }
 }

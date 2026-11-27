@@ -306,6 +306,14 @@
     bind:skip="onCoachTourSkip"
   />
 
+  <!-- 按需登录半屏抽屉 -->
+  <login-sheet
+    visible="{{loginSheet.visible}}"
+    desc="{{loginSheet.desc}}"
+    bind:success="onLoginSheetSuccess"
+    bind:close="onLoginSheetClose"
+  />
+
   <!-- 微信隐私保护指引弹窗 -->
   <privacy-popup />
 </view>

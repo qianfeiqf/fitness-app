@@ -551,19 +551,14 @@ Page({
   },
 
   /**
-   * 显示使用模板弹窗
+   * 统一跳转预填创建页使用模板（与计划详情页保持一致，支持按需调整训练日、动作与重量）
    */
   onShowCloneTemplateModal(e) {
     const { templateId } = e.currentTarget.dataset;
-    const template = this.data.templates.find(t => t.id === templateId);
-
-    if (template) {
-      this.setData({
-        showCloneModal: true,
-        cloneSource: { type: 'template', data: template },
-        newPlanName: this._getDefaultPlanName(template.name)
-      });
-    }
+    if (!templateId) return;
+    wx.navigateTo({
+      url: '/pages/plans/create/create?templateId=' + templateId
+    });
   },
 
   /**
@@ -571,14 +566,11 @@ Page({
    */
   onShowCloneTemplateFromDetail() {
     const template = this.data.selectedTemplate;
-    if (template) {
-      this.setData({
-        showTemplateDetailModal: false,
-        showCloneModal: true,
-        cloneSource: { type: 'template', data: template },
-        newPlanName: this._getDefaultPlanName(template.name)
-      });
-    }
+    if (!template) return;
+    this.setData({ showTemplateDetailModal: false });
+    wx.navigateTo({
+      url: '/pages/plans/create/create?templateId=' + template.id
+    });
   },
 
   /**
@@ -586,14 +578,11 @@ Page({
    */
   onShowCloneTemplateFromIntro() {
     const template = this.data.selectedTemplate;
-    if (template) {
-      this.setData({
-        showTemplateIntroModal: false,
-        showCloneModal: true,
-        cloneSource: { type: 'template', data: template },
-        newPlanName: this._getDefaultPlanName(template.name)
-      });
-    }
+    if (!template) return;
+    this.setData({ showTemplateIntroModal: false });
+    wx.navigateTo({
+      url: '/pages/plans/create/create?templateId=' + template.id
+    });
   },
 
   /**
@@ -964,7 +953,9 @@ Page({
     });
 
     this.setData({ showRecommendModal: false });
-    this.onShowCloneTemplateModal({ currentTarget: { dataset: { templateId: planId } } });
+    wx.navigateTo({
+      url: '/pages/plans/create/create?templateId=' + planId
+    });
   },
 
   onCloseRecommend() {

@@ -99,10 +99,13 @@
 
     <!-- 底部精简药丸操作栏 -->
     <view class="action-buttons">
-      <!-- 模板模式：唯一绿色主按钮 -->
-      <view wx:if="{{isTemplate}}" class="detail-btn primary" bindtap="onUseTemplate">
-        <text>使用此计划</text>
-      </view>
+      <!-- 模板模式：轻量预期提示 + 唯一绿色主按钮 -->
+      <block wx:if="{{isTemplate}}">
+        <text class="template-use-hint">点击按需调整训练日、动作与重量</text>
+        <view class="detail-btn primary" bindtap="onUseTemplate">
+          <text>使用此计划</text>
+        </view>
+      </block>
       <!-- 用户计划模式：单行双药丸按钮（左：暂停/恢复，右：编辑计划） -->
       <view wx:else class="action-btn-row">
         <view

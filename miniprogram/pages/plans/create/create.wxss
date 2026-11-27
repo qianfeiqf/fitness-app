@@ -1,4 +1,4 @@
-/* 新建计划页面样式 — WeUI 扁平风格 */
+/* 新建/编辑计划页面样式 — 与全 App 统一的浅灰底 + 无边框纯白卡片 */
 
 .page-create {
   height: 100vh;
@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #FFFFFF;
+  background: #F7F8FA;
   padding: 0;
   box-sizing: border-box;
 }
@@ -19,7 +19,7 @@
 }
 
 .create-scroll-inner {
-  padding: 30rpx 30rpx 48rpx;
+  padding: 28rpx 32rpx 48rpx;
   box-sizing: border-box;
 }
 
@@ -27,11 +27,11 @@
    表单区块
    ===================== */
 .form-section {
-  margin-bottom: 48rpx;
+  margin-bottom: 36rpx;
 }
 
 .section-title {
-  font-size: 32rpx;
+  font-size: 28rpx;
   font-weight: 600;
   color: #1A1A1A;
   display: block;
@@ -42,304 +42,57 @@
   font-size: 24rpx;
   color: #999999;
   display: block;
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
 }
 
 .form-input {
   width: 100%;
-  height: 96rpx;
+  height: 92rpx;
   background: #FFFFFF;
-  border: 1rpx solid #E5E5E5;
-  border-radius: 16rpx;
-  padding: 0 32rpx;
+  border: none;
+  border-radius: 22rpx;
+  padding: 0 28rpx;
   font-size: 30rpx;
+  font-weight: 500;
   color: #1A1A1A;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
   box-sizing: border-box;
 }
 
 /* =====================
-   周期类型选择
-   ===================== */
-.cycle-options {
-  display: flex;
-  gap: 20rpx;
-}
-
-.cycle-option {
-  flex: 1;
-  padding: 32rpx 24rpx;
-  background: #FFFFFF;
-  border: 1rpx solid #E5E5E5;
-  border-radius: 24rpx;
-}
-
-.cycle-option.active {
-  background-color: #F8F8F8;
-  border-color: #07C160;
-}
-
-.cycle-name {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-  display: block;
-  margin-bottom: 8rpx;
-}
-
-.cycle-option.active .cycle-name {
-  color: #1A1A1A;
-  font-weight: 700;
-}
-
-.cycle-desc {
-  font-size: 22rpx;
-  color: #999999;
-  display: block;
-}
-
-/* =====================
-   训练日选择
+   训练日选择（单行 7 列齐平）
    ===================== */
 .day-selector {
-  display: flex;
-  gap: 12rpx;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10rpx;
 }
 
 .day-item {
-  width: 100rpx;
-  height: 100rpx;
+  height: 76rpx;
   background: #FFFFFF;
-  border: 1rpx solid #E5E5E5;
-  border-radius: 24rpx;
+  border: none;
+  border-radius: 18rpx;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
 }
 
 .day-item.active {
-  background: #07C160;
+  background: #1A1A1A;
+  box-shadow: 0 6rpx 16rpx rgba(26, 26, 26, 0.14);
 }
 
 .day-name {
-  font-size: 28rpx;
+  font-size: 24rpx;
   font-weight: 600;
-  color: #1A1A1A;
+  color: #444444;
 }
 
 .day-item.active .day-name {
   color: #FFFFFF;
-}
-
-/* =====================
-   循环标签
-   ===================== */
-.cycle-labels {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-}
-
-.cycle-label-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 24rpx;
-  background: #F5F5F5;
-  border-radius: 16rpx;
-}
-
-.cycle-label-day {
-  font-size: 28rpx;
-  font-weight: 500;
-  color: #1A1A1A;
-}
-
-.cycle-label-picker {
-  padding: 12rpx 24rpx;
-  background: #FFFFFF;
-  border: 1rpx solid #E5E5E5;
-  border-radius: 16rpx;
-}
-
-.picker-value {
-  font-size: 26rpx;
-  color: #1A1A1A;
-}
-
-/* =====================
-   训练日动作
-   ===================== */
-.day-exercises {
-  margin-bottom: 40rpx;
-}
-
-.day-header {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  margin-bottom: 16rpx;
-}
-
-.day-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-}
-
-.day-cycle-tag {
-  padding: 6rpx 16rpx;
-  background: #F0F0F0;
-  color: #1A1A1A;
-  font-size: 22rpx;
-  font-weight: 600;
-  border-radius: 9999rpx;
-}
-
-/* =====================
-   动作卡片
-   ===================== */
-.exercise-card {
-  background: #FFFFFF;
-  border: 1rpx solid #E5E5E5;
-  border-radius: 24rpx;
-  margin-bottom: 16rpx;
-  overflow: hidden;
-}
-
-.exercise-card-header {
-  display: flex;
-  align-items: center;
-  padding: 20rpx 24rpx;
-  background: #F5F5F5;
-  border-bottom: none;
-}
-
-.exercise-card-name-wrap {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-  margin-right: 12rpx;
-}
-
-.exercise-card-name {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.exercise-info-btn {
-  width: 36rpx;
-  height: 36rpx;
-  border-radius: 50%;
-  background: #E8EAEE;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.exercise-info-icon {
-  font-size: 20rpx;
-  font-weight: 700;
-  color: #666666;
-  font-family: Georgia, serif;
-}
-
-.exercise-card-muscle {
-  font-size: 22rpx;
-  color: #999999;
-  margin-right: 16rpx;
-  flex-shrink: 0;
-}
-
-.exercise-card-delete {
-  width: 48rpx;
-  height: 48rpx;
-  background: rgba(250, 81, 81, 0.08);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32rpx;
-  color: #FA5151;
-  font-weight: 300;
-}
-
-.exercise-card-body {
-  display: flex;
-  gap: 12rpx;
-  padding: 20rpx 24rpx;
-}
-
-.exercise-param {
-  flex: 1;
-}
-
-.param-label {
-  font-size: 20rpx;
-  color: #999999;
-  display: block;
-  margin-bottom: 8rpx;
-}
-
-.param-input {
-  width: 100%;
-  height: 72rpx;
-  background: #FFFFFF;
-  border: 1rpx solid #E5E5E5;
-  border-radius: 16rpx;
-  padding: 0 16rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #1A1A1A;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-/* =====================
-   添加动作按钮
-   ===================== */
-.add-exercise-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8rpx;
-  height: 88rpx;
-  background: #F5F5F5;
-  border: 2rpx dashed rgba(0, 0, 0, 0.15);
-  border-radius: 16rpx;
-  margin-top: 16rpx;
-}
-
-.add-icon {
-  font-size: 32rpx;
-  color: #1A1A1A;
-  font-weight: 600;
-}
-
-.add-exercise-btn text:not(.add-icon) {
-  font-size: 28rpx;
-  color: #1A1A1A;
-  font-weight: 500;
-}
-
-/* =====================
-   空提示
-   ===================== */
-.empty-hint {
-  text-align: center;
-  padding: 60rpx 40rpx;
-}
-
-.empty-hint text {
-  font-size: 28rpx;
-  color: #999999;
 }
 
 /* =====================
@@ -349,19 +102,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24rpx 0;
-  border-top: none;
-  margin-top: 16rpx;
+  padding: 24rpx 28rpx;
+  background: #FFFFFF;
+  border-radius: 22rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
 }
 
 .advanced-toggle-text {
   font-size: 28rpx;
-  color: #666666;
+  font-weight: 500;
+  color: #555555;
 }
 
 .advanced-toggle-icon {
-  font-size: 36rpx;
-  color: #999999;
+  font-size: 34rpx;
+  color: #BBBBBB;
   transition: transform 0.2s ease;
 }
 
@@ -370,18 +125,18 @@
 }
 
 .advanced-content {
-  padding-top: 24rpx;
-  animation: fadeIn 0.3s ease;
+  margin-top: 16rpx;
+  padding: 24rpx;
+  background: #FFFFFF;
+  border-radius: 22rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
 }
 
 .advanced-option {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 24rpx;
-  background: #F5F5F5;
-  border-radius: 16rpx;
-  margin-bottom: 20rpx;
+  padding: 8rpx 4rpx 20rpx;
 }
 
 .advanced-option-header {
@@ -399,38 +154,279 @@
 
 .advanced-option-hint {
   font-size: 22rpx;
-  color: #999999;
+  color: #888888;
   display: block;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .advanced-switch {
   transform: scale(0.85);
 }
 
-.cycle-labels-title {
+.cycle-length-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 4rpx;
+  border-top: 1rpx solid #F2F3F5;
+}
+
+.cycle-length-title {
   font-size: 26rpx;
-  color: #666666;
+  font-weight: 600;
+  color: #1A1A1A;
   display: block;
-  margin-bottom: 16rpx;
+  margin-bottom: 4rpx;
+}
+
+.cycle-length-hint {
+  font-size: 22rpx;
+  color: #888888;
+  display: block;
+}
+
+.picker-cycle-length {
+  padding: 10rpx 22rpx;
+  background: #F4F5F7;
+  border-radius: 9999rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.picker-arrow {
+  margin-left: 8rpx;
+  color: #999999;
+}
+
+.cycle-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F2F3F5;
+}
+
+.cycle-labels-title {
+  font-size: 24rpx;
+  color: #888888;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.cycle-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 20rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+}
+
+.cycle-label-day {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+
+.cycle-label-picker {
+  padding: 8rpx 22rpx;
+  background: #FFFFFF;
+  border-radius: 9999rpx;
+}
+
+.picker-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
 /* =====================
-   底部操作按钮
+   训练日动作编辑
+   ===================== */
+.day-exercises {
+  margin-bottom: 32rpx;
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 14rpx;
+  padding: 0 4rpx;
+}
+
+.day-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.day-cycle-tag {
+  padding: 4rpx 16rpx;
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-size: 20rpx;
+  font-weight: 600;
+  border-radius: 9999rpx;
+}
+
+/* 动作卡片 — 纯白无边框 + 轻灰凹槽参数框 */
+.exercise-card {
+  background: #FFFFFF;
+  border: none;
+  border-radius: 24rpx;
+  margin-bottom: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+}
+
+.exercise-card-header {
+  display: flex;
+  align-items: center;
+  padding-bottom: 18rpx;
+  margin-bottom: 18rpx;
+  border-bottom: 1rpx solid #F4F5F7;
+}
+
+.exercise-card-name-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-right: 12rpx;
+}
+
+.exercise-card-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exercise-info-btn {
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  background: #F0F1F4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.exercise-info-icon {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #777777;
+  font-family: Georgia, serif;
+}
+
+.exercise-card-muscle {
+  font-size: 22rpx;
+  color: #888888;
+  background: #F4F5F7;
+  padding: 4rpx 14rpx;
+  border-radius: 9999rpx;
+  margin-right: 14rpx;
+  flex-shrink: 0;
+}
+
+.exercise-card-delete {
+  width: 48rpx;
+  height: 48rpx;
+  background: #FFF2F2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  color: #FA5151;
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+.exercise-card-body {
+  display: flex;
+  gap: 12rpx;
+}
+
+.exercise-param {
+  flex: 1;
+  min-width: 0;
+}
+
+.param-label {
+  font-size: 20rpx;
+  color: #999999;
+  display: block;
+  text-align: center;
+  margin-bottom: 8rpx;
+}
+
+.param-input {
+  width: 100%;
+  height: 68rpx;
+  background: #F5F6F8;
+  border: none;
+  border-radius: 14rpx;
+  padding: 0 8rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-align: center;
+  font-family: 'DIN Alternate', system-ui, sans-serif;
+  box-sizing: border-box;
+}
+
+/* 添加动作按钮 */
+.add-exercise-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  height: 82rpx;
+  background: #FFFFFF;
+  border: 2rpx dashed #DCE0E6;
+  border-radius: 20rpx;
+  margin-top: 8rpx;
+}
+
+.add-exercise-btn:active {
+  background: #F4F5F7;
+}
+
+.add-icon {
+  font-size: 32rpx;
+  color: #07C160;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.add-exercise-btn text:not(.add-icon) {
+  font-size: 26rpx;
+  color: #555555;
+  font-weight: 600;
+}
+
+/* =====================
+   底部操作按钮（新建与编辑统一微信绿主按钮）
    ===================== */
 .bottom-actions {
   flex-shrink: 0;
-  padding: 24rpx 30rpx calc(28rpx + env(safe-area-inset-bottom));
+  padding: 20rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
   background: #FFFFFF;
-  border-top: 1rpx solid #F0F0F0;
-  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.04);
+  border-top: 1rpx solid #F0F1F4;
   position: relative;
   z-index: 20;
 }
 
 .btn-save {
   width: 100%;
-  height: 100rpx;
+  height: 94rpx;
   background: #07C160;
   color: #FFFFFF;
   border-radius: 9999rpx;
@@ -439,12 +435,9 @@
   justify-content: center;
   font-size: 32rpx;
   font-weight: 600;
-}
-
-.btn-save.edit {
-  background: #666666;
+  box-shadow: 0 8rpx 20rpx rgba(7, 193, 96, 0.22);
 }
 
 .btn-save:active {
-  opacity: 0.85;
+  opacity: 0.88;
 }

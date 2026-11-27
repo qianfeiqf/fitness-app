@@ -430,7 +430,7 @@ Page({
    * 保存计划
    */
   onSavePlan() {
-    const { planName, selectedDays } = this.data;
+    const { planName, selectedDays, planExercises } = this.data;
 
     if (!planName.trim()) {
       wx.showToast({ title: '请输入计划名称', icon: 'none' });
@@ -439,6 +439,11 @@ Page({
 
     if (selectedDays.length === 0) {
       wx.showToast({ title: '请至少选择一个训练日', icon: 'none' });
+      return;
+    }
+
+    if (!planExercises || planExercises.length === 0) {
+      wx.showToast({ title: '请至少添加一个训练动作', icon: 'none' });
       return;
     }
 

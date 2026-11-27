@@ -271,7 +271,7 @@ Page({
   onActivatePlan() {
     const { plan } = this.data;
     update('plans', plan.id, { status: 'active', updated_at: Date.now() });
-    wx.showToast({ title: '已恢复，加入首页训练', icon: 'success' });
+    wx.showToast({ title: '计划已恢复', icon: 'success' });
     this.loadPlan(plan.id);
     this._triggerSilentSync();
   },
@@ -282,7 +282,7 @@ Page({
   onArchivePlan() {
     const { plan } = this.data;
     update('plans', plan.id, { status: 'archived', updated_at: Date.now() });
-    wx.showToast({ title: '已暂停，已从首页移出', icon: 'success' });
+    wx.showToast({ title: '计划已暂停', icon: 'success' });
     this.loadPlan(plan.id);
     this._triggerSilentSync();
   },

@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "定制训练计划",
-  "navigationBarBackgroundColor": "#FFFFFF",
-  "navigationBarTextStyle": "black",
-  "usingComponents": {
-    "mp-icon": "weui-miniprogram/icon/icon"
-  }
-}

@@ -266,7 +266,9 @@ App({
 
     // 云开发就绪时立即触发一次双向同步（拉取云端历史 + 推送本地记录）
     if (!isOfflineMode) {
-      this.startSync();
+      this._lastLoginSyncPromise = this.startSync();
+    } else {
+      this._lastLoginSyncPromise = Promise.resolve({ success: false, reason: 'offline' });
     }
 
     return user;

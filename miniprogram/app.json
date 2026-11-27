@@ -1,7 +1,6 @@
 {
   "pages": [
     "pages/home/home",
-    "pages/onboarding/onboarding",
     "pages/home/training/training",
     "pages/home/complete/complete",
     "pages/plans/plans",

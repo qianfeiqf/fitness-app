@@ -167,15 +167,23 @@ Page({
       this.checkLoginStatus();
       wx.showToast({ title: '登录成功', icon: 'success' });
       const completed = wx.getStorageSync('onboarding_completed');
-      const existingPlans = getCollection('plans') || [];
-      if (!completed && existingPlans.length === 0) {
-        app.globalData.needsOnboarding = true;
-        setTimeout(() => {
-          this.setData({ showRecommendModal: true });
-        }, 450);
-      } else if (!completed && existingPlans.length > 0) {
-        wx.setStorageSync('onboarding_completed', true);
-        app.globalData.needsOnboarding = false;
+      if (!completed) {
+        // 等待首轮云端同步完成（最多 2.5 秒），避免换机老用户在云端计划拉取前误弹推荐窗
+        const syncPromise = app._lastLoginSyncPromise || Promise.resolve();
+        Promise.race([
+          syncPromise,
+          new Promise(resolve => setTimeout(resolve, 2500))
+        ]).then(() => {
+          this.loadProfile();
+          const existingPlans = getCollection('plans') || [];
+          if (existingPlans.length === 0) {
+            app.globalData.needsOnboarding = true;
+            this.setData({ showRecommendModal: true });
+          } else {
+            wx.setStorageSync('onboarding_completed', true);
+            app.globalData.needsOnboarding = false;
+          }
+        });
       }
     }).catch(() => {
       wx.showToast({ title: '登录失败', icon: 'error' });

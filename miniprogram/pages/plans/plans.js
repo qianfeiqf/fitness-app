@@ -64,32 +64,8 @@ Page({
     ],
     daysTabIndex: 0,
 
-    // 计划推荐向导
+    // 计划推荐弹窗
     showRecommendModal: false,
-    recommendStep: 1,
-    wizardGoals: [
-      { id: 'muscle', name: '增肌塑形', icon: '', desc: '增加肌肉量，改善体型线条' },
-      { id: 'fatloss', name: '减脂瘦身', icon: '', desc: '降低体脂率，提升代谢水平' },
-      { id: 'strength', name: '力量提升', icon: '', desc: '提升最大力量，突破重量瓶颈' },
-      { id: 'general', name: '综合健康', icon: '', desc: '全面提升身体素质，保持健康' }
-    ],
-    wizardSelectedGoal: null,
-    wizardDayOptions: [
-      { days: 2, desc: '轻松入门' },
-      { days: 3, desc: '经典安排' },
-      { days: 4, desc: '进阶训练' },
-      { days: 5, desc: '密集训练' },
-      { days: 6, desc: '硬核模式' }
-    ],
-    wizardSelectedDays: null,
-    wizardExpOptions: [
-      { id: 'beginner', name: '纯新手', tag: '入门', desc: '刚开始接触健身，或从未系统训练过' },
-      { id: 'intermediate', name: '有半年经验', tag: '中级', desc: '已经训练过一段时间，熟悉基础动作' },
-      { id: 'advanced', name: '老手', tag: '进阶', desc: '系统训练一年以上，追求突破' }
-    ],
-    wizardSelectedExp: null,
-    wizardRecommended: [],
-    wizardSelectedPlan: null,
 
     // 统一确认弹窗
     confirmModal: {

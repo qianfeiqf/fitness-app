@@ -172,7 +172,7 @@ Page({
    */
   checkOnboardingRedirect() {
     const app = getApp();
-    if (!app.globalData.isLoggedIn || !app.globalData.needsOnboarding) return;
+    if (!app.globalData.isLoggedIn || !app.globalData.needsOnboarding || app.globalData.isSyncing) return;
     const existingPlans = getCollection('plans') || [];
     if (existingPlans.length > 0) {
       wx.setStorageSync('onboarding_completed', true);
@@ -1083,28 +1083,6 @@ Page({
     this.checkLoginAndLoadData({ silent: true });
   },
 
-  /**
-   * 跳转到登录
-   */
-  onLogin() {
-    wx.showModal({
-      title: '提示',
-      content: '请先登录后再开始训练',
-      confirmText: '去登录',
-      success: (res) => {
-        if (res.confirm) {
-          // 触发全局登录并同步更新首页登录态
-          const app = getApp();
-          app.wxLogin().then(() => {
-            this.checkLoginAndLoadData();
-            wx.showToast({ title: '登录成功', icon: 'success' });
-          }).catch(() => {
-            wx.showToast({ title: '登录失败，请重试', icon: 'error' });
-          });
-        }
-      }
-    });
-  },
 
   /**
    * 预览计划详情（指定计划）

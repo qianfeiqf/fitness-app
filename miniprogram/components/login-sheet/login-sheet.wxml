@@ -1,8 +1,7 @@
-<!-- 公共按需登录半屏抽屉（覆盖原生 TabBar 的深炭黑品牌风格） -->
+<!-- 公共按需登录居中卡片弹窗（深炭黑品牌风格） -->
 <root-portal wx:if="{{visible}}">
   <view class="login-sheet-overlay" bindtap="onClose" catchtouchmove="noop">
     <view class="login-sheet-card" catchtap="noop">
-      <view class="login-sheet-handle"></view>
       <view class="login-sheet-badge">
         <view class="login-sheet-badge-icon"></view>
       </view>

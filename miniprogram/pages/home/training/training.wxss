@@ -2305,27 +2305,6 @@
   color: #07C160;
 }
 
-.exercise-history-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 44rpx;
-  padding: 0 18rpx;
-  border-radius: 9999rpx;
-  background: #F4F5F7;
-  border: 1rpx solid #E5E7EB;
-}
-
-.exercise-history-btn:active {
-  background: #E8EAEE;
-}
-
-.exercise-history-text {
-  font-size: 22rpx;
-  font-weight: 600;
-  color: #555555;
-}
-
 .alt-right-actions {
   display: flex;
   align-items: center;

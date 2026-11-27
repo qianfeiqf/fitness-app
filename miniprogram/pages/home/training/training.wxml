@@ -106,12 +106,9 @@
     <view class="exercise-header">
       <view class="exercise-tags">
         <view class="tag tag-primary">{{currentExercise.muscle_group}}</view>
-        <view wx:if="{{currentExercise.description}}" class="exercise-guide-btn" bindtap="onViewCurrentExerciseDetail">
+        <view class="exercise-guide-btn" bindtap="onViewCurrentExerciseDetail">
           <text class="exercise-guide-icon">i</text>
-          <text class="exercise-guide-text">要领</text>
-        </view>
-        <view class="exercise-history-btn" bindtap="onViewCurrentExerciseHistory">
-          <text class="exercise-history-text">历史</text>
+          <text class="exercise-guide-text">要领·历史</text>
         </view>
       </view>
       <view class="exercise-remove-btn" bindtap="onRemoveCurrentExercise">

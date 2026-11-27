@@ -76,7 +76,11 @@ Page({
     coachTour: { visible: false, rect: {}, title: '', desc: '', stepText: '', nextText: '下一步', isLast: false },
 
     // 按需登录半屏抽屉
-    loginSheet: { visible: false, desc: '' }
+    loginSheet: { visible: false, desc: '' },
+
+    // 4 步智能推荐半屏弹窗（首次登录引导与手动推荐共用）
+    showRecommendModal: false,
+    recommendIsOnboarding: false
   },
 
   // 空操作函数（用于阻止事件冒泡）
@@ -116,6 +120,7 @@ Page({
     console.log('=== 训练中心页面显示 ===');
     this.checkLoginAndLoadData();
     this.checkTrainingFloat();
+    this.checkOnboardingRedirect();
     const app = getApp();
     if (!(app && app.globalData && app.globalData.needsOnboarding)) {
       this.checkFirstLaunchProfilePrompt();
@@ -163,7 +168,7 @@ Page({
   },
 
   /**
-   * 检查是否需要跳转到引导页（仅已登录且尚无任何计划的新用户才触发）
+   * 检查是否需要弹出首次登录智能推荐半屏弹窗（仅已登录且尚无任何计划的新用户才触发）
    */
   checkOnboardingRedirect() {
     const app = getApp();
@@ -174,9 +179,9 @@ Page({
       app.globalData.needsOnboarding = false;
       return;
     }
-    wx.redirectTo({
-      url: '/pages/onboarding/onboarding'
-    });
+    if (!this.data.showRecommendModal) {
+      this.setData({ showRecommendModal: true, recommendIsOnboarding: true });
+    }
   },
 
   /**
@@ -1166,15 +1171,24 @@ Page({
   },
 
   /**
-   * 首页空态直达训练库并自动弹出 4 步智能推荐
+   * 首页空态直接弹出 4 步智能推荐半屏弹窗
    */
   onGoToRecommend() {
-    const app = getApp();
-    if (app && app.globalData) {
-      app.globalData.openPlanRecommend = true;
-    }
-    wx.switchTab({
-      url: '/pages/plans/plans'
+    this.setData({ showRecommendModal: true, recommendIsOnboarding: false });
+  },
+
+  onCloseRecommendModal() {
+    this.setData({ showRecommendModal: false, recommendIsOnboarding: false });
+  },
+
+  onApplyRecommendPlan(e) {
+    const templateId = e.detail && e.detail.templateId;
+    if (!templateId) return;
+    requireLogin(this, '登录后即可应用推荐计划并按需调整', () => {
+      this.setData({ showRecommendModal: false, recommendIsOnboarding: false });
+      wx.navigateTo({
+        url: '/pages/plans/create/create?templateId=' + templateId
+      });
     });
   },
 

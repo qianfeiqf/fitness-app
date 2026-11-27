@@ -6,6 +6,7 @@
     "training-float": "../../components/training-float/training-float",
     "coach-tour": "../../components/coach-tour/coach-tour",
     "login-sheet": "../../components/login-sheet/login-sheet",
+    "recommend-sheet": "../../components/recommend-sheet/recommend-sheet",
     "mp-icon": "weui-miniprogram/icon/icon"
   },
   "navigationBarTitleText": "训练中心",

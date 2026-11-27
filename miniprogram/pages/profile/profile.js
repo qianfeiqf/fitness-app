@@ -60,7 +60,10 @@ Page({
     returnTrainingSessionId: null,
 
     // 按需登录半屏抽屉
-    loginSheet: { visible: false, desc: '' }
+    loginSheet: { visible: false, desc: '' },
+
+    // 首次登录智能推荐半屏弹窗
+    showRecommendModal: false
   },
 
   onLoad() {
@@ -168,8 +171,8 @@ Page({
       if (!completed && existingPlans.length === 0) {
         app.globalData.needsOnboarding = true;
         setTimeout(() => {
-          wx.navigateTo({ url: '/pages/onboarding/onboarding' });
-        }, 500);
+          this.setData({ showRecommendModal: true });
+        }, 450);
       } else if (!completed && existingPlans.length > 0) {
         wx.setStorageSync('onboarding_completed', true);
         app.globalData.needsOnboarding = false;
@@ -308,6 +311,19 @@ Page({
 
   onLoginSheetClose() {
     handleLoginClose(this);
+  },
+
+  onCloseRecommendModal() {
+    this.setData({ showRecommendModal: false });
+  },
+
+  onApplyRecommendPlan(e) {
+    const templateId = e.detail && e.detail.templateId;
+    if (!templateId) return;
+    this.setData({ showRecommendModal: false });
+    wx.navigateTo({
+      url: '/pages/plans/create/create?templateId=' + templateId
+    });
   },
 
   _promptLoginFirst() {

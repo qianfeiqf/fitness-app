@@ -883,99 +883,15 @@ Page({
   },
 
   /**
-   * 打开计划推荐弹窗（4步向导）
+   * 打开计划推荐弹窗（复用公共 4 步智能推荐半屏组件）
    */
   onShowRecommend() {
-    this.setData({
-      showRecommendModal: true,
-      recommendStep: 1,
-      wizardSelectedGoal: null,
-      wizardSelectedDays: null,
-      wizardSelectedExp: null,
-      wizardRecommended: [],
-      wizardSelectedPlan: null
-    });
+    this.setData({ showRecommendModal: true });
   },
 
-  // ===== 4步向导 handlers =====
-
-  onWizardSelectGoal(e) {
-    this.setData({ wizardSelectedGoal: e.currentTarget.dataset.id });
-  },
-
-  onWizardSelectDays(e) {
-    this.setData({ wizardSelectedDays: parseInt(e.currentTarget.dataset.days) });
-  },
-
-  onWizardSelectExp(e) {
-    this.setData({ wizardSelectedExp: e.currentTarget.dataset.id });
-  },
-
-  onWizardSelectPlan(e) {
-    this.setData({ wizardSelectedPlan: e.currentTarget.dataset.id });
-  },
-
-  onWizardPrev() {
-    const step = this.data.recommendStep;
-    if (step > 1) {
-      this.setData({ recommendStep: step - 1 });
-    } else {
-      this.onCloseRecommend();
-    }
-  },
-
-  onWizardNext() {
-    const { recommendStep, wizardSelectedGoal, wizardSelectedDays, wizardSelectedExp } = this.data;
-
-    if (recommendStep === 1 && !wizardSelectedGoal) {
-      wx.showToast({ title: '请选择健身目标', icon: 'none' });
-      return;
-    }
-    if (recommendStep === 2 && !wizardSelectedDays) {
-      wx.showToast({ title: '请选择训练天数', icon: 'none' });
-      return;
-    }
-    if (recommendStep === 3 && !wizardSelectedExp) {
-      wx.showToast({ title: '请选择训练经验', icon: 'none' });
-      return;
-    }
-
-    if (recommendStep < 4) {
-      this.setData({ recommendStep: recommendStep + 1 });
-    }
-
-    if (recommendStep === 3) {
-      // 生成推荐
-      const recommended = this._generateRecommendations({
-        goal: wizardSelectedGoal,
-        days: wizardSelectedDays,
-        experience: wizardSelectedExp
-      });
-      this.setData({
-        wizardRecommended: recommended,
-        wizardSelectedPlan: recommended.length > 0 ? recommended[0].id : null,
-        recommendStep: 4
-      });
-    }
-  },
-
-  onWizardApply() {
-    const planId = this.data.wizardSelectedPlan;
+  onWizardApply(e) {
+    const planId = e.detail && e.detail.templateId;
     if (!planId) return;
-
-    const template = this.data.templates.find(t => t.id === planId);
-    if (!template) {
-      wx.showToast({ title: '计划不存在', icon: 'error' });
-      return;
-    }
-
-    // 保存用户偏好
-    wx.setStorageSync('user_preference', {
-      goal: this.data.wizardSelectedGoal,
-      days: this.data.wizardSelectedDays,
-      experience: this.data.wizardSelectedExp,
-      completed: true
-    });
 
     requireLogin(this, '登录后即可应用推荐计划并按需调整', () => {
       this.setData({ showRecommendModal: false });
@@ -987,54 +903,5 @@ Page({
 
   onCloseRecommend() {
     this.setData({ showRecommendModal: false });
-  },
-
-  // ===== 推荐算法 =====
-
-  _generateRecommendations(userPref) {
-    const templates = getCollection('plan_templates');
-    const { goal, days, experience } = userPref;
-
-    let candidates = templates.filter(t => Math.abs(t.training_days - days) <= 1);
-
-    const diffMap = { beginner: ['入门'], intermediate: ['入门', '中级'], advanced: ['中级', '进阶'] };
-    candidates = candidates.filter(t => (diffMap[experience] || ['入门']).includes(t.difficulty));
-
-    const priorityMap = {
-      muscle: ['PHUL', 'PPL', '五分化', '阿诺德', '臀腿', '上下肢', '5x5'],
-      fatloss: ['全身', '居家', '臀腿', 'PPLR', '上下肢'],
-      strength: ['GZCLP', '5/3/1', '5x5', 'Strength', 'Texas', 'nSuns'],
-      general: ['全身', '居家', 'PPLR', '上下肢', '5x5']
-    };
-    const priorities = priorityMap[goal] || [];
-    candidates.sort((a, b) => {
-      const aS = priorities.findIndex(p => a.name.includes(p));
-      const bS = priorities.findIndex(p => b.name.includes(p));
-      const aExact = a.training_days === days ? 0 : 1;
-      const bExact = b.training_days === days ? 0 : 1;
-      if (aExact !== bExact) return aExact - bExact;
-      return (aS === -1 ? 999 : aS) - (bS === -1 ? 999 : bS);
-    });
-
-    const diffClassMap = { '入门': 'beginner', '中级': 'intermediate', '进阶': 'advanced' };
-    return candidates.slice(0, 3).map(t => ({
-      ...t,
-      difficultyClass: diffClassMap[t.difficulty] || 'beginner',
-      features: this._getPlanFeatures(t)
-    }));
-  },
-
-  _getPlanFeatures(plan) {
-    const features = [];
-    if (plan.difficulty === '入门') features.push('新手友好');
-    if (plan.difficulty === '进阶') features.push('高强度');
-    if (plan.name.includes('5x5') || plan.name.includes('GZCLP') || plan.name.includes('5/3/1')) features.push('经典增力');
-    if (plan.name.includes('PHUL')) features.push('力量肌肥大双修');
-    if (plan.name.includes('居家')) features.push('居家哑铃');
-    if (plan.name.includes('臀腿')) features.push('臀腿塑形');
-    if (plan.name.includes('PPL') || plan.name.includes('五分化') || plan.name.includes('阿诺德')) features.push('肌群分化');
-    if (plan.training_days <= 3) features.push('时间友好');
-    if (!features.length) features.push('系统训练');
-    return features.slice(0, 3);
   }
 });

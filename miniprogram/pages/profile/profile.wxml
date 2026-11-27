@@ -312,6 +312,14 @@
   <!-- 训练悬浮窗（含全局组间休息倒计时） -->
   <training-float />
 
+  <!-- 首次登录智能推荐半屏弹窗 -->
+  <recommend-sheet
+    visible="{{showRecommendModal}}"
+    isOnboarding="{{true}}"
+    bind:apply="onApplyRecommendPlan"
+    bind:close="onCloseRecommendModal"
+  />
+
   <!-- 按需登录半屏抽屉 -->
   <login-sheet
     visible="{{loginSheet.visible}}"

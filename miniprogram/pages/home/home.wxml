@@ -306,6 +306,14 @@
     bind:skip="onCoachTourSkip"
   />
 
+  <!-- 公共 4 步智能推荐半屏弹窗 -->
+  <recommend-sheet
+    visible="{{showRecommendModal}}"
+    isOnboarding="{{recommendIsOnboarding}}"
+    bind:apply="onApplyRecommendPlan"
+    bind:close="onCloseRecommendModal"
+  />
+
   <!-- 按需登录半屏抽屉 -->
   <login-sheet
     visible="{{loginSheet.visible}}"

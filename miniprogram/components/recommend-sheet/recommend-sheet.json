@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "modal-sheet": "../modal-sheet/modal-sheet"
+  }
+}

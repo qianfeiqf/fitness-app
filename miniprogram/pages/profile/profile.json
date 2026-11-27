@@ -4,6 +4,7 @@
     "privacy-popup": "../../components/privacy-popup/privacy-popup",
     "training-float": "../../components/training-float/training-float",
     "login-sheet": "../../components/login-sheet/login-sheet",
+    "recommend-sheet": "../../components/recommend-sheet/recommend-sheet",
     "mp-icon": "weui-miniprogram/icon/icon"
   },
   "navigationBarTitleText": "个人中心",

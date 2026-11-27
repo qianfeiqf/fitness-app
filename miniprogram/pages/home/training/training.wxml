@@ -110,6 +110,9 @@
           <text class="exercise-guide-icon">i</text>
           <text class="exercise-guide-text">要领</text>
         </view>
+        <view class="exercise-history-btn" bindtap="onViewCurrentExerciseHistory">
+          <text class="exercise-history-text">历史</text>
+        </view>
       </view>
       <view class="exercise-remove-btn" bindtap="onRemoveCurrentExercise">
         <view class="exercise-remove-icon"></view>
@@ -658,6 +661,7 @@
   <exercise-guide-sheet
     visible="{{showExerciseDetail}}"
     exercise="{{detailExercise}}"
+    initialTab="{{detailInitialTab}}"
     bind:close="onCloseExerciseDetail"
   />
 

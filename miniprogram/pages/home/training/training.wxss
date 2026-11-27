@@ -843,18 +843,32 @@
   align-items: center;
   gap: 20rpx;
   padding: 22rpx 24rpx;
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  border: 1rpx solid #E5E5E5;
+  background: #F7F8FA;
+  border-radius: 18rpx;
+  border: 2rpx solid transparent;
+  transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .warmup-item.current {
-  background-color: #F7F7F7;
-  border-color: #D0D0D0;
+  background-color: #FFFFFF;
+  border-color: #1A1A1A;
+  box-shadow: 0 6rpx 18rpx rgba(26, 26, 26, 0.08);
 }
 
 .warmup-item.completed {
-  opacity: 0.72;
+  background-color: #F1FBF5;
+  border-color: #CBEFD9;
+}
+
+.warmup-item.completed .warmup-input {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #D5F0DF;
+  color: #1F5135;
+}
+
+.warmup-item.completed .warmup-unit,
+.warmup-item.completed .warmup-sep {
+  color: #5C8A70;
 }
 
 .warmup-check {
@@ -1278,18 +1292,32 @@
   align-items: center;
   gap: 20rpx;
   padding: 22rpx 24rpx;
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  border: 1rpx solid #E5E5E5;
+  background: #F7F8FA;
+  border-radius: 18rpx;
+  border: 2rpx solid transparent;
+  transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .formal-item.current {
-  background-color: #F4FBF7;
-  border-color: #A7E3BE;
+  background-color: #FFFFFF;
+  border-color: #1A1A1A;
+  box-shadow: 0 6rpx 18rpx rgba(26, 26, 26, 0.08);
 }
 
 .formal-item.completed {
-  opacity: 0.72;
+  background-color: #F1FBF5;
+  border-color: #CBEFD9;
+}
+
+.formal-item.completed .warmup-input {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #D5F0DF;
+  color: #1F5135;
+}
+
+.formal-item.completed .warmup-unit,
+.formal-item.completed .warmup-sep {
+  color: #5C8A70;
 }
 
 .formal-check {
@@ -2275,6 +2303,27 @@
   font-size: 22rpx;
   font-weight: 600;
   color: #07C160;
+}
+
+.exercise-history-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44rpx;
+  padding: 0 18rpx;
+  border-radius: 9999rpx;
+  background: #F4F5F7;
+  border: 1rpx solid #E5E7EB;
+}
+
+.exercise-history-btn:active {
+  background: #E8EAEE;
+}
+
+.exercise-history-text {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #555555;
 }
 
 .alt-right-actions {

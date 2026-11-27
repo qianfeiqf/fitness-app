@@ -107,6 +107,7 @@ Page({
     confirmSheetDanger: false,
     showExerciseDetail: false,
     detailExercise: null,
+    detailInitialTab: 'guide',
     gifLoadError: false,
     playingExerciseId: '',
     thumbErrorMap: {},
@@ -2628,6 +2629,19 @@ Page({
     this.setData({
       showExerciseDetail: true,
       detailExercise: detail,
+      detailInitialTab: 'guide',
+      gifLoadError: false
+    });
+  },
+
+  onViewCurrentExerciseHistory() {
+    const cur = this.data.currentExercise;
+    if (!cur) return;
+    const detail = findOne('exercises', { id: cur.exercise_id }) || cur;
+    this.setData({
+      showExerciseDetail: true,
+      detailExercise: detail,
+      detailInitialTab: 'history',
       gifLoadError: false
     });
   },
@@ -2641,7 +2655,7 @@ Page({
     const detail = findOne('exercises', { id: exerciseId });
     if (!detail) return;
     if (!detail.gif_url) {
-      this.setData({ showExerciseDetail: true, detailExercise: detail, gifLoadError: false });
+      this.setData({ showExerciseDetail: true, detailExercise: detail, detailInitialTab: 'guide', gifLoadError: false });
       return;
     }
     this.setData({
@@ -2663,6 +2677,7 @@ Page({
     this.setData({
       showExerciseDetail: true,
       detailExercise: detail,
+      detailInitialTab: 'guide',
       gifLoadError: false
     });
   },

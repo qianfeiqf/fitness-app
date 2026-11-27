@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.48);
+  background: rgba(0, 0, 0, 0.42);
   z-index: 1300;
   display: flex;
   flex-direction: column;
@@ -13,39 +13,77 @@
 }
 
 .login-sheet-card {
-  background: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+  background: #1A1A1A;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
   border-radius: 32rpx 32rpx 0 0;
   padding: 20rpx 40rpx calc(40rpx + env(safe-area-inset-bottom));
   text-align: center;
   box-sizing: border-box;
+  box-shadow: 0 -12rpx 36rpx rgba(0, 0, 0, 0.28);
   animation: loginSheetSlideUp 0.24s ease-out;
 }
 
+.login-sheet-watermark {
+  position: absolute;
+  top: -12rpx;
+  right: -14rpx;
+  width: 220rpx;
+  height: 220rpx;
+  pointer-events: none;
+  opacity: 0.06;
+  transform: rotate(-18deg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='%23FFFFFF' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 20v24M48 20v24M10 25v14M54 25v14M16 32h32'/%3E%3C/svg%3E");
+}
+
 .login-sheet-handle {
+  position: relative;
+  z-index: 1;
   width: 56rpx;
   height: 6rpx;
-  background: #E2E4E8;
+  background: rgba(255, 255, 255, 0.22);
   border-radius: 9999rpx;
   margin: 0 auto 28rpx;
 }
 
-.login-sheet-title {
+.login-sheet-eyebrow {
+  position: relative;
+  z-index: 1;
   display: block;
-  font-size: 36rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #07C160;
+  letter-spacing: 1rpx;
+  margin-bottom: 10rpx;
+}
+
+.login-sheet-title {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-size: 38rpx;
   font-weight: 700;
-  color: #1A1A1A;
+  color: #FFFFFF;
   margin-bottom: 14rpx;
 }
 
 .login-sheet-desc {
+  position: relative;
+  z-index: 1;
   display: block;
   font-size: 26rpx;
-  color: #777777;
+  color: rgba(255, 255, 255, 0.66);
   line-height: 1.55;
   margin-bottom: 40rpx;
 }
 
 .login-sheet-actions {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 18rpx;
@@ -75,13 +113,13 @@
 }
 
 .login-sheet-btn.secondary {
-  background: #F4F5F7;
-  color: #555555;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
 }
 
 .login-sheet-btn.secondary:active {
-  background: #E8EAEE;
+  background: rgba(255, 255, 255, 0.16);
 }
 
 @keyframes loginSheetFadeIn {

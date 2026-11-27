@@ -1,7 +1,9 @@
-<!-- 公共按需登录半屏抽屉 -->
+<!-- 公共按需登录半屏抽屉（深炭黑品牌风格） -->
 <view wx:if="{{visible}}" class="login-sheet-overlay" bindtap="onClose" catchtouchmove="noop">
   <view class="login-sheet-card" catchtap="noop">
+    <view class="login-sheet-watermark"></view>
     <view class="login-sheet-handle"></view>
+    <text class="login-sheet-eyebrow">训练记一记 · 云端同步</text>
     <text class="login-sheet-title">{{title}}</text>
     <text class="login-sheet-desc">{{desc}}</text>
 

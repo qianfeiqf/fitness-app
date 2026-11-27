@@ -8,20 +8,20 @@
 
   <!-- 主内容区（未登录也可完整使用本地档案、目标、导出与小贴士） -->
   <view class="profile-content">
-    <!-- 未登录时置顶展示深炭黑云端同步引导卡 -->
+    <!-- 未登录时置顶展示深炭黑登录引导卡 -->
     <view wx:if="{{!isLoggedIn}}" class="sync-login-card">
       <view class="sync-login-watermark"></view>
       <view class="sync-login-head">
         <text class="sync-login-eyebrow">云端同步</text>
-        <text class="sync-login-title">开启云端备份</text>
-        <text class="sync-login-desc">微信一键登录，换机不丢训练记录与 1RM 数据</text>
+        <text class="sync-login-title">登录开启完整功能</text>
+        <text class="sync-login-desc">记录身体档案、设定 1RM 目标并云端同步，换机不丢记录</text>
       </view>
       <view class="sync-login-btn" bindtap="onLogin">
         <text>微信一键登录</text>
       </view>
     </view>
     <!-- 从训练页引导填写体重时的返回提示条 -->
-    <view wx:if="{{returnTrainingSessionId}}" class="return-training-banner" bindtap="onReturnToTraining">
+    <view wx:if="{{isLoggedIn && returnTrainingSessionId}}" class="return-training-banner" bindtap="onReturnToTraining">
       <view class="return-banner-text">
         <text class="return-banner-title">填写体重后返回继续训练</text>
         <text class="return-banner-desc">输入体重会自动保存，点此直接回到刚才的训练</text>
@@ -29,8 +29,8 @@
       <text class="return-banner-btn">返回训练 ›</text>
     </view>
 
-    <!-- 身体档案卡片 -->
-    <view class="profile-card">
+    <!-- 身体档案卡片（登录后展示） -->
+    <view wx:if="{{isLoggedIn}}" class="profile-card">
       <view class="card-header">
         <text class="card-title">身体档案</text>
       </view>
@@ -74,8 +74,8 @@
       </view>
     </view>
 
-    <!-- 训练目标 -->
-    <view class="profile-card goals-card">
+    <!-- 训练目标（登录后展示） -->
+    <view wx:if="{{isLoggedIn}}" class="profile-card goals-card">
       <view class="card-header goals-header">
         <text class="card-title">训练目标</text>
         <view class="btn-add-goal" bindtap="onShowGoalModal">+ 添加</view>
@@ -122,7 +122,7 @@
         <mp-icon icon="arrow" color="#CCCCCC" size="{{12}}" />
       </view>
 
-      <view class="menu-item" bindtap="onExportData">
+      <view wx:if="{{isLoggedIn}}" class="menu-item" bindtap="onExportData">
         <view class="menu-icon-wrap">
           <mp-icon icon="download" color="#1A1A1A" size="{{22}}" />
         </view>

@@ -59,6 +59,9 @@ Page({
   },
 
   onLoad() {
+    if (typeof wx.hideHomeButton === 'function') {
+      wx.hideHomeButton();
+    }
     this.calcNavBarHeight();
     this.loadTemplates();
     

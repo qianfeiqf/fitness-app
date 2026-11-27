@@ -24,7 +24,7 @@ page {
   flex-shrink: 0;
 }
 
-.progress-bar {
+.onboarding-progress-bar {
   display: flex;
   align-items: center;
   gap: 18rpx;

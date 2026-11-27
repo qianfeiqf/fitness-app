@@ -2,7 +2,7 @@
   
   <!-- 顶部进度条（紧贴原生白色导航栏下方，不再与胶囊重叠） -->
   <view class="onboarding-header">
-    <view class="progress-bar">
+    <view class="onboarding-progress-bar">
       <view class="progress-track">
         <view class="progress-fill" style="width: {{(currentStep / 4) * 100}}%"></view>
       </view>

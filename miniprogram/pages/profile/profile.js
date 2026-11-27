@@ -34,9 +34,14 @@ Page({
       deadline: ''
     },
 
-    // 账号管理与使用小贴士半屏抽屉
+    // 账号管理与协议条款半屏抽屉
     showAccountSheet: false,
     showGuideSheet: false,
+    legalModal: {
+      visible: false,
+      title: '',
+      items: []
+    },
 
     // 统一确认/说明弹窗
     confirmModal: {
@@ -649,12 +654,30 @@ Page({
     }
   },
 
+  onCloseLegalModal() {
+    this.setData({ 'legalModal.visible': false });
+  },
+
   _showFallbackPrivacyModal() {
-    this._openConfirmModal({
-      title: '隐私保护指引',
-      content: '本小程序仅在您主动使用时收集训练计划、训练记录及身高体重等身体档案，用于提供跟练记录、1RM估算与云端同步服务；保存战报图片或导出数据时仅在您确认后访问相册或剪贴板。您可随时在「我的」页面导出数据或注销账号。',
-      showCancel: false,
-      confirmText: '我知道了'
+    this.setData({
+      legalModal: {
+        visible: true,
+        title: '隐私保护指引',
+        items: [
+          {
+            title: '1. 信息收集范围',
+            body: '仅在您主动使用时收集训练计划、训练记录及身高体重等身体档案，用于跟练记录、1RM 估算与云端同步。'
+          },
+          {
+            title: '2. 设备权限说明',
+            body: '保存战报图片或导出数据时，仅在您主动操作并确认后访问相册或剪贴板。'
+          },
+          {
+            title: '3. 数据导出与注销',
+            body: '您可随时在「我的」页面导出完整训练数据，或通过「账号管理 → 注销账号」永久删除全部数据。'
+          }
+        ]
+      }
     });
   },
 
@@ -662,11 +685,25 @@ Page({
    * 查看用户服务协议
    */
   onOpenUserAgreement() {
-    this._openConfirmModal({
-      title: '用户服务协议',
-      content: '1. 本小程序提供的训练计划、1RM估算与重量演进建议仅作健身参考，不构成医疗或专业康复建议。\n2. 请根据自身身体状况合理安排负荷，训练前充分热身，如有不适请立即停止。\n3. 您的训练数据归您本人所有，可随时导出或通过「注销账号」永久删除。',
-      showCancel: false,
-      confirmText: '我知道了'
+    this.setData({
+      legalModal: {
+        visible: true,
+        title: '用户服务协议',
+        items: [
+          {
+            title: '1. 健身参考声明',
+            body: '本小程序提供的训练计划、1RM 估算与重量演进建议仅作健身参考，不构成医疗或专业康复建议。'
+          },
+          {
+            title: '2. 安全训练提示',
+            body: '请根据自身身体状况合理安排负荷，训练前充分热身，如有不适请立即停止。'
+          },
+          {
+            title: '3. 数据归属与删除',
+            body: '您的训练数据归您本人所有，可随时导出或通过「注销账号」永久删除。'
+          }
+        ]
+      }
     });
   },
 

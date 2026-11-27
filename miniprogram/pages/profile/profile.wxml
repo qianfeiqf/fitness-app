@@ -273,6 +273,23 @@
     </view>
   </modal-sheet>
 
+  <!-- 用户服务协议 / 隐私保护指引（左对齐分条排版） -->
+  <modal-sheet
+    visible="{{legalModal.visible}}"
+    title="{{legalModal.title}}"
+    confirmText="我知道了"
+    showCancel="{{false}}"
+    bind:confirm="onCloseLegalModal"
+    bind:close="onCloseLegalModal"
+  >
+    <view class="legal-clause-list">
+      <view wx:for="{{legalModal.items}}" wx:key="title" class="legal-clause-item">
+        <text class="legal-clause-title">{{item.title}}</text>
+        <text class="legal-clause-body">{{item.body}}</text>
+      </view>
+    </view>
+  </modal-sheet>
+
   <!-- 统一确认/说明半屏弹窗 -->
   <modal-sheet
     visible="{{confirmModal.visible}}"

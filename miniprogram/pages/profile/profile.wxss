@@ -864,3 +864,31 @@
   color: #666666;
   line-height: 1.55;
 }
+
+/* 用户服务协议 / 隐私指引 左对齐分条排版 */
+.legal-clause-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding: 4rpx 6rpx 24rpx;
+  text-align: left;
+}
+
+.legal-clause-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.legal-clause-title {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  line-height: 1.4;
+}
+
+.legal-clause-body {
+  font-size: 25rpx;
+  color: #666666;
+  line-height: 1.65;
+}

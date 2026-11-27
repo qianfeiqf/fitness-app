@@ -45,6 +45,7 @@
               <input class="input"
                      type="digit"
                      placeholder="0"
+                     placeholder-style="color: #C0C4CC; font-weight: 400;"
                      value="{{weight}}"
                      bindinput="onUpdateWeight"
                      bindblur="onProfileInputBlur" />
@@ -62,6 +63,7 @@
               <input class="input"
                      type="digit"
                      placeholder="0"
+                     placeholder-style="color: #C0C4CC; font-weight: 400;"
                      value="{{height}}"
                      bindinput="onUpdateHeight"
                      bindblur="onProfileInputBlur" />

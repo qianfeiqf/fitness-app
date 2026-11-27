@@ -10,10 +10,10 @@ Page({
     userInfo: null,
     isLoggedIn: false,
 
-    // 身体档案
+    // 身体档案（未填写时绑定空字符串，显示浅灰占位符 0）
     profile: null,
-    weight: 0,
-    height: 0,
+    weight: '',
+    height: '',
 
     // 导出状态
     exporting: false,
@@ -173,9 +173,11 @@ Page({
     if (profile) {
       this.setData({
         profile,
-        weight: profile.weight || 0,
-        height: profile.height || 0
+        weight: Number(profile.weight) > 0 ? String(profile.weight) : '',
+        height: Number(profile.height) > 0 ? String(profile.height) : ''
       });
+    } else {
+      this.setData({ profile: null, weight: '', height: '' });
     }
 
     this.loadGoals();
@@ -426,29 +428,38 @@ Page({
   },
 
   /**
-   * 更新体重
+   * 更新体重（输入过程中保留原始字符串，支持删空和输入小数点）
    */
   onUpdateWeight(e) {
-    const weight = parseFloat(e.detail.value) || 0;
-    this.setData({ weight });
+    const raw = e.detail.value || '';
+    const num = parseFloat(raw);
+    this.setData({ weight: raw });
     this._profileDirty = true;
-    this.saveProfile({ weight });
+    this.saveProfile({ weight: !Number.isNaN(num) && num > 0 ? num : 0 });
   },
 
   /**
-   * 更新身高
+   * 更新身高（输入过程中保留原始字符串，支持删空和输入小数点）
    */
   onUpdateHeight(e) {
-    const height = parseFloat(e.detail.value) || 0;
-    this.setData({ height });
+    const raw = e.detail.value || '';
+    const num = parseFloat(raw);
+    this.setData({ height: raw });
     this._profileDirty = true;
-    this.saveProfile({ height });
+    this.saveProfile({ height: !Number.isNaN(num) && num > 0 ? num : 0 });
   },
 
   /**
-   * 身体档案失焦时给予轻量已保存反馈并静默同步到云端
+   * 身体档案失焦时规范化展示值、轻提示已保存并静默同步到云端
    */
   onProfileInputBlur() {
+    const wNum = parseFloat(this.data.weight);
+    const hNum = parseFloat(this.data.height);
+    const nextWeight = !Number.isNaN(wNum) && wNum > 0 ? String(wNum) : '';
+    const nextHeight = !Number.isNaN(hNum) && hNum > 0 ? String(hNum) : '';
+    if (nextWeight !== this.data.weight || nextHeight !== this.data.height) {
+      this.setData({ weight: nextWeight, height: nextHeight });
+    }
     if (this._profileDirty) {
       this._profileDirty = false;
       wx.showToast({ title: '身体档案已保存', icon: 'success', duration: 1200 });
@@ -468,6 +479,8 @@ Page({
    */
   saveProfile(data) {
     const existingProfile = findOne('profiles', {});
+    const baseWeight = parseFloat(this.data.weight) || 0;
+    const baseHeight = parseFloat(this.data.height) || 0;
 
     if (existingProfile) {
       update('profiles', existingProfile.id, {
@@ -477,8 +490,9 @@ Page({
     } else {
       const db = require('../../localdb/db.js');
       db.insert('profiles', {
-        weight: this.data.weight,
-        height: this.data.height,
+        weight: baseWeight,
+        height: baseHeight,
+        ...data,
         updated_at: Date.now()
       });
     }
@@ -769,8 +783,8 @@ Page({
             isLoggedIn: false,
             userInfo: null,
             profile: null,
-            weight: 0,
-            height: 0,
+            weight: '',
+            height: '',
             goals: [],
             returnTrainingSessionId: null
           });

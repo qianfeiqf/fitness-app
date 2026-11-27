@@ -114,7 +114,12 @@ Page({
           onFinish: () => {
             app.globalData.fullTourStage = null;
             this._redrawChartsAfterTour();
-            wx.showToast({ title: '引导完成，祝训练顺利', icon: 'none' });
+            wx.switchTab({
+              url: '/pages/home/home',
+              complete: () => {
+                wx.showToast({ title: '开始训练', icon: 'none' });
+              }
+            });
           },
           onSkip: () => {
             this._redrawChartsAfterTour();

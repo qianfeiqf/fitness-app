@@ -409,6 +409,35 @@ Page({
     return { monday, sunday };
   },
 
+  _resolveSessionDayKey(session, plan, dayGroups) {
+    if (!session || !dayGroups || dayGroups.length === 0) return null;
+    const validKeys = new Set(dayGroups.map(g => g.key));
+    if (session.plan_day_key && validKeys.has(String(session.plan_day_key))) {
+      return String(session.plan_day_key);
+    }
+    if (session.plan_day_label) {
+      const matchedByLabel = dayGroups.find(g => g.label === session.plan_day_label || g.key === session.plan_day_label);
+      if (matchedByLabel) return matchedByLabel.key;
+    }
+    const cycleType = plan.cycle_type || 'natural_week';
+    if (cycleType === 'natural_week' && session.completed_at) {
+      const d = new Date(session.completed_at).getDay();
+      const dowKey = String(d === 0 ? 7 : d);
+      if (validKeys.has(dowKey)) return dowKey;
+    }
+    const doneExIds = new Set((session.completed_sets || []).map(x => x.exercise_id));
+    if (doneExIds.size > 0) {
+      let bestKey = null;
+      let bestHit = 0;
+      dayGroups.forEach(g => {
+        const hit = g.exercises.filter(e => doneExIds.has(e.id)).length;
+        if (hit > bestHit) { bestHit = hit; bestKey = g.key; }
+      });
+      if (bestKey) return bestKey;
+    }
+    return null;
+  },
+
   _getCompletedDayKeysThisWeek(plan, dayGroups) {
     const { monday, sunday } = this._getWeekRange();
     const sessions = find('sessions', s =>
@@ -418,32 +447,57 @@ Page({
       s.completed_at <= sunday.getTime()
     ) || [];
     const completedKeys = new Set();
-    const cycleType = plan.cycle_type || 'natural_week';
     sessions.forEach(s => {
-      if (s.plan_day_key) {
-        completedKeys.add(String(s.plan_day_key));
-        return;
-      }
-      if (cycleType === 'natural_week' && s.completed_at) {
-        const d = new Date(s.completed_at).getDay();
-        const dowKey = String(d === 0 ? 7 : d);
-        if (dayGroups.some(g => g.key === dowKey)) {
-          completedKeys.add(dowKey);
-          return;
-        }
-      }
-      const doneExIds = new Set((s.completed_sets || []).map(x => x.exercise_id));
-      if (doneExIds.size > 0) {
-        let bestKey = null;
-        let bestHit = 0;
-        dayGroups.forEach(g => {
-          const hit = g.exercises.filter(e => doneExIds.has(e.id)).length;
-          if (hit > bestHit) { bestHit = hit; bestKey = g.key; }
-        });
-        if (bestKey) completedKeys.add(bestKey);
-      }
+      const key = this._resolveSessionDayKey(s, plan, dayGroups);
+      if (key) completedKeys.add(key);
     });
     return completedKeys;
+  },
+
+  /**
+   * 顺序轮换模式进度计算：按最近完成记录自动推进，整轮练完自动开启新一轮，本周按实际完成次数统计
+   */
+  _getCycleProgress(plan, dayGroups) {
+    const { monday, sunday } = this._getWeekRange();
+    const allCompleted = (find('sessions', s =>
+      s.status === 'completed' &&
+      s.plan_id === plan.id
+    ) || []).sort((a, b) => (a.completed_at || a.created_at || 0) - (b.completed_at || b.created_at || 0));
+
+    const weeklySessionCount = allCompleted.filter(s =>
+      s.completed_at >= monday.getTime() && s.completed_at <= sunday.getTime()
+    ).length;
+
+    if (dayGroups.length === 0) {
+      return { nextKey: '', roundCompletedKeys: new Set(), weeklySessionCount };
+    }
+
+    const roundSet = new Set();
+    let lastKey = null;
+    allCompleted.forEach(s => {
+      const key = this._resolveSessionDayKey(s, plan, dayGroups);
+      if (!key) return;
+      lastKey = key;
+      roundSet.add(key);
+      if (roundSet.size >= dayGroups.length) {
+        roundSet.clear();
+      }
+    });
+
+    let nextKey = dayGroups[0].key;
+    if (lastKey) {
+      const lastIdx = dayGroups.findIndex(g => g.key === lastKey);
+      const candidateIdx = lastIdx >= 0 ? (lastIdx + 1) % dayGroups.length : 0;
+      const candidateKey = dayGroups[candidateIdx].key;
+      if (roundSet.size > 0 && roundSet.has(candidateKey)) {
+        const firstPending = dayGroups.find(g => !roundSet.has(g.key));
+        nextKey = firstPending ? firstPending.key : candidateKey;
+      } else {
+        nextKey = candidateKey;
+      }
+    }
+
+    return { nextKey, roundCompletedKeys: roundSet, weeklySessionCount };
   },
 
   _buildPlanData(plan) {
@@ -452,10 +506,10 @@ Page({
     const weekDayNames = ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];
     const planExercises = find('plan_exercises', { plan_id: plan.id }) || [];
     const cycleType = plan.cycle_type || 'natural_week';
-    const todayCycleLabel = cycleType !== 'natural_week' ? this.calculateCycleDay(plan, planExercises) : '';
+    const isCycleMode = cycleType !== 'natural_week';
 
     const dayGroups = [];
-    if (cycleType === 'natural_week') {
+    if (!isCycleMode) {
       const savedDows = Array.isArray(plan.selected_days) ? plan.selected_days.map(Number).filter(Boolean) : [];
       const exDows = planExercises.map(pe => Number(pe.day_of_week)).filter(Boolean);
       const dows = [...new Set([...savedDows, ...exDows])].sort((a, b) => a - b);
@@ -477,13 +531,25 @@ Page({
         dayGroups.push({
           key: String(lbl),
           label: lbl.length <= 2 ? `${lbl}日` : lbl,
-          isToday: lbl === todayCycleLabel,
+          isToday: false,
           exercises: list
         });
       });
     }
 
-    const completedKeys = this._getCompletedDayKeysThisWeek(plan, dayGroups);
+    let completedKeys;
+    let weeklySessionCount = 0;
+    if (isCycleMode) {
+      const cycleProgress = this._getCycleProgress(plan, dayGroups);
+      completedKeys = cycleProgress.roundCompletedKeys;
+      weeklySessionCount = cycleProgress.weeklySessionCount;
+      dayGroups.forEach(g => {
+        g.isToday = g.key === cycleProgress.nextKey;
+      });
+    } else {
+      completedKeys = this._getCompletedDayKeysThisWeek(plan, dayGroups);
+    }
+
     const dayOptions = dayGroups.map(g => {
       const totalSets = g.exercises.reduce((sum, e) => sum + (e.target_sets || 0), 0);
       const estimatedMinutes = g.exercises.length * 8;
@@ -528,11 +594,13 @@ Page({
     const estimatedMinutes = selectedDay ? selectedDay.estimatedMinutes : 0;
     const muscleGroups = selectedDay ? selectedDay.muscleGroups : '';
     const plannedDays = Math.max(dayOptions.length, 1);
-    const completedDays = Math.min(completedKeys.size, plannedDays);
+    const completedDays = isCycleMode ? weeklySessionCount : completedKeys.size;
+    const ringTarget = isCycleMode ? Math.max(dayOptions.length, 3) : plannedDays;
     const weekProgress = {
+      isCycle: isCycleMode,
       plannedDays: dayOptions.length || 3,
-      completedDays: completedKeys.size,
-      percent: dayOptions.length > 0 ? Math.min(Math.round((completedDays / plannedDays) * 100), 100) : 0
+      completedDays,
+      percent: ringTarget > 0 ? Math.min(Math.round((completedDays / ringTarget) * 100), 100) : 0
     };
 
     return {
@@ -883,6 +951,9 @@ Page({
       return;
     }
 
+    if (this._selectedDayByPlan && planData.plan) {
+      delete this._selectedDayByPlan[planData.plan.id];
+    }
     const session = this._createSessionForPlan(planData);
     this.setData({ currentSession: session, isTraining: true });
     wx.navigateTo({

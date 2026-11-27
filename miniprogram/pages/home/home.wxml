@@ -159,7 +159,7 @@
                   <view class="progress-ring-fill" style="background: conic-gradient(#07C160 {{pd.weekProgress.percent * 3.6}}deg, rgba(255, 255, 255, 0.14) 0deg);"></view>
                   <view class="progress-ring-center">
                     <text class="progress-ring-num">{{pd.weekProgress.completedDays}}</text>
-                    <text class="progress-ring-total">/{{pd.weekProgress.plannedDays}}</text>
+                    <text class="progress-ring-total">{{pd.weekProgress.isCycle ? '次' : ('/' + pd.weekProgress.plannedDays)}}</text>
                   </view>
                 </view>
                 <text class="hero-ring-label">本周</text>

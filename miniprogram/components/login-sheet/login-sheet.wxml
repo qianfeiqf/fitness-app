@@ -1,19 +1,28 @@
-<!-- 公共按需登录居中卡片弹窗（深炭黑品牌风格） -->
+<!-- 公共按需登录半屏弹窗（微信原生白底半屏风格） -->
 <root-portal wx:if="{{visible}}">
   <view class="login-sheet-overlay" bindtap="onClose" catchtouchmove="noop">
     <view class="login-sheet-card" catchtap="noop">
-      <view class="login-sheet-badge">
-        <view class="login-sheet-badge-icon"></view>
+      <view class="login-sheet-header">
+        <view class="login-sheet-brand">
+          <view class="login-sheet-brand-icon"></view>
+          <text class="login-sheet-brand-name">训练记一记</text>
+        </view>
+        <view class="login-sheet-close" bindtap="onClose">
+          <view class="login-sheet-close-icon"></view>
+        </view>
       </view>
-      <text class="login-sheet-title">{{title}}</text>
-      <text class="login-sheet-desc">{{desc}}</text>
+
+      <view class="login-sheet-body">
+        <text class="login-sheet-title">{{title}}</text>
+        <text class="login-sheet-desc">{{desc}}</text>
+      </view>
 
       <view class="login-sheet-actions">
+        <view class="login-sheet-btn secondary" bindtap="onClose">
+          <text>暂不登录</text>
+        </view>
         <view class="login-sheet-btn primary {{submitting ? 'loading' : ''}}" bindtap="onConfirmLogin">
           <text>{{submitting ? '登录中...' : '微信一键登录'}}</text>
-        </view>
-        <view class="login-sheet-skip" bindtap="onClose">
-          <text>暂不登录</text>
         </view>
       </view>
     </view>

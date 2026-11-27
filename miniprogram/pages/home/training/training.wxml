@@ -313,7 +313,7 @@
   </view>
 
   <!-- 底部操作栏（统一圆润线性 SVG 图标 + 像素居中对齐） -->
-  <view class="bottom-bar">
+  <view wx:if="{{!freeAllDone}}" class="bottom-bar">
     <view class="bottom-btn" bindtap="{{isPaused ? 'onResumeTraining' : 'onPauseTraining'}}">
       <view class="bottom-svg-icon {{isPaused ? 'icon-play' : 'icon-pause'}}"></view>
       <text class="bottom-label">{{isPaused ? '继续' : '暂停'}}</text>
